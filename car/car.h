@@ -17,3 +17,8 @@ void initCar(struct car** player){
 	(*player)->tail = malloc(sizeof(struct coords));
 	return;
 }
+void printCar(struct car* player){
+	printf("playerId: %d\nhx: %d\nhy: %d\nmx: %d\nmy: %d\ntx: %d\nty: %d\nangle: %d\n", 
+	player->playerId, player->head->x, player->head->y, player->mid->x, player->mid->y,
+	player->tail->x, player->tail->y, player->angle);
+}
