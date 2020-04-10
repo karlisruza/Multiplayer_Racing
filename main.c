@@ -3,27 +3,28 @@
 #include <ncurses.h>
 #include <stdbool.h>
 #include <math.h>
+#include "car/car.h"
 
-const int height = 50; //y axis
-const int width = 200; //x axis
+const int height = 40; //y axis
+const int width = 150; //x axis
 
-struct coords{
-	int x;
-	int y;
-};
-struct car{
-	int playerId;
-	struct coords* head;
-	struct coords* mid;
-	struct coords* tail;
-	int angle;
-};
-void initCar(struct car** player){
-	(*player)->head = malloc(sizeof(struct coords));
-	(*player)->mid = malloc(sizeof(struct coords));
-	(*player)->tail = malloc(sizeof(struct coords));
-	return;
-}
+// struct coords{
+// 	int x;
+// 	int y;
+// };
+// struct car{
+// 	int playerId;
+// 	struct coords* head;
+// 	struct coords* mid;
+// 	struct coords* tail;
+// 	int angle;
+// };
+// void initCar(struct car** player){
+// 	(*player)->head = malloc(sizeof(struct coords));
+// 	(*player)->mid = malloc(sizeof(struct coords));
+// 	(*player)->tail = malloc(sizeof(struct coords));
+// 	return;
+// }
 void moveCar(struct car** player, WINDOW* win, bool forward){
 	int hx = (*player)->head->x;
 	int hy = (*player)->head->y;
@@ -298,12 +299,12 @@ int main(void){
 	struct car* player1 = malloc(sizeof(struct car));
 	initCar(&player1);
 	player1->angle=0;
-	player1->head->x = 100;
-	player1->head->y = 43;
-	player1->mid->x = 99;
-	player1->mid->y = 43;
-	player1->tail->x = 98;
-	player1->tail->y = 43;
+	player1->head->x = 75;
+	player1->head->y = 31;
+	player1->mid->x = 74;
+	player1->mid->y = 31;
+	player1->tail->x = 73;
+	player1->tail->y = 31;
 
 	drawCar(win, &player1);
 	wrefresh(win);
