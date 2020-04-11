@@ -97,7 +97,6 @@ int main(int argc, char* argv[]){
     //connect to server address
     connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(struct sockaddr));
     char* data = "Hello, mr server! \n";
-    // sendData(clientSocket, data, , &serverAddr);
     sendto(clientSocket, buffer, sizeof(char)*256, 0, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
 
 }

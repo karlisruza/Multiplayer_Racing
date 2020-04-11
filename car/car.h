@@ -1,5 +1,7 @@
 #include <stdlib.h>
 
+#ifndef _CAR_HEADER
+#define _CAR_HEADER
 struct coords{
 	int x;
 	int y;
@@ -22,3 +24,4 @@ void printCar(struct car* player){
 	player->playerId, player->head->x, player->head->y, player->mid->x, player->mid->y,
 	player->tail->x, player->tail->y, player->angle);
 }
+#endif
