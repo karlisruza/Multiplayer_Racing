@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdbool.h>
 
 #ifndef _CAR_HEADER
 #define _CAR_HEADER
@@ -12,6 +13,8 @@ struct car{
 	struct coords* mid;
 	struct coords* tail;
 	int angle;
+	int laps;
+	bool midMark;
 };
 void initCar(struct car** player){
 	(*player)->head = malloc(sizeof(struct coords));
