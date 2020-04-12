@@ -60,6 +60,7 @@ int main(void){
 		//creates the track
     //attron(COLOR_PAIR(2));
 		drawMap(win);
+		drawFinishLine(win);
 		wrefresh(win);
 	//attroff(COLOR_PAIR(2));
 
@@ -379,8 +380,6 @@ void drawMap(WINDOW * win){
 			}
 		}
 	}
-
-	drawFinishLine(win);
 
 	return;
 }
