@@ -25,11 +25,8 @@ void keyPress(struct car** player, WINDOW* win);
 	//Places symbols after each completion of the moveCar function and rotateCar functions
 void drawCar(WINDOW* win, struct car** player);
 
-	//	 a map with x's before spawning the car
+	//Creates the race track
 void drawMap(WINDOW * win);
-
-	//Updates the location of the car in the Terminal
-void printCoords(struct car** player, WINDOW* win);
 
 	//draws finish line and renews it when cars pass.
 void drawFinishLine (WINDOW * win);
@@ -37,14 +34,23 @@ void drawFinishLine (WINDOW * win);
 	//outputs stats such as player color, lap count, etc. 
 void outputPlayerStats (struct car** player, WINDOW* win);
 
+	//waits for player to resize the window if it is too small for the game. 
+void winSizeCheck (WINDOW* win);
+
 
 int main(void){
-		//necessary to transform terminal into a map
 	initscr();
 	noecho();
+	
 
-		//creates a rectangular border for the map.
-	WINDOW * win = newwin(height+10, width, 0, 0);
+
+
+    	//10 height lines added for outputting the interface. 
+	WINDOW * win = newwin(height + 10, width, 0, 0);
+
+	winSizeCheck(win);
+
+		//creates a rectangular border for the map.	
 	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
 	refresh();
 
@@ -54,15 +60,16 @@ int main(void){
         exit(1);
     }
 
-	//start_color();
-    ///init_pair(2, COLOR_GREEN, COLOR_BLUE);
+    start_color();
+	init_pair(2, COLOR_MAGENTA, COLOR_BLUE);
+	wrefresh(win);
 
 		//creates the track
-    //attron(COLOR_PAIR(2));
-		drawMap(win);
-		drawFinishLine(win);
-		wrefresh(win);
-	//attroff(COLOR_PAIR(2));
+	wattron(win, A_DIM);
+	drawMap(win);
+	drawFinishLine(win);
+	wattroff(win, A_DIM);
+	wrefresh(win);
 
 
 		//creates the car object.
@@ -85,13 +92,17 @@ int main(void){
 	refresh();
 
 		//if a key is pressed, calls functions that move the car and read the pressed buttons.
-	while(true){
+	while(player1->laps < 1){
+		wattron(win, A_BOLD);
 		keyPress(&player1, win);
 		drawCar(win, &player1);
-		wrefresh(win);
-		refresh();
-		drawFinishLine(win);
+		wattroff(win, A_BOLD);
+
 		outputPlayerStats(&player1, win);
+		wrefresh(win);
+
+		drawFinishLine(win);
+
 	}
 
 	endwin();
@@ -196,7 +207,7 @@ void moveCar(struct car** player, WINDOW* win, bool forward){
 
 		//if w is pressed, check is the block behind is an obstacle. Move backward, if safe.
 	else{
-		if(mvwinch(win, hy, hx) == ' ' || mvwinch(win, hy, hx) == '|'){
+		if(mvwinch(win, ty, tx) == ' ' || mvwinch(win, ty, tx) == '|'){
 			mvwprintw(win, (*player)->head->y, (*player)->head->x, " ");
 			(*player)->head->x = (*player)->mid->x;
 			(*player)->head->y = (*player)->mid->y;
@@ -290,7 +301,7 @@ void rotateCar(struct car** player, WINDOW* win, bool clockwise){
 
 	//checks whether movement is blocked or not, if not, changes car coordinates
 	if(mvwinch(win, hy, hx) == ' ' || mvwinch(win, hy, hx) == '|'){
-		if(mvwinch(win, ty, tx) == ' '){
+		if(mvwinch(win, ty, tx) == ' ' || mvwinch(win, ty, tx) == '|'){
 			mvwprintw(win, (*player)->head->y, (*player)->head->x, " ");
 			mvwprintw(win, (*player)->tail->y, (*player)->tail->x, " ");
 			(*player)->head->y = hy;
@@ -355,8 +366,10 @@ void drawMap(WINDOW * win){
 	double realx, realy;
 
 	for (int i = 1; i < width-1; i++){
-		mvwprintw(win, 1, i, "x");
-		mvwprintw(win, height-1, i, "x");
+		//mvwprintw(win, 1, i, "x");
+		//mvwprintw(win, height-1, i, "x");
+		mvwhline(win, 1, i, 'x', 1);
+		mvwhline(win, height-1, i, 'x', 1);
 	}
 
 	for(int y = 2; y < height-1;y++){
@@ -384,26 +397,56 @@ void drawMap(WINDOW * win){
 	return;
 }
 
-void printCoords(struct car** player, WINDOW* win){
-	mvwprintw(win, 6, 6, "head x: %d, head y: %d\n mid x: %d, mid y: %d\n tail x: %d tail y: %d\n",
-		(*player)->head->x, (*player)->head->y, (*player)->mid->x, (*player)->mid->y, (*player)->tail->x, (*player)->tail->y
-	);
-	return;
-}
-
 void drawFinishLine (WINDOW * win){
 			// draws finish line back - should move to the drawcar function so that it doesn't glitch
 			//(this version might fail if there is a thread where the other car passes the finish line)
+		wattron(win, A_DIM);
 		for (int i = height-10; i < height-1; i++){
 				//should check if car is on the line with an if and the coordinates of the car or any car symbols
 			mvwprintw (win, i, 74, "|");
 		}
+		wattroff(win, A_DIM);
 
 		return;
 }
 
 void outputPlayerStats (struct car** player, WINDOW* win){
+
 	mvwprintw(win, height + 2, 10, 
 		"Lap count: %d; middle crossed? - %i", (*player)->laps, (*player)->midMark);
+
+	mvwprintw(win, height + 4, 10, 
+		"maxx(win): %d; maxy(win): %d. width: %d; height: %d", getmaxx(win),getmaxy(win), width, height);
+	
+	return;
+
+}
+
+void winSizeCheck (WINDOW* win){
+	while (getmaxx(win) < width || getmaxy(win) < height+10){
+	
+		mvwprintw(win, 1, 3,
+			"You need to increase the window size.\nTry decreasing character size (ctrl + [-])\nor increasing the terminal window size.");
+
+		if (getmaxx(win) < width){
+			mvwprintw(win, 4, 3, 
+				"Window width should increase to %d. Increase it by %d.", width, width - getmaxx(win));
+		}
+		
+		if (getmaxy(win) < height+10){
+			mvwprintw(win, 5, 3, 
+				"Window height should increase to %d. Increase it by %d.", height, height - getmaxy(win));
+		}
+
+		mvwprintw(win, 7, 1, 
+			"Press any key to check again.");
+
+
+		refresh();
+		wrefresh(win);
+
+		getch();
+	}
+
 	return;
 }
