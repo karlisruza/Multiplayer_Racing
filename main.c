@@ -54,9 +54,15 @@ int main(void){
 	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
 	refresh();
 
-	if (has_colors() == FALSE) {
+	if (!has_colors()) {
         endwin();
         printf("Your terminal does not support color\n");
+        exit(1);
+    }
+
+    if (!start_color()) {
+        endwin();
+        printf("Did not properly initialize colors\n");
         exit(1);
     }
 
