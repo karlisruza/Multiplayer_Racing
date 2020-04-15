@@ -5,10 +5,12 @@
 #include <math.h>
 #include "car/car.h"
 
-//TODO - create a fuction that forbids the player from playing if the window is too small. The player would have to resize it, and the 
-	//other player recieves a pause screen of some sorts.
-		//use getmaxyx() for that.
+//TODO - have a press anykey to continue for the screen size thing. 
 	//
+
+#define MAP_COLOR     		COLOR_PAIR(1)
+#define PLAYER_ONE_COLOR    COLOR_PAIR(2)
+#define PLAYER_TWO_COLOR    COLOR_PAIR(3)
 
 const int height = 40; //height of the map
 const int width = 150; //width of the map
@@ -37,13 +39,18 @@ void outputPlayerStats (struct car** player, WINDOW* win);
 	//waits for player to resize the window if it is too small for the game. 
 void winSizeCheck (WINDOW* win);
 
+	//since fields due to colour in curses are not simply chars anymore,
+		//this function checks if the selected coordinates contain a ' ' or '|'
+bool checkMove(WINDOW* win, int y, int x);
+
+	//Once the game is over, output this.
+void endScreen (WINDOW* win, struct car** player);
+
 
 int main(void){
 	initscr();
 	noecho();
 	
-
-
 
     	//10 height lines added for outputting the interface. 
 	WINDOW * win = newwin(height + 10, width, 0, 0);
@@ -51,6 +58,8 @@ int main(void){
 	winSizeCheck(win);
 
 		//creates a rectangular border for the map.	
+	noecho();
+
 	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
 	refresh();
 
@@ -60,21 +69,26 @@ int main(void){
         exit(1);
     }
 
-    if (!start_color()) {
+    if (start_color() != OK) {
         endwin();
         printf("Did not properly initialize colors\n");
         exit(1);
     }
 
     start_color();
-	init_pair(2, COLOR_MAGENTA, COLOR_BLUE);
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+	init_pair(2, COLOR_BLUE, COLOR_BLACK);
+	init_pair(3, COLOR_RED, COLOR_BLACK);
+
+		//sets default colour scheme for the window to be white text with
+			//a black background 
+	bkgd(MAP_COLOR);
 	wrefresh(win);
+	refresh();
 
 		//creates the track
-	wattron(win, A_DIM);
 	drawMap(win);
 	drawFinishLine(win);
-	wattroff(win, A_DIM);
 	wrefresh(win);
 
 
@@ -99,17 +113,16 @@ int main(void){
 
 		//if a key is pressed, calls functions that move the car and read the pressed buttons.
 	while(player1->laps < 1){
-		wattron(win, A_BOLD);
 		keyPress(&player1, win);
 		drawCar(win, &player1);
-		wattroff(win, A_BOLD);
 
 		outputPlayerStats(&player1, win);
 		wrefresh(win);
-
+		
 		drawFinishLine(win);
-
 	}
+
+	endScreen(win, &player1);
 
 	endwin();
 	return 0;
@@ -198,9 +211,10 @@ void moveCar(struct car** player, WINDOW* win, bool forward){
    			break;
 	}
 
+
 		//if w is pressed, check is the block in front is an obstacle. Move forward, if safe
 	if(forward){
-		if(mvwinch(win, hy, hx) == ' ' || mvwinch(win, hy, hx) == '|'){
+		if(checkMove(win, hy, hx)){
 			mvwprintw(win, (*player)->tail->y, (*player)->tail->x, " ");
 			(*player)->tail->x = (*player)->mid->x;
 			(*player)->tail->y = (*player)->mid->y;
@@ -211,9 +225,9 @@ void moveCar(struct car** player, WINDOW* win, bool forward){
 		}
 	}
 
-		//if w is pressed, check is the block behind is an obstacle. Move backward, if safe.
+		//if s is pressed, check is the block behind is an obstacle. Move backward, if safe.
 	else{
-		if(mvwinch(win, ty, tx) == ' ' || mvwinch(win, ty, tx) == '|'){
+		if(checkMove(win, ty, tx)){
 			mvwprintw(win, (*player)->head->y, (*player)->head->x, " ");
 			(*player)->head->x = (*player)->mid->x;
 			(*player)->head->y = (*player)->mid->y;
@@ -239,9 +253,8 @@ void moveCar(struct car** player, WINDOW* win, bool forward){
 }
 
 void rotateCar(struct car** player, WINDOW* win, bool clockwise){
-		
 		//checks if D is pressed on the keyboard. If true, rotates the car clockwise. 
-		//Else, it is considered A was pressed, and will turn counter-clockwise.
+		//otherwise, it is considered A was pressed, and will turn counter-clockwise.
 	if(clockwise){
 		(*player)->angle +=1;
 		if((*player)->angle == 8){
@@ -306,16 +319,15 @@ void rotateCar(struct car** player, WINDOW* win, bool clockwise){
 	}
 
 	//checks whether movement is blocked or not, if not, changes car coordinates
-	if(mvwinch(win, hy, hx) == ' ' || mvwinch(win, hy, hx) == '|'){
-		if(mvwinch(win, ty, tx) == ' ' || mvwinch(win, ty, tx) == '|'){
-			mvwprintw(win, (*player)->head->y, (*player)->head->x, " ");
-			mvwprintw(win, (*player)->tail->y, (*player)->tail->x, " ");
-			(*player)->head->y = hy;
-			(*player)->head->x = hx;
-			(*player)->tail->y = ty;
-			(*player)->tail->x = tx;
-			return;
-		}
+
+	if(checkMove(win, hy, hx) && checkMove(win, ty, tx)){
+		mvwprintw(win, (*player)->head->y, (*player)->head->x, " ");
+		mvwprintw(win, (*player)->tail->y, (*player)->tail->x, " ");
+		(*player)->head->y = hy;
+		(*player)->head->x = hx;
+		(*player)->tail->y = ty;
+		(*player)->tail->x = tx;
+		return;
 	}
 
 	//if previous if fails, changes angle back to previous, because rotation was not possible
@@ -358,9 +370,18 @@ void keyPress(struct car** player, WINDOW* win){
 
 
 void drawCar(WINDOW* win, struct car** player){
+
+		//wattron intiates the ability to use ncurses formatting properties
+			//in this case, the car is outlined and coloured according 
+			//to the player.
+	wattron(win, A_BOLD);
+	wattron(win, PLAYER_ONE_COLOR);
 		mvwprintw(win, (*player)->head->y, (*player)->head->x, "0");
 		mvwprintw(win, (*player)->mid->y, (*player)->mid->x, "=");
 		mvwprintw(win, (*player)->tail->y, (*player)->tail->x, "=");
+	wattroff(win, PLAYER_ONE_COLOR);
+	wattroff(win, A_BOLD);
+
 }
 	//1 = 0*; 2 = 45*; 3 = 90*; 4 = 135*; 5 = 180*; 6 = 225*; 7 = 270*; 8 = 315*
 	// ==0		  0			0	    0		0==		     =		    =        =		
@@ -371,9 +392,9 @@ void drawCar(WINDOW* win, struct car** player){
 void drawMap(WINDOW * win){
 	double realx, realy;
 
+	wattron(win, A_DIM);
+
 	for (int i = 1; i < width-1; i++){
-		//mvwprintw(win, 1, i, "x");
-		//mvwprintw(win, height-1, i, "x");
 		mvwhline(win, 1, i, 'x', 1);
 		mvwhline(win, height-1, i, 'x', 1);
 	}
@@ -400,6 +421,8 @@ void drawMap(WINDOW * win){
 		}
 	}
 
+	wattroff(win, A_DIM);
+
 	return;
 }
 
@@ -419,40 +442,97 @@ void drawFinishLine (WINDOW * win){
 void outputPlayerStats (struct car** player, WINDOW* win){
 
 	mvwprintw(win, height + 2, 10, 
-		"Lap count: %d; middle crossed? - %i", (*player)->laps, (*player)->midMark);
-
-	mvwprintw(win, height + 4, 10, 
-		"maxx(win): %d; maxy(win): %d. width: %d; height: %d", getmaxx(win),getmaxy(win), width, height);
+		"Lap count: %d", (*player)->laps);
 	
 	return;
 
 }
 
 void winSizeCheck (WINDOW* win){
-	while (getmaxx(win) < width || getmaxy(win) < height+10){
+	while (COLS < width || LINES < height+10){
 	
 		mvwprintw(win, 1, 3,
 			"You need to increase the window size.\nTry decreasing character size (ctrl + [-])\nor increasing the terminal window size.");
 
-		if (getmaxx(win) < width){
+		if (COLS < width){
 			mvwprintw(win, 4, 3, 
-				"Window width should increase to %d. Increase it by %d.", width, width - getmaxx(win));
+				"Window width should increase to %d. Increase it by %d.", width, width - COLS);
+		}
+		else {
+			move(4, 3);
+			clrtoeol();
 		}
 		
-		if (getmaxy(win) < height+10){
+		if (LINES < height+10){
 			mvwprintw(win, 5, 3, 
-				"Window height should increase to %d. Increase it by %d.", height, height - getmaxy(win));
+				"Window height should increase to %d. Increase it by %d.", height, height - LINES+10);
 		}
-
+		else {
+			move(5, 3);
+			clrtoeol();
+		}
+		
 		mvwprintw(win, 7, 1, 
 			"Press any key to check again.");
-
 
 		refresh();
 		wrefresh(win);
 
-		getch();
+		getchar();
+
 	}
 
+	werase(win);
+
 	return;
+}
+
+	//A_CHARTEXT lets you parse the character 
+		//all while ignoring colours
+		//This is also frequently used, so for humans it's 
+		//easier to parse this way. 
+bool checkMove(WINDOW * win, int y, int x){
+
+	if (((mvinch(y, x) & A_CHARTEXT) == ' ') || 
+		((mvinch(y, x) & A_CHARTEXT) == '|')){
+			return true;
+	}
+	else{
+		return false;
+	}
+}
+
+void endScreen(WINDOW* win, struct car** player){
+	werase(win);
+
+	wattron (win, A_BOLD);
+	mvwprintw(win, 20, 3, 
+		"The winner of this game is");
+
+	//checks whose lap count is higher. If it's the thread's, the it 
+		// is declared the winner. 
+	
+	// if player one
+	wattron(win, PLAYER_ONE_COLOR);
+	mvwprintw(win, 24, 4, 
+		"the blue player! ==0");
+	wattroff(win, PLAYER_ONE_COLOR);
+	// if player two
+	wattroff (win, A_BOLD);	
+
+	wattron(win, A_DIM);
+		mvwprintw(win, 27, 7, 
+		"Press enter to exit the game.");
+	wattroff(win, A_DIM);
+
+	wrefresh(win);
+
+
+	char enter = 0;
+	while (enter != '\r' && enter != '\n') {
+	 	enter = getchar(); 
+	 }
+
+	return;
+
 }
