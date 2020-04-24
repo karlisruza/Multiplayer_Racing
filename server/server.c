@@ -10,12 +10,14 @@
 #include <pthread.h>
 #include "../car/car.h"
 #include "../car/player.h"
+#include "../protocol/message.h"
 
-#define PORT 8080
+#define PORT 8081
 #define _MAX_LISTEN_QUE 10
 
 struct threadParam{
     int clientFd;
+    int serverFd;
     struct playerList* list;
 };
 
@@ -77,20 +79,44 @@ void parseBuffer(char** buffer, struct car** player){
 }
 
 void *clientThread(void* param){
-    char* buffer = malloc(sizeof(char)* 256);
-    struct car* player = malloc(sizeof(struct car));
-    initCar(&player);
+    msg_t message;
+    message.type = PONG;
+    message.payload[0] = 'P';
+    message.payload[1] = 'O';
+    message.payload[2] = 'N';
+    message.payload[3] = 'G';
 
-    while(true){        
-        int retLen = recv(((struct threadParam*)param)->clientFd, buffer, sizeof(char)*256, 0);
-        if(retLen > 0){
-                parseBuffer(&buffer, &player);
-                printCar(player);
+
+    while(true){
+        void* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
+
+        int length = (sizeof(msg_t)) + MAX_PAYLOAD_SIZE;
+
+        int retLen = recv(((struct threadParam*)param)->clientFd, buffer, length, 0);
+        if(retLen < 0){
+            printf("fail \n");
         }
-        else{
-            perror("No data received");
-        }  
-    }  
+        msg_t* msgr = (msg_t*)buffer;
+        handleData(msgr, ((struct threadParam*)param)->clientFd);
+
+        printf("Enum %d\n", msgr->type);
+        printf("Enum %s\n", msgr->payload);
+
+        length = ((void*)&message.payload - (void*)&message.type) + 4;
+
+        sendData(((struct threadParam*)param)->clientFd, (void*)&message, length, NULL);
+        free(buffer);
+    }
+
+
+    // while(true){        
+    //     if(retLen > 0){
+    //             parseBuffer(&buffer, &player);
+    //             printCar(player);
+    //     }
+    //     printf("thread alive\n");
+    //     send(((struct threadParam*)param)->clientFd, data, sizeof(char)*256, 0);
+    // }  
 }
 
 int main(void){
@@ -133,6 +159,7 @@ int main(void){
             //so that the list is passed and thread knows its fd
             struct threadParam* params = malloc(sizeof(struct threadParam));
             params->clientFd = clientFd;
+            params->serverFd = serverSocket;
             params->list = players;
 
             pushPlayer(&players, clientFd);
