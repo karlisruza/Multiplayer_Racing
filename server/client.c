@@ -8,7 +8,43 @@
 #include <string.h> 
 #include "../car/car.h"
 #include "../protocol/message.h"
+#include "../protocol/payload.h"
+#include <ncurses.h>
 
+void keyPress(int playerid, int gameid, int fd){
+	int key = getch();
+    msg_t message;
+    message.type = UP;
+
+    up_pt data;
+    data.playerID = playerid;
+    data.gameID = gameid;
+
+    action_t keypress; //(0, 1) UP (0, -1) Down (1, 0) Right (-1, 0) Left
+	switch (key)
+	{
+	    case 'w':
+            keypress.x = 0;
+            keypress.y = 1;
+	     	break;
+	    case 's':
+            keypress.x = 0;
+            keypress.y = -1;
+	    	break;
+	    case 'a':
+            keypress.x = -1;
+            keypress.y = 0;
+	     	break;
+	    case 'd':
+            keypress.x = 1;
+            keypress.y = 0;
+	     	break;
+	}
+    data.action = keypress;
+    memcpy((void*)&message.payload, (void*)&data, sizeof(data));
+    int length = ((void*)&message.payload - (void*)&message.type) + sizeof(data);
+    sendData(fd, (void*)&message, length, NULL);
+}
 
 int main(int argc, char* argv[]){
     char* ptr;
@@ -44,7 +80,9 @@ int main(int argc, char* argv[]){
     //connect to server address
     connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(struct sockaddr));
 
-   
+    player_t player;
+    player.ID = 1;
+    
 
     msg_t message;
     message.type = PING;
@@ -52,15 +90,16 @@ int main(int argc, char* argv[]){
     int length = ((void*)&message.payload - (void*)&message.type);
     msg_t* msgr;
     int i = 0;
-    while(i < 10){
-        void* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
-        send(clientSocket, (void*)&message, length, 0);
-        recv(clientSocket, buffer, sizeof(msg_t), 0);
-        msgr = (msg_t*)buffer;
-        printf("b4 handle %d \n", msgr->type);
-        handleData(msgr, clientSocket);
+    while(true){
+        keyPress(player.ID, player.gameID, clientSocket);
+        // void* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
+        // send(clientSocket, (void*)&message, length, 0);
+        // recv(clientSocket, buffer, sizeof(msg_t), 0);
+        // msgr = (msg_t*)buffer;
+        // printf("b4 handle %d \n", msgr->type);
+        // handleData(msgr, clientSocket);
 
-        free(buffer);
-        i++;
+        // free(buffer);
+        // i++;
     }
 }

@@ -86,8 +86,7 @@ void *clientThread(void* param){
     message.payload[2] = 'N';
     message.payload[3] = 'G';
 
-
-    while(true){
+    // while(true){
         void* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
 
         int length = (sizeof(msg_t)) + MAX_PAYLOAD_SIZE;
@@ -99,14 +98,14 @@ void *clientThread(void* param){
         msg_t* msgr = (msg_t*)buffer;
         handleData(msgr, ((struct threadParam*)param)->clientFd);
 
-        printf("Enum %d\n", msgr->type);
-        printf("Enum %s\n", msgr->payload);
+        // printf("Enum %d\n", msgr->type);
+        // printf("Enum %s\n", msgr->payload);
 
-        length = ((void*)&message.payload - (void*)&message.type) + 4;
+        // length = ((void*)&message.payload - (void*)&message.type) + 4;
 
-        sendData(((struct threadParam*)param)->clientFd, (void*)&message, length, NULL);
-        free(buffer);
-    }
+        // sendData(((struct threadParam*)param)->clientFd, (void*)&message, length, NULL);
+        // free(buffer);
+    // }
 
 
     // while(true){        
