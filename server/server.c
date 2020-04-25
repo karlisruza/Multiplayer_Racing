@@ -10,9 +10,16 @@
 #include <pthread.h>
 #include "../car/car.h"
 #include "../car/player.h"
+#include "../protocol/message.h"
 
-#define PORT 8080
+#define PORT 8081
 #define _MAX_LISTEN_QUE 10
+
+struct threadParam{
+    int clientFd;
+    int serverFd;
+    struct playerList* list;
+};
 
 //this functions takes buffer of type char and converts string int/int/int/int/int/int/int/ to seperate ints
 //and places data into struct car passed
@@ -71,14 +78,47 @@ void parseBuffer(char** buffer, struct car** player){
         }
 }
 
-void clientThread(){
-    return;
+void *clientThread(void* param){
+    msg_t message;
+    message.type = PONG;
+    message.payload[0] = 'P';
+    message.payload[1] = 'O';
+    message.payload[2] = 'N';
+    message.payload[3] = 'G';
+
+    // while(true){
+        void* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
+
+        int length = (sizeof(msg_t)) + MAX_PAYLOAD_SIZE;
+
+        int retLen = recv(((struct threadParam*)param)->clientFd, buffer, length, 0);
+        if(retLen < 0){
+            printf("fail \n");
+        }
+        msg_t* msgr = (msg_t*)buffer;
+        handleData(msgr, ((struct threadParam*)param)->clientFd);
+
+        // printf("Enum %d\n", msgr->type);
+        // printf("Enum %s\n", msgr->payload);
+
+        // length = ((void*)&message.payload - (void*)&message.type) + 4;
+
+        // sendData(((struct threadParam*)param)->clientFd, (void*)&message, length, NULL);
+        // free(buffer);
+    // }
+
+
+    // while(true){        
+    //     if(retLen > 0){
+    //             parseBuffer(&buffer, &player);
+    //             printCar(player);
+    //     }
+    //     printf("thread alive\n");
+    //     send(((struct threadParam*)param)->clientFd, data, sizeof(char)*256, 0);
+    // }  
 }
 
 int main(void){
-    char* buffer = malloc(sizeof(char)* 256);
-    struct playerList* players = malloc(sizeof(struct playerList));
-
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0) {
         perror("tcp socket error");
@@ -104,6 +144,7 @@ int main(void){
     }
     printf("Listening on port %d \n", PORT);
 
+    struct playerList* players = malloc(sizeof(struct playerList));
     while(true){
         	struct sockaddr_in peerAddr;
 	        socklen_t addrSize = sizeof(peerAddr);
@@ -113,16 +154,16 @@ int main(void){
                 return -1;
             }
             printClient(clientFd);	
-            // int retLen = recv(clientFd, buffer, sizeof(char)*256, 0);
-            // if(retLen > 0){
-            //     parseBuffer(&buffer, &player);
-            //     printCar(player);
-            // }
-            struct player* client = malloc(sizeof(struct player));
-            client->clientSocket = clientFd;
-            pushPlayer(&client, &players);
 
-            // pthread_t clientThread;
-	        // pthread_create(&clientThread, NULL, clientThread, (void *) clientFd);
+            //so that the list is passed and thread knows its fd
+            struct threadParam* params = malloc(sizeof(struct threadParam));
+            params->clientFd = clientFd;
+            params->serverFd = serverSocket;
+            params->list = players;
+
+            pushPlayer(&players, clientFd);
+
+            pthread_t thread;
+	        pthread_create(&thread, NULL, clientThread, (void *) params);
     }
 }
