@@ -362,6 +362,7 @@ bool checkMove(WINDOW * win, int y, int x){
 		((mvinch(y, x) & A_CHARTEXT) == '|')){
 			return true;
 	}
+	
 	else{
 		return false;
 	}
