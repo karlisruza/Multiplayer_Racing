@@ -39,7 +39,7 @@ void playerlistPush(playerlist_t** list){
     return;
 }
 
-void gamelistPush(gamelist_t** list){
+int gamelistPush(gamelist_t** list){
     game_t* game = malloc(sizeof(game_t));
     game->playerlist = malloc(sizeof(playerlist_t));
     playerlistPush(&game->playerlist);
@@ -56,6 +56,7 @@ void gamelistPush(gamelist_t** list){
         (*list)->tail = game;
         (*list)->count++;
     }
+    return game->gameid;
     //TODO SEND GAME ID TO PLAYER
 }
 

@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include "./protocol.h"
 #include "./payload.h"
+#include "./racinglist.h"
 
 #ifndef MESSAGE_H_INCLUDED
 #define MESSAGE_H_INCLUDED
@@ -29,6 +30,9 @@ typedef enum{
     //messages sent by both
     PING = 7,
     PONG = 8,
+    REQUEST_GAME = 9,
+    SEND_GAMES = 10,
+    CREATE_GAME = 11,
 }mtype_e;
 
 typedef struct msg_s{
@@ -50,9 +54,83 @@ void sendData(int fd, char *data, unsigned length, struct sockaddr_in *remote) {
     }
 }
 
-void handleData(msg_t *message, int fd){
+void handleDataS(msg_t *message, params_t* params){
     msg_t reply;
     up_pt* data;
+    gamelist_t* gameslist;
+    int fd = params->clientFd;
+    gameslist = params->list;
+    int length;
+
+    printf("aaaa \n");
+    printf("handleData enum %d\n", message->type);
+    switch (message->type){
+        case 1:
+            printf("lmao\n");
+            data = (up_pt*)(message->payload);
+            printf("playerId %d", data->playerID);
+            printf("gameId %d", data->playerID);
+            printf("keypress x: %d", data->action.x);
+            printf("keypress y: %d", data->action.y);
+            printf("lmao\n");
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7: //ping
+            reply.type = PONG;
+            length = ((void*)&reply.payload - (void*)&reply.type);
+            sendData(fd, (void*)&reply, length, NULL);
+            break;
+        case 8:
+            printf("PONG\n");
+            break;
+        case 9:
+            reply.type = SEND_GAMES;
+            if(gameslist->head == NULL){
+                reply.payload[0] = '0';
+                length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(char);
+            }
+            else{
+                return;
+            }
+            sendData(fd, (void*)&reply, length, NULL);
+            break;
+        case 10:
+            printf("There are no games active currently. Try creating a game instead! \n");
+            break;
+        case 11:
+            printf("Creating game...\n");
+            int gameId = gamelistPush(&gameslist);
+            reply.type = CREATE_GAME;
+
+            cg_pt gameinfo;
+            gameinfo.gameID = gameId;
+            gameinfo.playerID = 1;
+
+            printf("gameinfo.gameid: %d\n", gameinfo.gameID);
+
+            memcpy((void*)&reply.payload, (void*)&gameinfo, sizeof(gameinfo));
+            length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(gameinfo);
+            sendData(fd, (void*)&reply, length, NULL);
+            break;
+        default:
+            perror("invalid message");
+    }
+}
+
+void handleDataC(msg_t *message, int fd){
+    msg_t reply;
+    up_pt* data;
+    cg_pt* gameinfo;
+    int length;
 
     printf("handleData enum %d\n", message->type);
     switch (message->type){
@@ -77,15 +155,30 @@ void handleData(msg_t *message, int fd){
             break;
         case 7: //ping
             reply.type = PONG;
-            int length = ((void*)&reply.payload - (void*)&reply.type);
+            length = ((void*)&reply.payload - (void*)&reply.type);
             sendData(fd, (void*)&reply, length, NULL);
             break;
         case 8:
             printf("PONG\n");
             break;
+        case 9:
+            break;
+        case 10:
+            printf("There are no games active currently. Try creating a game instead! \n");
+            break;
+        case 11:{
+            gameinfo = (cg_pt*)message->payload;
+            printf("gameId: %d\n", gameinfo->gameID);
+            printf("gameId: %d\n", gameinfo->playerID);
+            printf("case 11\n");
+
+            break;
+        }
         default:
             perror("invalid message");
     }
 }
+
+
 
 #endif

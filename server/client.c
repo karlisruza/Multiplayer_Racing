@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h> 
@@ -85,13 +86,36 @@ int main(int argc, char* argv[]){
     
 
     msg_t message;
-    message.type = PING;
-
+    message.type = REQUEST_GAME;
+    void* buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
     int length = ((void*)&message.payload - (void*)&message.type);
-    msg_t* msgr;
-    int i = 0;
+
+    sendData(clientSocket, (void*)&message, length, NULL);
+    recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
+    handleDataC(buffer, clientSocket);
+
+    message.type = CREATE_GAME;
+    sendData(clientSocket, (void*)&message, length, NULL);
+    free(buffer);
+    buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
+
+    recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
+    handleDataC(buffer, clientSocket);
+
     while(true){
-        keyPress(player.ID, player.gameID, clientSocket);
+
+    }
+
+
+
+
+    // close(clientSocket);
+
+
+    // msg_t* msgr;
+    // int i = 0;
+    // while(true){
+    //     keyPress(player.ID, player.gameID, clientSocket);
         // void* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
         // send(clientSocket, (void*)&message, length, 0);
         // recv(clientSocket, buffer, sizeof(msg_t), 0);
@@ -101,5 +125,5 @@ int main(int argc, char* argv[]){
 
         // free(buffer);
         // i++;
-    }
+    // }
 }
