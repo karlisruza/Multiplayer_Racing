@@ -13,17 +13,15 @@
 #include "../protocol/message.h"
 #include "../protocol/protocol.h"
 #include "../protocol/racinglist.h"
+#include "../protocol/listtest.h"
 
-#define PORT 8003
+#define PORT 8005
 #define _MAX_LISTEN_QUE 10
 
 void *clientThread(void* param){
 
     gamelist_t* gamelist = ((params_t*)param)->list;
-    // while(true){
-    //     if(gamelist->head != NULL){
-    //         printGamelist(&gamelist);
-    //     }
+
         void* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
 
         int length = (sizeof(msg_t)) + MAX_PAYLOAD_SIZE;
@@ -35,9 +33,6 @@ void *clientThread(void* param){
         msg_t* msgr = (msg_t*)buffer;
         handleDataS(msgr, (params_t*)param);
 
-        // free(buffer);
-        // buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
-
         retLen = recv(((params_t*)param)->clientFd, buffer, length, 0);
         if(retLen < 0){
             printf("fail \n");
@@ -45,7 +40,6 @@ void *clientThread(void* param){
         
         handleDataS(msgr, (params_t*)param);
 
-        printGamelist(&gamelist);
 
     // }
  
@@ -78,6 +72,8 @@ int main(void){
     printf("Listening on port %d \n", PORT);
 
     gamelist_t* gamelist = malloc(sizeof(gamelist_t));
+    getTestingList(&gamelist);
+
     while(true){
         	struct sockaddr_in peerAddr;
 	        socklen_t addrSize = sizeof(peerAddr);

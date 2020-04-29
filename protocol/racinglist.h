@@ -42,12 +42,14 @@ void playerlistPush(playerlist_t** list){
 int gamelistPush(gamelist_t** list){
     game_t* game = malloc(sizeof(game_t));
     game->playerlist = malloc(sizeof(playerlist_t));
+    game->hostId = 1;
     playerlistPush(&game->playerlist);
     if((*list)->head == NULL){
         game->gameid = 1;
         game->prev = (*list)->tail;
         (*list)->head = game;
         (*list)->tail = game;
+        (*list)->count++;
     }
     else{
         game->gameid = (*list)->tail->gameid + 1;
@@ -58,6 +60,21 @@ int gamelistPush(gamelist_t** list){
     }
     return game->gameid;
     //TODO SEND GAME ID TO PLAYER
+}
+
+void clientgamelistPush(gamelist_t** list, game_t** game){
+    if((*list)->head == NULL){
+        (*list)->head = *game;
+        (*list)->tail = *game;
+        (*list)->count++;
+    }
+    else{
+        (*list)->tail->next = *game;
+        (*game)->prev = (*list)->tail;
+        (*list)->tail = *game;
+        (*list)->count++;
+    }
+    return;
 }
 
 void deletePlayer(playerlist_t** list, int playerId){
@@ -112,23 +129,6 @@ void deleteGame(gamelist_t** list, int gameId){
     return;
 }
 
-void printPlayerlist(playerlist_t** list){
-    player_t* current = (*list)->head;
-    while(current != NULL){
-        printf("playerId: %d\n", current->ID);
-        current = current->next;
-    }
-    return;
-}
-
-void printGamelist(gamelist_t** list){
-    game_t* current = (*list)->head;
-    while(current != NULL){
-        printf("gameId: %d\n", current->gameid);
-        current = current->next;
-    }
-    return;
-}
 
 // void pushPlayer(struct playerList** list, int clientFd){
 //     struct player* client = malloc(sizeof(struct player));

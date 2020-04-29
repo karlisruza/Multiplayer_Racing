@@ -10,6 +10,7 @@
 #include "../car/car.h"
 #include "../protocol/message.h"
 #include "../protocol/payload.h"
+#include "../protocol/listtest.h"
 #include <ncurses.h>
 
 void keyPress(int playerid, int gameid, int fd){
@@ -85,26 +86,33 @@ int main(int argc, char* argv[]){
     player.ID = 1;
     
 
+    //GET GAMES LIST
     msg_t message;
     message.type = REQUEST_GAME;
     void* buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
     int length = ((void*)&message.payload - (void*)&message.type);
 
+    gamelist_t* gamelist = malloc(sizeof(gamelist_t));
+
     sendData(clientSocket, (void*)&message, length, NULL);
     recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
-    handleDataC(buffer, clientSocket);
+    handleDataC(buffer, clientSocket, &gamelist);
 
-    message.type = CREATE_GAME;
-    sendData(clientSocket, (void*)&message, length, NULL);
-    free(buffer);
-    buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
+    printGamelist(&gamelist);
 
-    recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
-    handleDataC(buffer, clientSocket);
+    // message.type = CREATE_GAME;
+    // sendData(clientSocket, (void*)&message, length, NULL);
+    // free(buffer);
+    // buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
 
-    while(true){
 
-    }
+
+    // recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
+    // handleDataC(buffer, clientSocket);
+
+    // while(true){
+
+    // }
 
 
 

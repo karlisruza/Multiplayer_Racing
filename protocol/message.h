@@ -4,6 +4,7 @@
 #include "./protocol.h"
 #include "./payload.h"
 #include "./racinglist.h"
+#include "./listtest.h"
 
 #ifndef MESSAGE_H_INCLUDED
 #define MESSAGE_H_INCLUDED
@@ -31,8 +32,8 @@ typedef enum{
     PING = 7,
     PONG = 8,
     REQUEST_GAME = 9,
-    SEND_GAMES = 10,
-    CREATE_GAME = 11,
+    CREATE_GAME = 10,
+    RECEIVE_GAME = 11,
 }mtype_e;
 
 typedef struct msg_s{
@@ -93,20 +94,33 @@ void handleDataS(msg_t *message, params_t* params){
             printf("PONG\n");
             break;
         case 9:
-            reply.type = SEND_GAMES;
+            reply.type = REQUEST_GAME;
             if(gameslist->head == NULL){
                 reply.payload[0] = '0';
                 length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(char);
+                sendData(fd, (void*)&reply, length, NULL);
             }
             else{
+                game_t* current = gameslist->head;
+                rg_pt game;
+                while(current != NULL){
+                    game.gameId = current->gameid;
+                    game.hostId = current->playerlist->head->ID;
+                    game.gamecount = gameslist->count;
+                    game.status = current->status;
+
+                    printGame(current);
+
+                    memcpy((void*)&reply.payload, (void*)&game, sizeof(game));
+                    length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(game);
+                    sendData(fd, (void*)&reply, length, NULL);
+                    sleep(1);
+                    current = current->next;
+                }
                 return;
             }
-            sendData(fd, (void*)&reply, length, NULL);
             break;
         case 10:
-            printf("There are no games active currently. Try creating a game instead! \n");
-            break;
-        case 11:
             printf("Creating game...\n");
             int gameId = gamelistPush(&gameslist);
             reply.type = CREATE_GAME;
@@ -126,7 +140,7 @@ void handleDataS(msg_t *message, params_t* params){
     }
 }
 
-void handleDataC(msg_t *message, int fd){
+void handleDataC(msg_t *message, int fd, gamelist_t** gamelist){
     msg_t reply;
     up_pt* data;
     cg_pt* gameinfo;
@@ -161,18 +175,50 @@ void handleDataC(msg_t *message, int fd){
         case 8:
             printf("PONG\n");
             break;
-        case 9:
+        case 9:{
+            rg_pt* gamedata = (rg_pt*)message->payload;
+            gamelist_t* list = *gamelist;
+            
+            printf("gameCount: %d//////\n", gamedata->gamecount);
+            int gamecount = gamedata->gamecount;
+            char* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE));
+            printf("buffersize: %ld\n", sizeof(buffer));
+
+            for(int i = 0; i < gamecount; i++){
+                if(i != 0){
+                    printf("pre ret\n");
+                    int ret =  recv(fd, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
+                    printf("post ret\n");
+                    printf("buffersize: %ld\n", sizeof(buffer));
+
+                    message = (msg_t*)buffer;
+                }
+
+                gamedata = (rg_pt*)message->payload;
+                game_t* game = malloc(sizeof(game_t));
+                game->gameid = gamedata->gameId;
+                game->hostId = gamedata->hostId;
+                game->status = gamedata->status;
+                game->playerlist = NULL;
+
+                printGame(game);
+                clientgamelistPush(&list, &game);
+                free(message);
+
+                printf("i: %d\n", i);
+            }
             break;
-        case 10:
-            printf("There are no games active currently. Try creating a game instead! \n");
-            break;
-        case 11:{
+        }
+        case 10:{
             gameinfo = (cg_pt*)message->payload;
             printf("gameId: %d\n", gameinfo->gameID);
             printf("gameId: %d\n", gameinfo->playerID);
             printf("case 11\n");
-
             break;
+        }
+        case 11:{
+
+
         }
         default:
             perror("invalid message");
