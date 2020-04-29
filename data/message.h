@@ -76,6 +76,8 @@ void handleDataS(msg_t *message, params_t* params){
             printf("lmao\n");
             break;
         case 2:
+            //join game
+            
             break;
         case 3:
             break;
@@ -225,6 +227,16 @@ void handleDataC(msg_t *message, int fd, gamelist_t** gamelist){
     }
 }
 
-
+void printClient(int fd) {
+    struct sockaddr_in addr;
+    socklen_t addrLen = sizeof(addr);
+    if (getpeername(fd, (struct sockaddr *) &addr, &addrLen) == -1) {
+        perror("getpeername");
+        return;
+    }
+    printf("%s:%d connected via TCP\n",
+	inet_ntoa(addr.sin_addr),
+	ntohs(addr.sin_port));
+}
 
 #endif

@@ -7,11 +7,11 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h> 
-#include "../car/car.h"
-#include "../protocol/message.h"
-#include "../protocol/payload.h"
-#include "../protocol/listtest.h"
 #include <ncurses.h>
+#include "data/message.h"
+#include "data/payload.h"
+#include "data/listtest.h"
+#include "graphics/graphics.h"
 
 void keyPress(int playerid, int gameid, int fd){
 	int key = getch();
@@ -48,7 +48,12 @@ void keyPress(int playerid, int gameid, int fd){
     sendData(fd, (void*)&message, length, NULL);
 }
 
+void getName(WINDOW* win){
+    return;
+}
+
 int main(int argc, char* argv[]){
+    //Connection setup
     char* ptr;
     int cPort = strtol(argv[1], &ptr, 10);
     int sPort = strtol(argv[3], &ptr, 10);
@@ -81,24 +86,34 @@ int main(int argc, char* argv[]){
     inet_aton(argv[2], &serverAddr.sin_addr);
     //connect to server address
     connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(struct sockaddr));
+    //////////////////////////////////////////////////////////////////////////////
+    //Graphics setup
 
-    player_t player;
-    player.ID = 1;
+
+    // player_t player;
+    // player.ID = 1;
+
+    // getName();
     
 
     //GET GAMES LIST
-    msg_t message;
-    message.type = REQUEST_GAME;
-    void* buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
-    int length = ((void*)&message.payload - (void*)&message.type);
+    // msg_t message;
+    // message.type = REQUEST_GAME;
+    // void* buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
+    // int length = ((void*)&message.payload - (void*)&message.type);
 
-    gamelist_t* gamelist = malloc(sizeof(gamelist_t));
+    // gamelist_t* gamelist = malloc(sizeof(gamelist_t));
 
-    sendData(clientSocket, (void*)&message, length, NULL);
-    recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
-    handleDataC(buffer, clientSocket, &gamelist);
+    // sendData(clientSocket, (void*)&message, length, NULL);
+    // recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
+    // handleDataC(buffer, clientSocket, &gamelist);
 
-    printGamelist(&gamelist);
+    // printGamelist(&gamelist);
+    // //JOIN GAME
+    // message.type = JOIN_GAME;
+    // sendData(clientSocket, (void*)&message, length, NULL);
+    // recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
+    // handleDataC(buffer, clientSocket, &gamelist);
 
     // message.type = CREATE_GAME;
     // sendData(clientSocket, (void*)&message, length, NULL);

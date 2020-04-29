@@ -65,6 +65,7 @@ typedef struct Game_list{
 typedef struct threadParam{
     int clientFd;
     int serverFd;
+    playerlist_t* clientlist;
     gamelist_t* list;
 }params_t;
 

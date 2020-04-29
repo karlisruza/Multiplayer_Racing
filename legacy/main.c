@@ -5,7 +5,6 @@
 #include <math.h>
 #include "car/car.h"
 
-
 #define MAP_COLOR     		COLOR_PAIR(1)
 #define PLAYER_ONE_COLOR    COLOR_PAIR(2)
 #define PLAYER_TWO_COLOR    COLOR_PAIR(3)
@@ -487,8 +486,8 @@ void winSizeCheck (WINDOW* win){
 	while (COLS < mapWidth || LINES < mapHeight+10){
 
 		//basically, before the game begins, it checks it the 
-			// race track fits on the screen and won't start the 
-			// game until everything is order. It's to prevent ncurses glitches. 
+		// race track fits on the screen and won't start the 
+		// game until everything is order. It's to prevent ncurses glitches. 
 	
 		mvwprintw(win, 1, 3,
 			"You need to increase the window size.\nTry decreasing character size (ctrl + [-])\nor increasing the terminal window size.");
