@@ -3,12 +3,14 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h> 
 #include "../car/car.h"
 #include "../protocol/message.h"
 #include "../protocol/payload.h"
+#include "../protocol/listtest.h"
 #include <ncurses.h>
 
 void keyPress(int playerid, int gameid, int fd){
@@ -84,14 +86,44 @@ int main(int argc, char* argv[]){
     player.ID = 1;
     
 
+    //GET GAMES LIST
     msg_t message;
-    message.type = PING;
-
+    message.type = REQUEST_GAME;
+    void* buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
     int length = ((void*)&message.payload - (void*)&message.type);
-    msg_t* msgr;
-    int i = 0;
-    while(true){
-        keyPress(player.ID, player.gameID, clientSocket);
+
+    gamelist_t* gamelist = malloc(sizeof(gamelist_t));
+
+    sendData(clientSocket, (void*)&message, length, NULL);
+    recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
+    handleDataC(buffer, clientSocket, &gamelist);
+
+    printGamelist(&gamelist);
+
+    // message.type = CREATE_GAME;
+    // sendData(clientSocket, (void*)&message, length, NULL);
+    // free(buffer);
+    // buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
+
+
+
+    // recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
+    // handleDataC(buffer, clientSocket);
+
+    // while(true){
+
+    // }
+
+
+
+
+    // close(clientSocket);
+
+
+    // msg_t* msgr;
+    // int i = 0;
+    // while(true){
+    //     keyPress(player.ID, player.gameID, clientSocket);
         // void* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
         // send(clientSocket, (void*)&message, length, 0);
         // recv(clientSocket, buffer, sizeof(msg_t), 0);
@@ -101,5 +133,5 @@ int main(int argc, char* argv[]){
 
         // free(buffer);
         // i++;
-    }
+    // }
 }

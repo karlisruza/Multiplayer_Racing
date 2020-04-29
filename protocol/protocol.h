@@ -49,7 +49,8 @@ typedef struct Player_list{
 typedef struct Game
 {
     int gameid;
-    int status; //(0- WAITING_PLAYERS, 1- STARTED, -1- ENDED); 
+    int status; //(0- WAITING_PLAYERS, 1- STARTED, -1- ENDED);
+    int hostId;
     playerlist_t* playerlist;
     struct Game* next;
     struct Game* prev;
@@ -61,15 +62,10 @@ typedef struct Game_list{
     game_t* tail;
 }gamelist_t;
 
-
-
-
-// Type: UPDATE_PLAYER,
-// Type: “UP”
-// PlayerID: int *Spēlētāja ID*,
-// GameID:  int *spēles ID*
-// PlayerPass[10]:* Spēlētāja identitāti apliecinoša simbolu virkne *
-// Action: struct Action;( skatīt protocol.h)
-
+typedef struct threadParam{
+    int clientFd;
+    int serverFd;
+    gamelist_t* list;
+}params_t;
 
 #endif

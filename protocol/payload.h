@@ -12,5 +12,16 @@ typedef struct update_payload_type{
     action_t action;
 }up_pt;
 
+typedef struct create_game_payload_type{
+    int playerID;
+    int gameID;
+}cg_pt;
+
+typedef struct request_game_payload_type{
+    int gameId;
+    int status;
+    int gamecount;
+    int hostId;
+}rg_pt;
 
 #endif
