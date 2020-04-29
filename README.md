@@ -1,5 +1,8 @@
 # LSP2020_racing_proj
 Final Project for LU LSP course
 
-Compile with gcc and run:
-gcc main.c -o racing -lncurses && ./racing
+Compile with with gcc:
+Server:
+gcc server.c -o server -lpthread
+Client:
+gcc client.c -o client -lncurses

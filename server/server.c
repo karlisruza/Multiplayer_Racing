@@ -8,18 +8,15 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <pthread.h>
-#include "../car/car.h"
-#include "../car/player.h"
-#include "../protocol/message.h"
-#include "../protocol/protocol.h"
-#include "../protocol/racinglist.h"
-#include "../protocol/listtest.h"
+#include "../data/message.h"
+#include "../data/protocol.h"
+#include "../data/racinglist.h"
+#include "../data/listtest.h"
 
 #define PORT 8005
 #define _MAX_LISTEN_QUE 10
 
 void *clientThread(void* param){
-
     gamelist_t* gamelist = ((params_t*)param)->list;
 
         void* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
@@ -40,9 +37,6 @@ void *clientThread(void* param){
         
         handleDataS(msgr, (params_t*)param);
 
-
-    // }
- 
 }
 
 int main(void){
@@ -71,6 +65,7 @@ int main(void){
     }
     printf("Listening on port %d \n", PORT);
 
+    playerlist_t* playerlist = malloc(sizeof(playerlist_t));
     gamelist_t* gamelist = malloc(sizeof(gamelist_t));
     getTestingList(&gamelist);
 
@@ -83,13 +78,16 @@ int main(void){
                 return -1;
             }
             printClient(clientFd);	
+            player_t player;
+            player.ID = clientFd;
 
             //so that the list is passed and thread knows its fd
             params_t* params = malloc(sizeof(struct threadParam));
             params->clientFd = clientFd;
             params->serverFd = serverSocket;
             params->list = gamelist;
-
+            params->clientlist = playerlist;
+            
             // pushPlayer(&players, clientFd);
 
             pthread_t thread;
