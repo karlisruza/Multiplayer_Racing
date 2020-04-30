@@ -103,7 +103,13 @@ int main(void){
 	wrefresh(win);
 
 		//if a key is pressed, calls functions that move the car and read the pressed buttons.
-	while(player1->laps < 1){
+	while(player1->laps < 2){
+		if (player1 -> velocity > 0){
+			player1 -> velocity -= 0.05;
+		} else if (player1 -> velocity < 0){
+			player1 -> velocity += 0.05;
+		}
+		
 		keyPress(&player1, win);
 		drawCar(win, &player1);
 
@@ -113,6 +119,7 @@ int main(void){
 		drawFinishLine(win);
 	}
 		//once lap is finished, launches endScreen displaying the winner.
+	player1 -> velocity = 0;
 	endScreen(win, &player1);
 
 	endwin();
@@ -129,108 +136,83 @@ int main(void){
 
 void moveCar(struct car** player, WINDOW* win, bool forward){
 
-	//head
-	double hx = ((*player)->mid->x) + 1*cos((*player)->angle * M_PI);
-	double hy = ((*player)->mid->y) + 1*sin((*player)->angle * M_PI);
-	//tail
-	double tx = ((*player)->mid->x) - 1*cos((*player)->angle * M_PI);
-	double ty = ((*player)->mid->y) - 1*sin((*player)->angle * M_PI);
+	// //head
+	// double hx = ((*player)->mid->x) + 1*cos((*player)->angle * M_PI);
+	// double hy = ((*player)->mid->y) + 1*sin((*player)->angle * M_PI);
+	// //tail
+	// double tx = ((*player)->mid->x) - 1*cos((*player)->angle * M_PI);
+	// double ty = ((*player)->mid->y) - 1*sin((*player)->angle * M_PI);
 
 		//depending on the rotation of the car in steps of 45 degrees, 
 			//the coordinates are increased in the direction.
-
-		
-
-		//if w is pressed, check is the block in front is an obstacle. Move forward, if safe
 	if(forward){
 		(*player) -> velocity = 1;
-
-		double newXHead = ((*player)->mid->x) + 
-			(*player)->velocity * cos((*player)->angle * M_PI) + 
-			1*cos((*player)->angle * M_PI);
-
-		double newYHead = ((*player)->mid->y) + 
-			(*player)->velocity * sin((*player)->angle * M_PI) + 
-			1*sin((*player)->angle * M_PI);
-
-		if(checkMove(win, newYHead, newXHead)){
-			//mvwprintw(win, (*player)->tail->y, (*player)->tail->x, " ");
-			(*player)->mid->x = newXHead - 1*cos((*player)->angle * M_PI);
-			(*player)->mid->y = newYHead - 1*sin((*player)->angle * M_PI);
-		}
+	}
+	else{
+		(*player) -> velocity = -0.5;
 	}
 
-		//if s is pressed, check is the block behind is an obstacle. Move backward, if safe.
-	else{
+	double newXHead = ((*player)->mid->x) + 
+		(*player)->velocity * cos((*player)->angle * M_PI) + 
+		1*cos((*player)->angle * M_PI);
 
-		(*player) -> velocity = 0.5;
+	double newYHead = ((*player)->mid->y) + 
+		(*player)->velocity * sin((*player)->angle * M_PI) + 
+		1*sin((*player)->angle * M_PI);
 
-		double newXHead = ((*player)->mid->x) - 
-			(*player)->velocity * cos((*player)->angle * M_PI) - 
-			1*cos((*player)->angle * M_PI);
-
-		double newYHead = ((*player)->mid->y) -  
-			(*player)->velocity * sin((*player)->angle * M_PI) -  
-			1*sin((*player)->angle * M_PI);
-
-		if(checkMove(win, newYHead, newXHead)){
-			//mvwprintw(win, (*player)->head->y, (*player)->head->x, " ");
-			(*player)->mid->x = newXHead + 1*cos((*player)->angle * M_PI);
-			(*player)->mid->y = newYHead + 1*sin((*player)->angle * M_PI);
-		}
-	};
+	if(checkMove(win, newYHead, newXHead)){
+		//mvwprintw(win, (*player)->tail->y, (*player)->tail->x, " ");
+		(*player)->mid->x = newXHead - 1*cos((*player)->angle * M_PI);
+		(*player)->mid->y = newYHead - 1*sin((*player)->angle * M_PI);
+	}
+	else 
+		(*player)->velocity = 0;
 
 		//checks if the car has reached more than 50% of the track so you cannot win by driving on the finish line
 		//the finish line is defined at x = 74; firstly checks if the player is in the upper side of the loop
-	if ((*player)->mid->x >= 73.0 && (*player)->mid->x >= 74.0 && round((*player)->mid->y <= 11.0)){
-		(*player)->midMark = true;
-	}	
-		//then checks if is on the lower side of the loop, and if they have passed the mid-point
-	if ((*player)->mid->x >= 73.0 && (*player)->mid->x >= 74.0 && (*player)->mid->y >= mapHeight - 10.0 && (*player)->midMark == true){
-		(*player)->laps++;
-		(*player)->midMark = false;		
-	}
+	if ((*player)->mid->x >= 73.0 && (*player)->mid->x >= 74.0){
 
+		if ((*player)->mid->y <= 11.0){
+			(*player)->midMark = true; 
+		} else if ((*player)->mid->y >= mapHeight - 10.0 && (*player)->midMark == true){
+			(*player)->laps++;
+			(*player)->midMark = false;		
+		};
+	};
+	
 	return;
 }
 
 void rotateCar(struct car** player, WINDOW* win, bool clockwise){
 		//checks if D is pressed on the keyboard. If true, rotates the car clockwise. 
 		//otherwise, it is considered A was pressed, and will turn counter-clockwise.
+
+	float tempAngle;
 	if(clockwise){
-		(*player)-> angle += 0.15;
+		tempAngle = -0.133;
 	}
 	else{
-		(*player)->angle -= 0.15;
+		tempAngle = 0.133;
 	}
-	/*
-	double hx = ((*player)->mid->x) + cos((*player)->angle * M_PI);
-	double hy = ((*player)->mid->y) + sin((*player)->angle * M_PI);
-	double tx = ((*player)->mid->x) - cos((*player)->angle * M_PI);
-	double ty = ((*player)->mid->y) - sin((*player)->angle * M_PI);
+		//temporary variables to hold the checkable values 
+	double newXHead = ((*player)->mid->x) + 
+		cos(((*player)->angle + tempAngle) * M_PI);
 
-	//checks whether movement is blocked or not, if not, changes car coordinates
+	double newYHead = ((*player)->mid->y) + 
+		sin(((*player)->angle + tempAngle) * M_PI);
 
-	if(checkMove(win, hy, hx) && checkMove(win, ty, tx)){
-		//mvwprintw(win, (*player)->head->y, (*player)->head->x, " ");
-		//mvwprintw(win, (*player)->tail->y, (*player)->tail->x, " ");
-		//(*player)->angle += 0.1;
-		return;
-	}
+	double newXTail = ((*player)->mid->x) -
+		cos(((*player)->angle + tempAngle) * M_PI);
 
-	//if previous if fails, changes angle back to previous, because rotation was not possible
-	if(clockwise){
-		(*player)->angle -=1;
-		if((*player)->angle == -1){
-	   		(*player)->angle = 7;
-	    }
-	}
-	else{
-		(*player)->angle +=1;
-		if((*player)->angle == 8){
-	   		(*player)->angle = 0;
-	    }
-	}*/
+	double newYTail = ((*player)->mid->y) -
+		sin(((*player)->angle + tempAngle) * M_PI);
+
+
+	if(checkMove(win, newYHead, newXHead) && checkMove (win, newYTail, newXTail)){
+		(*player)->angle += tempAngle;
+	}	else 
+		(*player)->velocity = 0;
+
 	return;
 }
 
@@ -256,16 +238,16 @@ bool checkMove (WINDOW * win, double y, double x){
 		"inty: %d", inty);
 
 	if ((mvwinch(win, inty, intx) & A_CHARTEXT) != 'x') {
-	mvwprintw(win, mapHeight + 8, 40, 
+	mvwprintw(win, mapHeight + 3, 40, 
 		"bool: %s", "true");
 	} else{
-	mvwprintw(win, mapHeight + 8, 40, 
+	mvwprintw(win, mapHeight + 3, 40, 
 		"bool: %s", "false");
 	}
 
 	char c = mvwinch(win, inty, intx);
 
-	mvwprintw(win, mapHeight + 9, 40, 
+	mvwprintw(win, mapHeight + 3, 46, 
 		"char: %c", c);
 
 
@@ -337,25 +319,32 @@ WINDOW* startGraphics (){
 
 void drawCar(WINDOW* win, struct car** player){
 
+		//creates the int value for the car head
+	int hx = round(((*player)->mid->x) + 1*cos((*player)->angle * M_PI));
+	int hy = round(((*player)->mid->y) + 1*sin((*player)->angle * M_PI));
+	
+		//creates the int value for the car middle
+	int mx = round((*player)->mid->x);
+	int my = round((*player)->mid->y);
+
+		//creates the int value for the car tail
+	int tx = round(((*player)->mid->x) - 1*cos((*player)->angle * M_PI));
+	int ty = round(((*player)->mid->y) - 1*sin((*player)->angle * M_PI));
+		
 		//wattron intiates the ability to use ncurses formatting properties
 			//in this case, the car is outlined and coloured according 
 			//to the player.
-
 	wattron(win, A_BOLD);
 	wattron(win, PLAYER_ONE_COLOR);
 
-		mvwprintw(win, round((*player)->mid->y) - sin((*player)->angle*M_PI), round((*player)->mid->x) - cos((*player)->angle*M_PI), "=");
-		mvwprintw(win, round((*player)->mid->y), round((*player)->mid->x), "=");
-		mvwprintw(win, round((*player)->mid->y) + sin((*player)->angle*M_PI), round((*player)->mid->x) + cos((*player)->angle*M_PI), "0");
+		mvwprintw(win, ty, tx, "=");
+		mvwprintw(win, my, mx, "=");
+		mvwprintw(win, hy, hx, "0");
 
 	wattroff(win, PLAYER_ONE_COLOR);
 	wattroff(win, A_BOLD);
 
 }
-	//1 = 0*; 2 = 45*; 3 = 90*; 4 = 135*; 5 = 180*; 6 = 225*; 7 = 270*; 8 = 315*
-	// ==0		  0			0	    0		0==		     =		    =        =		
-	//			 =			=	     =                  =		    =         =
-	//			=			=         =                0		    0          0
 
 
 void drawMap(WINDOW * win){
@@ -567,11 +556,11 @@ void keyPress(struct car** player, WINDOW* win){
 	    	break;
 
 	    case 'a':
-	    	rotateCar(&(*player), win, false);
+	    	rotateCar(&(*player), win, true);
 	     	break;
 
 	    case 'd':
-	    	rotateCar(&(*player), win, true);
+	    	rotateCar(&(*player), win, false);
 	     	break;
 	}
 }
