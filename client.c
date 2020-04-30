@@ -90,17 +90,26 @@ int main(int argc, char* argv[]){
     //Graphics setup
 
 
-    // player_t player;
-    // player.ID = 1;
 
-    // getName();
+    //send name and get player id
+    void* buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
+    char* playerName = "xxKarlis1337xx";
+    msg_t message;
+    message.type = ADD_PLAYER;    
+    memcpy((void*)&message.payload, (void*)playerName, sizeof(playerName));
+    int length = ((void*)&message.payload - (void*)&message.type) + sizeof(playerName);
+    sendData(clientSocket, (void*)&message, length, NULL);
+    recv(clientSocket, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
+
+    player_t* clientplayer;
+    handleDataC(buffer, clientSocket, NULL, &clientplayer);
+     
     
 
     //GET GAMES LIST
-    // msg_t message;
-    // message.type = REQUEST_GAME;
-    // void* buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
-    // int length = ((void*)&message.payload - (void*)&message.type);
+
+    // 
+
 
     // gamelist_t* gamelist = malloc(sizeof(gamelist_t));
 

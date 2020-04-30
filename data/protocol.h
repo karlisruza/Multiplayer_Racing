@@ -29,7 +29,7 @@ typedef struct Player_info
 {
     int ID; /*Spēlētāja ID*/
     int gameID;
-    char name[30];/* Spēlētāja vārds */
+    char* name;/* Spēlētāja vārds */
     coordinate_t position; /* Spēlētāja koordinātas */
     float angle; /* Spēlētāja leņķis */
     float speed; /*Spēlētāja ātrums*/
@@ -38,7 +38,6 @@ typedef struct Player_info
     struct Player_info* next;
     struct Player_info* prev;
 }player_t;
-
 
 typedef struct Player_list{
     int count;

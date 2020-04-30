@@ -33,7 +33,7 @@ typedef enum{
     PONG = 8,
     REQUEST_GAME = 9,
     CREATE_GAME = 10,
-    RECEIVE_GAME = 11,
+    ADD_PLAYER = 11,
 }mtype_e;
 
 typedef struct msg_s{
@@ -59,8 +59,10 @@ void handleDataS(msg_t *message, params_t* params){
     msg_t reply;
     up_pt* data;
     gamelist_t* gameslist;
+    playerlist_t* clientlist;
     int fd = params->clientFd;
     gameslist = params->list;
+    clientlist = params->clientlist;
     int length;
 
     printf("aaaa \n");
@@ -137,12 +139,29 @@ void handleDataS(msg_t *message, params_t* params){
             length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(gameinfo);
             sendData(fd, (void*)&reply, length, NULL);
             break;
+        case 11:{
+            char* playername = (char*)message->payload;
+            player_t* current;
+            while(current != NULL){
+                if(current->ID == fd){
+                    current->name = playername;
+                }
+            }
+            reply.type = ADD_PLAYER;
+            cg_pt data;
+            data.playerID = fd;
+            data.gameID = 0;
+            memcpy((void*)&reply.payload, (void*)&data, sizeof(data));
+            length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(data);
+            sendData(fd, (void*)&reply, length, NULL);
+            break;
+        }
         default:
             perror("invalid message");
     }
 }
 
-void handleDataC(msg_t *message, int fd, gamelist_t** gamelist){
+void handleDataC(msg_t *message, int fd, gamelist_t** gamelist, player_t** clientplayer){
     msg_t reply;
     up_pt* data;
     cg_pt* gameinfo;
@@ -219,6 +238,7 @@ void handleDataC(msg_t *message, int fd, gamelist_t** gamelist){
             break;
         }
         case 11:{
+            cg_pt* data = (cg_pt*)message->payload;
 
 
         }

@@ -77,6 +77,21 @@ void clientgamelistPush(gamelist_t** list, game_t** game){
     return;
 }
 
+void clientplayerlistPush(playerlist_t** list, player_t** player){
+        if((*list)->head == NULL){
+        (*list)->head = *player;
+        (*list)->tail = *player;
+        (*list)->count++;
+    }
+    else{
+        (*list)->tail->next = *player;
+        (*player)->prev = (*list)->tail;
+        (*list)->tail = *player;
+        (*list)->count++;
+    }
+    return;
+}
+
 void deletePlayer(playerlist_t** list, int playerId){
     player_t* current = (*list)->tail;
     while(current != NULL){

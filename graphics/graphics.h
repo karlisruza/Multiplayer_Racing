@@ -8,6 +8,49 @@
 #define MAP_HEIGHT          40
 #define MAP_WIDTH           150
 
+//didn't figure out how to allow one to write - you can't use backspace yet or 
+	//see what you type. Otherwise, works just fine for now while i'm still figuring
+	// out the other terminal system.
+
+char* enterNameMenu (WINDOW* win){
+
+		mvwprintw(win, 1, 3, "ENTER YOUR NAME");	
+
+
+
+		refresh();
+		wrefresh(win);
+
+		move(3,4);
+
+		char* userName = malloc(20);
+		bool usableName = false;
+		char enter = 0;
+
+		int length;
+		for (length = 0; length < 20; length++){
+
+			enter = getchar();
+
+			//if (!alnum(enter)) usableName = false;
+	 		if (enter == '\r' || enter == '\n') break; 
+			
+	 		userName[length] = enter;
+			usableName = true;
+			mvwprintw(win, 4, length+3, "%c ", enter);
+	 	};
+
+	 	userName[length] = '\0';
+
+	 	if (!usableName){
+	 		return "";
+	 	}
+
+		werase(win);
+		return userName;
+}
+
+
 void winSizeCheck (WINDOW* win){
 	while (COLS < MAP_WIDTH || LINES < MAP_HEIGHT+10){
 		//basically, before the game begins, it checks it the 

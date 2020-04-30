@@ -78,8 +78,9 @@ int main(void){
                 return -1;
             }
             printClient(clientFd);	
-            player_t player;
-            player.ID = clientFd;
+            player_t* player = malloc(sizeof(player_t));
+            player->ID = clientFd;
+            clientplayerlistPush(&playerlist, &player);
 
             //so that the list is passed and thread knows its fd
             params_t* params = malloc(sizeof(struct threadParam));
