@@ -39,6 +39,15 @@ keycode  32 release
 const int mapHeight = 40;
 const int mapWidth = 150;
 
+// INITIALIZER DECLARATIONS
+
+ 	//creates window instance as well as initializes what ncurses needs.
+WINDOW* startGraphics ();
+
+	//creates player struct
+struct car* initPlayer ();
+
+
 // CONTROLS FUNCTIONS DECLARATIONS
 
 	//provides forward motion when the forward motion key is pressed
@@ -53,6 +62,7 @@ bool checkMove(WINDOW* win, double y, double x);
 
 	//determines which key is pressed at a certain moment
 void keyPress(struct car** player, WINDOW* win);
+
 
 // GRAPHICS FUNCTIONS DECLARATIONS
 
@@ -74,65 +84,23 @@ void endScreen (WINDOW* win, struct car** player);
 
 	//waits for player to resize the window if it is too small for the game. 
 void winSizeCheck (WINDOW* win);
+
+
+
 int main(void){
 	initscr();
 	noecho();
 
     	//10 mapHeight lines added for outputting the player information. 
-	WINDOW * win = newwin(mapHeight + 10, mapWidth, 0, 0);
+	WINDOW * win = startGraphics();
 
-	winSizeCheck(win);
-
-		//creates a rectangular border for the map.	
-	noecho();
-
-	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
-	refresh();
-
-	if (!has_colors()) {
-        endwin();
-        printf("Your terminal does not support color\n");
-        exit(1);
-    }
-
-    if (start_color() != OK) {
-        endwin();
-        printf("Did not properly initialize colors\n");
-        exit(1);
-    }
-
-    start_color();
-	init_pair(1, COLOR_WHITE, COLOR_BLACK);
-	init_pair(2, COLOR_BLUE, COLOR_BLACK);
-	init_pair(3, COLOR_RED, COLOR_BLACK);
-
-		//sets default colour scheme for the window to be white text with
-			//a black background 
-	bkgd(MAP_COLOR);
-	wrefresh(win);
-	refresh();
-
-		//creates the track
-	drawMap(win);
-	drawFinishLine(win);
-	wrefresh(win);
-
-
-		//creates the car object.
-	struct car* player1 = malloc(sizeof(struct car));
-	initCar(&player1);
-	player1->angle=0;
-	player1->velocity=0;
-	player1->mid->x = 74.0;
-	player1->mid->y = 31.0;
-
-
+	struct car* player1 = initPlayer();
 
 		//car is placed according to the coordinates shown in the car object. 
 	outputPlayerStats(&player1, win);
 	drawCar(win, &player1);
+
 	wrefresh(win);
-	refresh();
 
 		//if a key is pressed, calls functions that move the car and read the pressed buttons.
 	while(player1->laps < 1){
@@ -144,7 +112,7 @@ int main(void){
 		
 		drawFinishLine(win);
 	}
-
+		//once lap is finished, launches endScreen displaying the winner.
 	endScreen(win, &player1);
 
 	endwin();
@@ -152,48 +120,73 @@ int main(void){
 }
 
 
+
+
+
 //######################################
 //		   CONTROLS FUNCTIONS 
 //######################################
 
 void moveCar(struct car** player, WINDOW* win, bool forward){
-	double hx = ((*player)->mid->x) + cos((*player)->angle * M_PI);
-	double hy = ((*player)->mid->y) + sin((*player)->angle * M_PI);
-	double tx = ((*player)->mid->x) - cos((*player)->angle * M_PI);
-	double ty = ((*player)->mid->y) - sin((*player)->angle * M_PI);
+
+	//head
+	double hx = ((*player)->mid->x) + 1*cos((*player)->angle * M_PI);
+	double hy = ((*player)->mid->y) + 1*sin((*player)->angle * M_PI);
+	//tail
+	double tx = ((*player)->mid->x) - 1*cos((*player)->angle * M_PI);
+	double ty = ((*player)->mid->y) - 1*sin((*player)->angle * M_PI);
 
 		//depending on the rotation of the car in steps of 45 degrees, 
 			//the coordinates are increased in the direction.
 
-
+		
 
 		//if w is pressed, check is the block in front is an obstacle. Move forward, if safe
 	if(forward){
-		if(checkMove(win, hy, hx)){
+		(*player) -> velocity = 1;
+
+		double newXHead = ((*player)->mid->x) + 
+			(*player)->velocity * cos((*player)->angle * M_PI) + 
+			1*cos((*player)->angle * M_PI);
+
+		double newYHead = ((*player)->mid->y) + 
+			(*player)->velocity * sin((*player)->angle * M_PI) + 
+			1*sin((*player)->angle * M_PI);
+
+		if(checkMove(win, newYHead, newXHead)){
 			//mvwprintw(win, (*player)->tail->y, (*player)->tail->x, " ");
-			(*player) -> velocity = 1;
-			(*player)->mid->x += (*player)->velocity * cos((*player)->angle * M_PI);
-			(*player)->mid->y += (*player)->velocity * sin((*player)->angle * M_PI);
+			(*player)->mid->x = newXHead - 1*cos((*player)->angle * M_PI);
+			(*player)->mid->y = newYHead - 1*sin((*player)->angle * M_PI);
 		}
 	}
 
 		//if s is pressed, check is the block behind is an obstacle. Move backward, if safe.
 	else{
-		if(checkMove(win, ty, tx)){
+
+		(*player) -> velocity = 0.5;
+
+		double newXHead = ((*player)->mid->x) - 
+			(*player)->velocity * cos((*player)->angle * M_PI) - 
+			1*cos((*player)->angle * M_PI);
+
+		double newYHead = ((*player)->mid->y) -  
+			(*player)->velocity * sin((*player)->angle * M_PI) -  
+			1*sin((*player)->angle * M_PI);
+
+		if(checkMove(win, newYHead, newXHead)){
 			//mvwprintw(win, (*player)->head->y, (*player)->head->x, " ");
-			(*player) -> velocity = 1;
-			(*player)->mid->x -= (*player)->velocity * cos((*player)->angle * M_PI);
-			(*player)->mid->y -= (*player)->velocity * sin((*player)->angle * M_PI);
+			(*player)->mid->x = newXHead + 1*cos((*player)->angle * M_PI);
+			(*player)->mid->y = newYHead + 1*sin((*player)->angle * M_PI);
 		}
 	};
 
 		//checks if the car has reached more than 50% of the track so you cannot win by driving on the finish line
 		//the finish line is defined at x = 74; firstly checks if the player is in the upper side of the loop
-	if (round((*player)->mid->x == 74) && (*player)->mid->y <= 11){
+	if ((*player)->mid->x >= 73.0 && (*player)->mid->x >= 74.0 && round((*player)->mid->y <= 11.0)){
 		(*player)->midMark = true;
 	}	
 		//then checks if is on the lower side of the loop, and if they have passed the mid-point
-	else if (round((*player)->mid->x == 74) && (*player)->mid->y >= mapHeight - 10 && (*player)->midMark == true){
+	if ((*player)->mid->x >= 73.0 && (*player)->mid->x >= 74.0 && (*player)->mid->y >= mapHeight - 10.0 && (*player)->midMark == true){
 		(*player)->laps++;
 		(*player)->midMark = false;		
 	}
@@ -246,13 +239,38 @@ void rotateCar(struct car** player, WINDOW* win, bool clockwise){
 		//all while ignoring colours
 		//This is also frequently used, so for humans it's 
 		//easier to parse this way. 
-bool checkMove(WINDOW * win, double y, double x){
+
+bool checkMove (WINDOW * win, double y, double x){
 	int intx = round(x);
 	int inty = round(y);
 
-	if (((mvinch(inty, intx) & A_CHARTEXT) == ' ') || 
-		((mvinch(inty, intx) & A_CHARTEXT) == '|')){
-			return true;
+
+	mvwprintw(win, mapHeight + 4, 40, 
+		"x: %f", x);
+	mvwprintw(win, mapHeight + 5, 40, 
+		"y: %f", y);
+
+	mvwprintw(win, mapHeight + 6, 40, 
+		"intx: %d", intx);
+	mvwprintw(win, mapHeight + 7, 40, 
+		"inty: %d", inty);
+
+	if ((mvwinch(win, inty, intx) & A_CHARTEXT) != 'x') {
+	mvwprintw(win, mapHeight + 8, 40, 
+		"bool: %s", "true");
+	} else{
+	mvwprintw(win, mapHeight + 8, 40, 
+		"bool: %s", "false");
+	}
+
+	char c = mvwinch(win, inty, intx);
+
+	mvwprintw(win, mapHeight + 9, 40, 
+		"char: %c", c);
+
+
+	if ((mvwinch(win, inty, intx) & A_CHARTEXT) != 'x'){
+		return true;
 	}
 	
 	else{
@@ -266,6 +284,56 @@ bool checkMove(WINDOW * win, double y, double x){
 //######################################
 //        	GRAPHICS FUNCTIONS 
 //######################################
+
+	//creates the car object on the finish line
+struct car* initPlayer (){
+	struct car* player = malloc(sizeof(struct car));
+	initCar(&player);
+	player->angle=0;
+	player->velocity=0;
+	player->mid->x = 74.0;
+	player->mid->y = 31.0;
+	return player;
+};
+
+WINDOW* startGraphics (){
+	WINDOW* win = newwin(mapHeight + 10, mapWidth, 0, 0);
+	winSizeCheck(win);
+
+	//creates a rectangular border for the map.	
+	noecho(); //<-- will change on new keyboard mode
+
+	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
+	refresh();
+
+	if (!has_colors()) {
+        endwin();
+        printf("Your terminal does not support color\n");
+        exit(1);
+    }
+
+    if (start_color() != OK) {
+        endwin();
+        printf("Did not properly initialize colors\n");
+        exit(1);
+    }
+
+    start_color();
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+	init_pair(2, COLOR_BLUE, COLOR_BLACK);
+	init_pair(3, COLOR_RED, COLOR_BLACK);
+
+		//sets default colour scheme for the window to be white text with
+			//a black background 
+	bkgd(MAP_COLOR);
+	refresh();
+
+	drawMap(win);
+	drawFinishLine(win);
+	wrefresh(win);
+
+	return win;
+}
 
 void drawCar(WINDOW* win, struct car** player){
 
@@ -378,6 +446,22 @@ void outputPlayerStats (struct car** player, WINDOW* win){
 			"X axis: %f", (*player)->mid->x);
 		mvwprintw(win, mapHeight + 8, 10, 
 			"Y axis: %f", (*player)->mid->y);
+
+		//head
+	double hx = ((*player)->mid->x) + 1*cos((*player)->angle * M_PI);
+	double hy = ((*player)->mid->y) + 1*sin((*player)->angle * M_PI);
+	//tail
+	double tx = ((*player)->mid->x) - 1*cos((*player)->angle * M_PI);
+	double ty = ((*player)->mid->y) - 1*sin((*player)->angle * M_PI);
+
+		mvwprintw(win, mapHeight + 4, 30, 
+			"hx: %f", hx);
+		mvwprintw(win, mapHeight + 5, 30, 
+			"hy: %f", hy);
+		mvwprintw(win, mapHeight + 6, 30, 
+			"tx: %f", tx);
+		mvwprintw(win, mapHeight + 7, 30, 
+			"ty: %f", ty);
 		
 	wattroff(win, A_BOLD);
 	
