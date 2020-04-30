@@ -14,13 +14,10 @@
 
 char* enterNameMenu (WINDOW* win){
 
-		mvwprintw(win, 1, 3, "ENTER YOUR NAME");	
-
-
+		mvwprintw(win, 0, 0, "ENTER YOUR NAME: ");	
 
 		refresh();
 		wrefresh(win);
-
 		move(3,4);
 
 		char* userName = malloc(20);
@@ -29,15 +26,13 @@ char* enterNameMenu (WINDOW* win){
 
 		int length;
 		for (length = 0; length < 20; length++){
-
 			enter = getchar();
-
 			//if (!alnum(enter)) usableName = false;
 	 		if (enter == '\r' || enter == '\n') break; 
-			
 	 		userName[length] = enter;
 			usableName = true;
-			mvwprintw(win, 4, length+3, "%c ", enter);
+			printw("%c", enter);
+			refresh();
 	 	};
 
 	 	userName[length] = '\0';

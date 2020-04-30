@@ -88,12 +88,18 @@ int main(int argc, char* argv[]){
     connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(struct sockaddr));
     //////////////////////////////////////////////////////////////////////////////
     //Graphics setup
+    initscr();
+	noecho();
 
-
+    //10 mapHeight added for player info. 
+	WINDOW * win = newwin(MAP_HEIGHT + 10, MAP_WIDTH, 0, 0);
+	// winSizeCheck(win);
+    char* playerName = enterNameMenu(win);
+    endwin();
+    printf("playername: %s\n", playerName);
 
     //send name and get player id
     void* buffer = malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
-    char* playerName = "xxKarlis1337xx";
     msg_t message;
     message.type = ADD_PLAYER;    
     memcpy((void*)&message.payload, (void*)playerName, sizeof(playerName));
