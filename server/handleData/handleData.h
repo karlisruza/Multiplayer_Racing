@@ -1,5 +1,8 @@
 #include "./handleType/handleAddPlayer.h"
 #include "./handleType/handleRequestGame.h"
+#include "./handleType/handleCreateGame.h"
+#include "./handleType/handleJoinGame.h"
+#include "./handleType/handleRequestPlayer.h"
 
 #ifndef HANDLEDATA_H_INCLUDED
 #define HANDLEDATA_H_INCLUDED
@@ -23,9 +26,8 @@ void handleData(msg_t *message, params_t* params){
             printf("keypress y: %d", data->action.y);
             printf("lmao\n");
             break;
-        case 2:
-            //join game
-            
+        case JOIN_GAME:
+            handleJoinGame(message, &gameList, &playerList);    
             break;
         case 3:
             break;
@@ -47,27 +49,15 @@ void handleData(msg_t *message, params_t* params){
             handleRequestGame(message, &gameList, clientFd);
             break;
         case CREATE_GAME:
-            printf("Creating game...\n");
-            game_t* game = (game_t*)malloc(sizeof(game_t));
-            game->gameid = 1;
-            game->hostId = 1;
-            gamelistPush(&gameList, &game);
-            reply.type = CREATE_GAME;
-
-            cg_pt gameinfo;
-            gameinfo.gameID = game->gameid;
-            gameinfo.playerID = 1;
-
-            printf("gameinfo.gameid: %d\n", gameinfo.gameID);
-
-            memcpy((void*)&reply.payload, (void*)&gameinfo, sizeof(gameinfo));
-            length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(gameinfo);
-            sendData(clientFd, (void*)&reply, length, NULL);
+            handleCreateGame(&gameList, clientFd);
             break;
         case ADD_PLAYER:{
             handleAddPlayer(message, clientFd, &playerList);
             break;
         }
+        case REQUEST_PLAYER:
+            handleRequestPlayer(message, &playerList, clientFd);
+            break;
         default:
             perror("invalid message");
     }

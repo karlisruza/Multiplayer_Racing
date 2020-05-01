@@ -30,6 +30,7 @@ typedef enum{
     REQUEST_GAME = 9,
     CREATE_GAME = 10,
     ADD_PLAYER = 11,
+    REQUEST_PLAYER = 12,
 }mtype_e;
 
 typedef struct msg_s{

@@ -30,9 +30,9 @@ void printPlayerList(playerlist_t** list){
 void printGame(game_t* game){
     printf("Game ID: %d\n", game->gameid);
     printf("Status: %d\n", game->status);
-    if(game->playerlist != NULL){
-        printf("Player Count: %d\n", game->playerlist->count);
-        printPlayerList(&game->playerlist);  
+    if(game->playerList != NULL){
+        printf("Player Count: %d\n", game->playerList->count);
+        printPlayerList(&game->playerList);  
     } 
 }
 
@@ -73,20 +73,20 @@ void getTestingList(gamelist_t** list){
     game->hostId = 0;
     gamelistPush(&gamelist, &game);
 
-    // gamelistPush(&gamelist->head->playerlist);
-    // gamelistPush(&gamelist->head->playerlist);
-    // gamelistPush(&gamelist->head->playerlist);
-    // gamelistPush(&gamelist->head->playerlist);
-    // gamelistPush(&gamelist->head->playerlist);
+    // gamelistPush(&gamelist->head->playerLis);
+    // gamelistPush(&gamelist->head->playerLis);
+    // gamelistPush(&gamelist->head->playerLis);
+    // gamelistPush(&gamelist->head->playerLis);
+    // gamelistPush(&gamelist->head->playerLis);
 
-    // gamelistPush(&gamelist->head->next->playerlist);
-    // gamelistPush(&gamelist->head->next->playerlist);
-    // gamelistPush(&gamelist->head->next->playerlist);
-    // gamelistPush(&gamelist->head->next->playerlist);
+    // gamelistPush(&gamelist->head->next->playerLis);
+    // gamelistPush(&gamelist->head->next->playerLis);
+    // gamelistPush(&gamelist->head->next->playerLis);
+    // gamelistPush(&gamelist->head->next->playerLis);
 
-    // gamelistPush(&gamelist->head->next->next->playerlist);
-    // gamelistPush(&gamelist->head->next->next->playerlist);
-    // gamelistPush(&gamelist->head->next->next->playerlist);
+    // gamelistPush(&gamelist->head->next->next->playerLis);
+    // gamelistPush(&gamelist->head->next->next->playerLis);
+    // gamelistPush(&gamelist->head->next->next->playerLis);
 
 }
 
