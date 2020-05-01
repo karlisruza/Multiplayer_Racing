@@ -32,48 +32,12 @@ int requestGame(gamelist_t** list, int clientFd){
         game->gameid = gameData->gameId;
         game->hostId = gameData->hostId;
         game->status = gameData->status;
-        game->playerlist = NULL;        
+        game->playerList = NULL;        
         gamelistPush(&gameList, &game);
         counter++;
     }while(counter < gamecount);
 
     return 0;
-
-
-
-
-
-            // rg_pt* gamedata = (rg_pt*)message->payload;
-            // gamelist_t* list = *gamelist;
-            
-            // printf("gameCount: %d//////\n", gamedata->gamecount);
-            // int gamecount = gamedata->gamecount;
-            // char* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE));
-            // printf("buffersize: %ld\n", sizeof(buffer));
-
-            // for(int i = 0; i < gamecount; i++){
-            //     if(i != 0){
-            //         printf("pre ret\n");
-            //         int ret =  recv(clientFd, buffer, sizeof(msg_t) + MAX_PAYLOAD_SIZE, 0);
-            //         printf("post ret\n");
-            //         printf("buffersize: %ld\n", sizeof(buffer));
-
-            //         message = (msg_t*)buffer;
-            //     }
-
-            //     gamedata = (rg_pt*)message->payload;
-            //     game_t* game = malloc(sizeof(game_t));
-            //     game->gameid = gamedata->gameId;
-            //     game->hostId = gamedata->hostId;
-            //     game->status = gamedata->status;
-            //     game->playerlist = NULL;
-
-            //     printGame(game);
-            //     gamelistPush(&list, &game);
-            //     free(message);
-
-            //     printf("i: %d\n", i);
-            // }
 }
 
 #endif // !REQUESTGAME_H_INCLUDED

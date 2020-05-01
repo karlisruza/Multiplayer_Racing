@@ -17,10 +17,11 @@
 int main(void){
     int serverFd = startListen();
 
-    playerlist_t* playerlist = malloc(sizeof(playerlist_t));
-    gamelist_t* gamelist = malloc(sizeof(gamelist_t));
-    getTestingList(&gamelist);
-    printGameList(&gamelist);
+    playerlist_t* playerList = malloc(sizeof(playerlist_t));
+    gamelist_t* gameList = malloc(sizeof(gamelist_t));
+    gameList->count = 0;
+    getTestingList(&gameList);
+    printGameList(&gameList);
 
     while(true){
         	struct sockaddr_in peerAddr;
@@ -33,15 +34,15 @@ int main(void){
             printClient(clientFd);	
             player_t* player = malloc(sizeof(player_t));
             player->ID = clientFd;
-            playerlistPush(&playerlist, &player);
-            printPlayerList(&playerlist);
+            playerlistPush(&playerList, &player);
+            printPlayerList(&playerList);
 
-            //so that the list is passed and thread knows its fd
+            //packs params for use in thread
             params_t* params = malloc(sizeof(struct threadParam));
             params->clientFd = clientFd;
             params->serverFd = serverFd;
-            params->gameList = gamelist;
-            params->playerList = playerlist;
+            params->gameList = gameList;
+            params->playerList = playerList;
             
             pthread_t thread;
 	        pthread_create(&thread, NULL, clientThread, (void *) params);

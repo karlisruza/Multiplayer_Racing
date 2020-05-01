@@ -6,18 +6,14 @@ void *clientThread(void* param){
         void* buffer = malloc(sizeof(MAX_PAYLOAD_SIZE+sizeof(msg_t)));
         int length = (sizeof(msg_t)) + MAX_PAYLOAD_SIZE;
 
-        int retLen = recv(((params_t*)param)->clientFd, buffer, length, 0);
-        if(retLen < 0){
-            printf("fail \n");
+        while(true){
+            int retLen = recv(((params_t*)param)->clientFd, buffer, length, 0);
+            if(retLen < 0){
+                printf("fail \n");
+            }
+            msg_t* msgr = (msg_t*)buffer;
+            handleData(msgr, (params_t*)param);
         }
-        msg_t* msgr = (msg_t*)buffer;
-        handleData(msgr, (params_t*)param);
-        retLen = recv(((params_t*)param)->clientFd, buffer, length, 0);
-        if(retLen < 0){
-            printf("fail \n");
-        }
-        handleData(msgr, (params_t*)param);
-
 }
 
 void printClient(int fd) {

@@ -15,11 +15,14 @@
 #include "handleData/handleData.h"
 #include "sendMessage/sendName.h"
 #include "sendMessage/requestGame.h"
+#include "sendMessage/createGame.h"
+#include "sendMessage/joinGame.h"
 
 int main(int argc, char* argv[]){
     int clientFd = clientConnect(argv[1], argv[2], argv[3]); //sets up connection
     // WINDOW* win = winSetup();
     player_t* clientPlayer = (player_t*)malloc(sizeof(player_t));
+    playerlist_t* playerList = (playerlist_t*)malloc(sizeof(playerlist_t)); //contains all players in lobby
     gamelist_t* gameList = (gamelist_t*)malloc(sizeof(gamelist_t));
 
     // clientPlayer->name = enterNameMenu(win);
@@ -27,8 +30,20 @@ int main(int argc, char* argv[]){
     clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response
 
     requestGame(&gameList, clientFd);
-    printGameList(&gameList);
     //displayGames()
+    createGame(&clientPlayer, clientFd);
+    int gameId = 4;
+    joinGame(&playerList, &clientPlayer, clientFd, gameId);
+
+
+    // while(true){
+    //     //WaitForInput(&playerlist)-> either joingGame() or createGame()
+    //     //displayLobby(&playerlist)
+    //     //
+    //     //waitForStart(); 
+    // }
+
+
 
     // handleData(buffer, clientSocket, NULL, &clientplayer);
      

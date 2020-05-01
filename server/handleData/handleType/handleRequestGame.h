@@ -24,7 +24,6 @@ void handleRequestGame(msg_t* message, gamelist_t** list, int clientFd){
             game.gamecount = gameList->count;
             game.status = current->status;
 
-            printGame(current);
             memcpy((void*)&reply.payload, (void*)&game, sizeof(game));
             length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(game);
             sendData(clientFd, (void*)&reply, length, NULL);

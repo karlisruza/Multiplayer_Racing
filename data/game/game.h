@@ -9,7 +9,7 @@ typedef struct Game{
     int gameid;
     int status; //(0- WAITING_PLAYERS, 1- STARTED, -1- ENDED);
     int hostId;
-    playerlist_t* playerlist;
+    playerlist_t* playerList;
     struct Game* next;
     struct Game* prev;
 }game_t;

@@ -24,4 +24,9 @@ typedef struct request_game_payload_type{
     int hostId;
 }rg_pt;
 
+typedef struct request_player_payload_type{
+    player_t* player;
+    int playerCount;
+}rp_pt;
+
 #endif

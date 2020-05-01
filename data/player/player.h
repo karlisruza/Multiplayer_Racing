@@ -66,34 +66,20 @@ void deletePlayer(playerlist_t** list, int playerId){
     }
     return;
 }
+char* getPlayerName(playerlist_t** list, int clientFd){
+    playerlist_t* playerList = *list;
+    player_t* current;
+    if(playerList != NULL){
+        if(playerList->head != NULL){
+            while(current != NULL){
+                if(current->ID == clientFd){
+                    return current->name;
+                }
+            }
+        }
+    }
+    return "Yikes";
+}
 
-// void serverplayerlistPush(playerlist_t** list){
-//     player_t* player = (player_t*)malloc(sizeof(player_t));
-//     player->angle = P_START_ANGLE;
-//     player->position.x = P_START_X;
-//     player->speed = 0;
-//     player->acceleration = 0;
-//     player->laps = 0;
-//     player->next = NULL;
-//     player->prev = NULL;
-    
-//     if((*list)->head == NULL){
-//         player->ID = 1;
-//         player->position.y = P_START_Y;
-//         (*list)->head = player;
-//         (*list)->tail = player;
-//         (*list)->count++;
-//         return;
-//     }
-//     else{
-//         player->ID = (*list)->tail->ID + 1;
-//         player->position.y = P_START_Y + (*list)->count*2;
-//         (*list)->tail->next = player;
-//         player->prev = (*list)->tail;
-//         (*list)->tail = player;
-//         (*list)->count++;
-//     }
-//     //:TODO SEND PLAYER ID TO PLAYER
-//     return;
-// }
+
 #endif
