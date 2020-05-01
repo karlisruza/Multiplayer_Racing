@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include "car/car.h"
-#include <math.h>
+
 
 
 /*
@@ -53,6 +53,9 @@ struct car* initPlayer ();
 	//provides forward motion when the forward motion key is pressed
 void moveCar(struct car** player, WINDOW* win, bool forward);
 
+	//basically, during the main loop moves the car forwards but in a slowdown manner
+void naturalMovement(struct car** player, WINDOW* win);
+
 	//rotates car in ccw or cw direction when, respectively, A or D are pressed
 void rotateCar(struct car** player, WINDOW* win, bool clockwise);
 
@@ -60,8 +63,11 @@ void rotateCar(struct car** player, WINDOW* win, bool clockwise);
 		//this function checks if the selected coordinates contain a ' ' or '|'
 bool checkMove(WINDOW* win, double y, double x);
 
+	//function that determines if half of the lap is completed. 
+void checkLapCrosing(struct car** player, WINDOW* win);
+
 	//determines which key is pressed at a certain moment
-void keyPress(struct car** player, WINDOW* win);
+bool keyPress(struct car** player, WINDOW* win);
 
 
 // GRAPHICS FUNCTIONS DECLARATIONS
@@ -86,6 +92,41 @@ void endScreen (WINDOW* win, struct car** player);
 void winSizeCheck (WINDOW* win);
 
 
+/////
+
+
+#include <ctype.h>
+#include <termios.h>
+#include <unistd.h>
+
+struct termios orig_termios;
+
+void die(const char *s) {
+  perror(s);
+  exit(1);
+}
+
+void disableRawMode() {
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
+    die("tcsetattr");
+}
+
+void enableRawMode() {
+  if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
+  atexit(disableRawMode);
+
+  struct termios raw = orig_termios;
+  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | IXON);
+  raw.c_oflag &= ~(OPOST);
+  raw.c_cflag |= (CS8);
+  raw.c_lflag &= ~(ICANON | IEXTEN | ISIG);
+
+  raw.c_cc[VMIN] = 0;
+  raw.c_cc[VTIME] = 1;
+
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
+}
+
 
 int main(void){
 	initscr();
@@ -102,15 +143,22 @@ int main(void){
 
 	wrefresh(win);
 
+	enableRawMode();
+
+	bool run = true;
 		//if a key is pressed, calls functions that move the car and read the pressed buttons.
-	while(player1->laps < 2){
-		if (player1 -> velocity > 0){
-			player1 -> velocity -= 0.05;
-		} else if (player1 -> velocity < 0){
-			player1 -> velocity += 0.05;
-		}
+	while(player1->laps < 2 && run){
 		
-		keyPress(&player1, win);
+		//natural deceleration	
+		//consider deceleration with division rather than linearly
+
+		naturalMovement(&player1, win);
+
+		//check for lap crossing
+		checkLapCrosing(&player1, win);
+
+	    run = keyPress(&player1, win);
+		
 		drawCar(win, &player1);
 
 		outputPlayerStats(&player1, win);
@@ -119,8 +167,12 @@ int main(void){
 		drawFinishLine(win);
 	}
 		//once lap is finished, launches endScreen displaying the winner.
+
+	disableRawMode();
+
 	player1 -> velocity = 0;
-	endScreen(win, &player1);
+	if (player1 -> laps == 2)
+		endScreen(win, &player1);
 
 	endwin();
 	return 0;
@@ -136,20 +188,54 @@ int main(void){
 
 void moveCar(struct car** player, WINDOW* win, bool forward){
 
-	// //head
-	// double hx = ((*player)->mid->x) + 1*cos((*player)->angle * M_PI);
-	// double hy = ((*player)->mid->y) + 1*sin((*player)->angle * M_PI);
-	// //tail
-	// double tx = ((*player)->mid->x) - 1*cos((*player)->angle * M_PI);
-	// double ty = ((*player)->mid->y) - 1*sin((*player)->angle * M_PI);
-
 		//depending on the rotation of the car in steps of 45 degrees, 
 			//the coordinates are increased in the direction.
 	if(forward){
-		(*player) -> velocity = 1;
+		(*player) -> velocity += 0.1;
 	}
-	else{
-		(*player) -> velocity = -0.5;
+	else {
+		(*player) -> velocity -= 0.1;
+	}
+
+	if ((*player) -> velocity >= 1.00){
+		(*player) -> velocity = 1.00;
+	} else if ((*player) -> velocity <= -0.6){
+		(*player) -> velocity = -0.6;
+	}
+
+
+	double newXHead = ((*player)->mid->x) + 
+		(*player)->velocity * cos((*player)->angle * M_PI) + 
+		1*cos((*player)->angle * M_PI);
+
+	double newYHead = ((*player)->mid->y) + 
+		(*player)->velocity * sin((*player)->angle * M_PI) + 
+		1*sin((*player)->angle * M_PI);
+
+	if(checkMove(win, newYHead, newXHead)){
+		//mvwprintw(win, (*player)->tail->y, (*player)->tail->x, " ");
+		(*player)->mid->x = newXHead - 1*cos((*player)->angle * M_PI);
+		(*player)->mid->y = newYHead - 1*sin((*player)->angle * M_PI);
+	}
+	else 
+		(*player)->velocity = 0;
+
+		//checks if the car has reached more than 50% of the track so you cannot win by driving on the finish line
+		//the finish line is defined at x = 74; firstly checks if the player is in the upper side of the loop
+	
+	return;
+}
+
+void naturalMovement(struct car** player, WINDOW* win){
+
+		//depending on the rotation of the car in steps of 45 degrees, 
+			//the coordinates are increased in the direction.
+	if (((*player) -> velocity) > 0.01){
+		(*player) -> velocity -= 0.05;
+	} else if (((*player) -> velocity) < -0.01){
+		(*player) -> velocity += 0.05;
+	} else {
+		return;
 	}
 
 	double newXHead = ((*player)->mid->x) + 
@@ -170,15 +256,6 @@ void moveCar(struct car** player, WINDOW* win, bool forward){
 
 		//checks if the car has reached more than 50% of the track so you cannot win by driving on the finish line
 		//the finish line is defined at x = 74; firstly checks if the player is in the upper side of the loop
-	if ((*player)->mid->x >= 73.0 && (*player)->mid->x >= 74.0){
-
-		if ((*player)->mid->y <= 11.0){
-			(*player)->midMark = true; 
-		} else if ((*player)->mid->y >= mapHeight - 10.0 && (*player)->midMark == true){
-			(*player)->laps++;
-			(*player)->midMark = false;		
-		};
-	};
 	
 	return;
 }
@@ -260,6 +337,18 @@ bool checkMove (WINDOW * win, double y, double x){
 	}
 }
 
+
+void checkLapCrosing(struct car** player, WINDOW* win){
+		if ((*player)->mid->x >= 73.0 && (*player)->mid->x >= 74.0){
+
+			if ((*player)->mid->y <= 11.0){
+				(*player)->midMark = true; 
+			} else if ((*player)->mid->y >= mapHeight - 10.0 && (*player)->midMark == true){
+				(*player)->laps++;
+				(*player)->midMark = false;		
+			};
+		};
+}
 
 
 
@@ -543,26 +632,40 @@ void endScreen(WINDOW* win, struct car** player){
 }
 
 
-void keyPress(struct car** player, WINDOW* win){
-	int key = getch();
-	switch (key)
+bool keyPress(struct car** player, WINDOW* win){
+    char c = '\0';
+    read(STDIN_FILENO, &c, 1);
+
+
+	switch (c)
 	{
-	    case 'w':
+	    case 119: //w
+	    case 87:  //W
 			moveCar(&(*player), win, true);
 	     	break;
 
-	    case 's':
+	    case 115: //s
+	    case 83: //S
 	    	moveCar(&(*player), win, false);
 	    	break;
 
-	    case 'a':
+	    case 97: //a
+	    case 65:  //A
 	    	rotateCar(&(*player), win, true);
 	     	break;
 
-	    case 'd':
+	    case 100: //d
+	    case 68:  //D
 	    	rotateCar(&(*player), win, false);
 	     	break;
+
+	    case 27: //esc
+	    	return false;
+
+		default:
+			break;
 	}
+	return true;
 }
 
 
