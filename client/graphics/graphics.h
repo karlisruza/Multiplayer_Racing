@@ -8,14 +8,20 @@
 #define MAP_HEIGHT          40
 #define MAP_WIDTH           150
 
+
+WINDOW* winSetup(void){
+	initscr();
+	noecho();
+    //10 mapHeight lines added for outputting the player information. 
+	WINDOW * win = newwin(MAP_HEIGHT + 10, MAP_WIDTH, 0, 0);
+	return win;
+}
+
 //didn't figure out how to allow one to write - you can't use backspace yet or 
-	//see what you type. Otherwise, works just fine for now while i'm still figuring
-	// out the other terminal system.
-
+//see what you type. Otherwise, works just fine for now while i'm still figuring
+// out the other terminal system.
 char* enterNameMenu (WINDOW* win){
-
 		mvwprintw(win, 0, 0, "ENTER YOUR NAME: ");	
-
 		refresh();
 		wrefresh(win);
 		move(3,4);
