@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "protocol.h"
+#include "../protocol.h"
 
 #ifndef PAYLOAD_H_INCLUDED
 #define PAYLOAD_H_INCLUDED
