@@ -1,20 +1,7 @@
-#include <stdlib.h>		
-#include <stdio.h>		
-#include <ncurses.h>	
-#include <stdbool.h>	
-#include <math.h>	
+#include <stdlib.h>
 
 #ifndef _CAR_HEADER
 #define _CAR_HEADER
-
-#define plRad				(*player)->angle * M_PI
-const float MAX_SPEED = 		1.0;
-const float MAX_REV_SPEED = 	-0.6*MAX_SPEED;
-const float ROAD_FIRICTION =	0.04;
-const float ACCELERATION = 		0.08;
-const float TURN_ANGLE = 		0.11;
-
-
 struct coords{
 	double x;
 	double y;
@@ -46,6 +33,13 @@ struct car* initPlayer (){
 	return player;
 };
 
+void printCar(struct car* player){
+	printf("playerId: %d\nmx: %f\nmy: %f\nv: %f\nangle: %f\n", 
+	player->playerId, player->mid->x, player->mid->y,
+	player->velocity, player->angle);
+}
+
+
 
 	//since fields due to colour in curses are not simply chars anymore,
 		//this function checks if the object in front is a wall. 
@@ -70,9 +64,9 @@ bool checkMove (WINDOW * win, double y, double x){
 void intertia(struct car** player, WINDOW* win){
 
 	if (((*player) -> velocity) > 0.01){
-		(*player) -> velocity -= ROAD_FIRICTION;
+		(*player) -> velocity -= 0.05;
 	} else if (((*player) -> velocity) < -0.01){
-		(*player) -> velocity += ROAD_FIRICTION;
+		(*player) -> velocity += 0.05;
 	} else {
 		return;
 	}
@@ -100,6 +94,9 @@ void intertia(struct car** player, WINDOW* win){
 	}
 	else 
 		(*player)->velocity = 0;
+
+		//checks if the car has reached more than 50% of the track so you cannot win by driving on the finish line
+		//the finish line is defined at x = 74; firstly checks if the player is in the upper side of the loop
 	
 	return;
 }
@@ -109,16 +106,16 @@ void intertia(struct car** player, WINDOW* win){
 void moveCar(struct car** player, WINDOW* win, bool forward){
 
 	if(forward){
-		(*player) -> velocity += ACCELERATION;
+		(*player) -> velocity += 0.1;
 	}
 	else {
-		(*player) -> velocity -= ACCELERATION;
+		(*player) -> velocity -= 0.1;
 	}
 
-	if ((*player) -> velocity >= MAX_SPEED){
-		(*player) -> velocity = MAX_SPEED;
-	} else if ((*player) -> velocity <= MAX_REV_SPEED){
-		(*player) -> velocity = MAX_REV_SPEED;
+	if ((*player) -> velocity >= 1.00){
+		(*player) -> velocity = 1.00;
+	} else if ((*player) -> velocity <= -0.6){
+		(*player) -> velocity = -0.6;
 	}
 
 
@@ -158,10 +155,10 @@ void rotateCar(struct car** player, WINDOW* win, bool clockwise){
 
 	float tempAngle;
 	if(clockwise){
-		tempAngle = -TURN_ANGLE;
+		tempAngle = -0.133;
 	}
 	else{
-		tempAngle = TURN_ANGLE;
+		tempAngle = 0.133;
 	}
 		//temporary variables to hold the checkable values 
 	double newXHead = ((*player)->mid->x) + 
