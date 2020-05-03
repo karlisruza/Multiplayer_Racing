@@ -36,6 +36,17 @@ void printGame(game_t* game){
     } 
 }
 
+void printGameById(gamelist_t** list, int id){
+    game_t* current = (*list)->head;
+    while(current != NULL){
+        if(current->gameid == id){
+            printGame(current);
+        }
+        current = current->next;
+    }
+    return;
+}
+
 void printGameList(gamelist_t** list){
     game_t* current = (*list)->head;
     while(current != NULL){
@@ -66,7 +77,14 @@ void getTestingList(gamelist_t** list){
     game = (game_t*)malloc(sizeof(game_t));
     game->gameid = 4;
     game->hostId = 0;
+    game->playerList = (playerlist_t*)malloc(sizeof(playerlist_t));
     gamelistPush(&gamelist, &game);
+
+    player_t* host = (player_t*)malloc(sizeof(player_t*));
+    host->name = "hostplayer";
+    host->ID = 99;
+    host->gameID = 4;
+    playerlistPush(&game->playerList, &host);
 
     game = (game_t*)malloc(sizeof(game_t));
     game->gameid = 5;

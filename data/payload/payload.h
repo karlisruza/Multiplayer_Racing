@@ -24,9 +24,10 @@ typedef struct request_game_payload_type{
     int hostId;
 }rg_pt;
 
-typedef struct request_player_payload_type{
-    player_t* player;
+typedef struct request_lobby_payload_type{
+    int ID; /*Spēlētāja ID*/
+    char* name;/* Spēlētāja vārds */
     int playerCount;
-}rp_pt;
+}rl_pt;
 
 #endif
