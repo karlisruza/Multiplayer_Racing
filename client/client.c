@@ -25,6 +25,8 @@
 #include "display/controls.h"
 
 
+
+
 int main(int argc, char* argv[]){
     // ./c 8015 10.0.2.15 8014
     int clientFd;
@@ -40,10 +42,20 @@ int main(int argc, char* argv[]){
     gamelist_t* gameList = (gamelist_t*)malloc(sizeof(gamelist_t));
 
     WINDOW* win = startGraphics();
+    enableRawMode();
 
-    clientPlayer->name = enterNameMenu(win);
-    
-    clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response from server
+    enterName(win);
+    clientPlayer->name = writePrompt(win, 3, 4);
+
+    refresh();
+    wrefresh(win);
+
+
+    if(clientPlayer->name != NULL){
+        clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response from server
+    } else {
+        exit(1);
+    };
 
         //game_t current iekš graphics.h
         //if game list != null
@@ -64,21 +76,17 @@ int main(int argc, char* argv[]){
     requestGame(&gameList, clientFd);
     displayGameList(win, &gameList); //in graphics.h
 
-    char enter = 0;
-    while (enter != '\n'){
-        enter = getchar();
+
+    unsigned int yes = lobbyNav(win, gameList->count);
+
+    if (yes == gameList->count){
+        //create game
+    } else {
+        //join game
     }
 
 
     exit(1);
-    //
-
-    // if (!displayGameList(win, &gameList, clientFd)){
-    //     printf("Did not get to display game list.");
-    //     exit(1);
-    // }
-
-
 
 
     //displayGames();

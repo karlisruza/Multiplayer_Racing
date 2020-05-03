@@ -67,4 +67,92 @@ bool keyPress(struct car** player, WINDOW* win){
 	return true;
 }
 
+
+char* writePrompt(WINDOW* win, int y, int x){
+	const int maxLength = 20;
+    char* input = malloc(maxLength+1);
+    int length = 0;
+
+    for (int i = 0; i < maxLength; i++){
+    	input [i] = ' ';
+    }
+
+    while (1){
+    	char c = 0;// = getchar();
+    	read(STDIN_FILENO, &c, 1);
+
+        if (isalnum(c) && length < maxLength){
+            input[length] = c;
+            length++;
+            displayInput (win, input, y, x);
+        } else {
+        	if (c == 127 && length != 0) { //backspace
+	            length--;
+	        	input [length] = ' ';
+	        	displayInput (win, input, y, x);
+	        }
+	        
+			if (c == 13 && length > 0){ //enter
+				input[length] = '\0';
+	        	return input;
+	        }
+	        
+	        if (c == 27){//esc
+		    	exit(1);
+	        } 
+	    }
+    }
+}
+
+
+ //
+int lobbyNav(WINDOW* win, int gameCount){
+    char c = '\0';
+    int pos = 1;
+    drawLobbyPos(win, pos, gameCount+1);
+
+    while (1){
+    	char c = 0;// = getchar();
+    	read(STDIN_FILENO, &c, 1);
+
+        switch (c){
+		    case 'w': //w
+		    case 'W':  //W
+				if (pos == 1){
+					pos = gameCount+1;
+				} 
+				else pos--;//go upwards function
+				drawLobbyPos(win, pos, gameCount+1);
+		     	break;
+
+		    case 's': //s
+		    case 'S': //S
+				if (pos == gameCount+1){
+					pos = 1;
+				} 
+				else pos++;
+				drawLobbyPos(win, pos, gameCount+1);
+				break;
+
+			case 'c': //c
+		    case 'C': //C
+		    	return gameCount+1;
+
+			case 13: //enter
+				//enter room/accept selection
+		    	return pos;
+
+		    case 27: //esc
+		    	exit(1);
+
+			default:
+				break;
+		}
+	}
+
+
+	
+	return gameCount;
+}
+
 #endif

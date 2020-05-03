@@ -42,33 +42,25 @@ WINDOW* winSetup(void){
 //didn't figure out how to allow one to write - you can't use backspace yet or 
 //see what you type. Otherwise, works just fine for now while i'm still figuring
 // out the other terminal system.
-char* enterNameMenu (WINDOW* win){
-		mvwprintw(win, 1, 1, "ENTER YOUR NAME: ");	
-		refresh();
-		wrefresh(win);
-		move(3,4);
 
-		char* userName = malloc(20);
-		bool usableName = false;
-		char enter = 0;
+void enterName (WINDOW* win){
+	clear();
+	mvwprintw(win, 1, 1, "ENTER YOUR NAME: ");	
+	wrefresh(win);
 
-		int length;
-		for (length = 0; length < 20; length++){
-			enter = getchar();
-			//if (!alnum(enter)) usableName = false;
-	 		if (enter == '\r' || enter == '\n') {userName [length] = '\0'; break;} 
-	 		userName[length] = enter;
-			usableName = true;
-			printw("%c", enter);
-			refresh();
-	 	};
+	move (3,4);
+	clrtoeol();
 
-	 	if (!usableName){
-	 		return "";
-	 	}
+	return;
+}
 
-		werase(win);
-		return userName;
+void displayInput (WINDOW* win, char* input, int y, int x){
+	wattron (win, A_BOLD);
+	mvwprintw(win, y, x, "%s", input);
+	wattroff (win, A_BOLD);
+	
+	wrefresh(win);
+	return;
 }
 
 	//takes list of games from client.c, and outputs the contents of the list on the screen
@@ -79,23 +71,29 @@ void displayGameList (WINDOW * win, gamelist_t** list){
 	    if ((*list) != NULL && (*list) -> head != NULL){
 	    	game_t* current = (game_t*)malloc(sizeof(game_t));
 	    	current = (*list) -> head;
-	    	int entryCount = 0; 
+	    	int entryCount = 1; 
 			
 			mvwprintw(win, 3, 3, "--- LIST OF GAMES ---");
 
 	    	while (current != NULL){
-	    		wattron(win, A_BOLD);
-		    	mvwprintw(win, 5+4*entryCount, 3, "Game ID: %d", current -> gameid);
-		    	wattroff(win, A_BOLD);
+	    		wattron(win, A_DIM);
+	    			mvwprintw(win, 5*entryCount, 3, "Game number: %d", entryCount);
 
-		    	wattron(win, A_DIM);
-		    	mvwprintw(win, 5+4*entryCount + 1, 6, "Host ID: %d", current -> hostId);
-		    	mvwprintw(win, 5+4*entryCount + 2, 6, "Status: %d", current -> status);
+					mvwprintw(win, 5*entryCount + 1, 6, "Game ID: %d", current -> gameid);
+			    	mvwprintw(win, 5*entryCount + 2, 6, "Host ID: %d", current -> hostId);
+			    	mvwprintw(win, 5*entryCount + 3, 6, "Status: %d", current -> status);
 		    	wattroff(win, A_DIM);
 
 		    	current = current -> next;
 		    	entryCount++;
 	    	}
+
+		wattron(win, A_DIM);
+	    	mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME");
+		wattroff(win, A_DIM);
+
+	    
+	    //free (current);
 	    wrefresh(win);
 	    refresh();
 	    }
@@ -105,7 +103,27 @@ void displayGameList (WINDOW * win, gamelist_t** list){
 	    	exit(1);
 	    }
 
-	 return;
+	return;
+}
+
+void drawLobbyPos (WINDOW* win, int pos, int maxPos){
+	if (pos == 1){
+		// int mvwchgat(int y, int x, int n, attr_t attr, short color, const void *opts)
+	
+		mvwchgat(win, 5*maxPos 	, 2, -1, A_DIM, MAP_COLOR, NULL);
+		mvwchgat(win, 5*(pos+1) , 2, -1, A_DIM, MAP_COLOR, NULL);
+	} else if (pos == maxPos){
+		mvwchgat(win, 5*(pos-1) , 2, -1, A_DIM, MAP_COLOR, NULL);
+		mvwchgat(win, 5			, 2, -1, A_DIM, MAP_COLOR, NULL); //first element
+	} else {
+		mvwchgat(win, 5*(pos+1) , 2, -1, A_DIM, MAP_COLOR, NULL);
+		mvwchgat(win, 5*(pos-1) , 2, -1, A_DIM, MAP_COLOR, NULL);
+	}
+
+	mvwchgat(win, 5*pos 	, 2, -1, A_BOLD, PLAYER_ONE_COLOR, NULL);
+
+	wrefresh(win);
+	return;
 }
 
  	//waits for player to resize the window if it is too small for the game. 
