@@ -18,16 +18,13 @@ void handleData(msg_t *message, params_t* params){
     printf("handleData enum %d\n", message->type);
     switch (message->type){
         case 1:
-            printf("lmao\n");
-            data = (up_pt*)(message->payload);
-            printf("playerId %d", data->playerID);
-            printf("gameId %d", data->playerID);
-            printf("keypress x: %d", data->action.x);
-            printf("keypress y: %d", data->action.y);
-            printf("lmao\n");
-            break;
-        case JOIN_GAME:
-            handleJoinGame(message, &gameList, &playerList);    
+            // printf("lmao\n");
+            // data = (up_pt*)(message->payload);
+            // printf("playerId %d", data->playerID);
+            // printf("gameId %d", data->playerID);
+            // printf("keypress x: %d", data->action.x);
+            // printf("keypress y: %d", data->action.y);
+            // printf("lmao\n");
             break;
         case 3:
             break;
@@ -46,18 +43,24 @@ void handleData(msg_t *message, params_t* params){
             printf("PONG\n");
             break;
         case REQUEST_GAME:
-            handleRequestGame(message, &gameList, clientFd);
+            handleRequestGame(&gameList, clientFd);
+            return;
             break;
         case CREATE_GAME:
             handleCreateGame(&gameList, clientFd);
             break;
         case ADD_PLAYER:{
             handleAddPlayer(message, clientFd, &playerList);
+            // sleep(1);
             break;
         }
         case REQUEST_PLAYER:
-            handleRequestPlayer(message, &playerList, clientFd);
+            handleRequestPlayer(message, &gameList, clientFd);
             break;
+        case JOIN_GAME:{
+            handleJoinGame(message, &gameList, &playerList, clientFd);  
+            break;
+        }
         default:
             perror("invalid message");
     }

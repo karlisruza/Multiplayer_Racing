@@ -1,7 +1,7 @@
 #ifndef HANDLEREQUESTGAME_H_INCLUDED
 #define HANDLEREQUESTGAME_H_INCLUDED
 
-void handleRequestGame(msg_t* message, gamelist_t** list, int clientFd){
+void handleRequestGame(gamelist_t** list, int clientFd){
     msg_t reply;
     reply.type = REQUEST_GAME;
     int length;
@@ -27,7 +27,6 @@ void handleRequestGame(msg_t* message, gamelist_t** list, int clientFd){
             memcpy((void*)&reply.payload, (void*)&game, sizeof(game));
             length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(game);
             sendData(clientFd, (void*)&reply, length, NULL);
-            // sleep(1);
             current = current->next;
         }
     }

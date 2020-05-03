@@ -52,4 +52,29 @@ void sendData(int fd, char *data, unsigned length, struct sockaddr_in *remote) {
     }
 }
 
+int payloadSize(int type){
+    switch(type){
+        case REQUEST_GAME:
+            return sizeof(rg_pt);
+            break;
+        case CREATE_GAME:
+            return 0;
+            break;
+        case ADD_PLAYER:{
+            return 0;
+            break;
+        }
+        case REQUEST_PLAYER:
+            return sizeof(rl_pt);
+            break;
+        case JOIN_GAME:{
+            return 0;
+            break;
+        }
+        default:
+            return 0;
+    }
+    return 0;
+}
+
 #endif

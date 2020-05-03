@@ -2,23 +2,31 @@
 #ifndef JOINGAME_H_INCLUDED
 #define JOINGAME_H_INCLUDED
 
-int joinGame(playerlist_t** list, player_t** player, int clientFd, int gameId){
+void joinGame(playerlist_t** list, player_t** player, int clientFd){
     msg_t request;
     request.type = JOIN_GAME;
     playerlist_t* playerList = *list;
     player_t* clientPlayer = *player;
 
     cg_pt payload;
-    payload.gameID = gameId;
+    payload.gameID = clientPlayer->gameID;
     payload.playerID = clientPlayer->ID;
+
+    printf("payload gameid: %d\n payload playerID: %d \n", payload.playerID, payload.gameID);
 
     memcpy((void*)&request.payload, (void*)&payload, sizeof(payload));
     int length = ((void*)&request.payload - (void*)&request.type) + sizeof(payload);
     sendData(clientFd, (void*)&request, length, NULL);
+    printf("join game executed\n");
 
-    requestPlayer(&playerList, clientFd);
-
-    return 1;
+    void* buffer = (void*)malloc(sizeof(msg_t));
+    length = sizeof(msg_t);
+    int retLen = recv(clientFd, (void*)buffer, length, 0);
+    if(retLen < 0){
+        printf("fail \n");
+    }
+    
+    return;
 }
 
 #endif

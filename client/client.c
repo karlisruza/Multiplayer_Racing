@@ -18,6 +18,8 @@
 #include "sendMessage/requestGame.h"
 #include "sendMessage/createGame.h"
 #include "sendMessage/joinGame.h"
+#include "sendMessage/requestPlayer.h"
+#include "sendMessage/ping.h"
 
 #include "display/const.h"
 #include "display/car.h"
@@ -45,6 +47,7 @@ int main(int argc, char* argv[]){
 
     // clientPlayer->name = enterNameMenu(win);
     clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response
+    printf("player ID: %d\n", clientPlayer->ID);
 
     //requestGame(&gameList, clientFd);
     displayGameList(win, &gameList, clientFd); //in graphics.h
@@ -58,9 +61,19 @@ int main(int argc, char* argv[]){
 
 
     //displayGames()
-   // createGame(&clientPlayer, clientFd);
-   // int gameId = 4;
-   // joinGame(&playerList, &clientPlayer, clientFd, gameId);
+    clientPlayer->gameID = 4;
+    joinGame(&playerList, &clientPlayer, clientFd);
+    requestPlayer(&playerList, &clientPlayer, clientFd);
+    printf("aa\n");
+
+    printPlayerList(&playerList);
+
+
+
+    while(true){
+   
+    }
+    // close(clientFd);
 
 
     // while(true){
@@ -68,10 +81,5 @@ int main(int argc, char* argv[]){
     //     //displayLobby(&playerlist)
     //     //
     //     //waitForStart(); 
-    // }
-
-
-
-    // handleData(buffer, clientSocket, NULL, &clientplayer);
-     
+    // }     
 }
