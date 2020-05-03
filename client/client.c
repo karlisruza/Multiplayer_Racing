@@ -40,15 +40,22 @@ int main(int argc, char* argv[]){
     gamelist_t* gameList = (gamelist_t*)malloc(sizeof(gamelist_t));
 
     WINDOW* win = startGraphics();
-    //char* pName = enterNameMenu(win);
+
+    clientPlayer->name = enterNameMenu(win);
 
     // clientPlayer->name = enterNameMenu(win);
-    clientPlayer->name = "karlisxx";
     clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response
 
     //requestGame(&gameList, clientFd);
+    displayGameList(win, &gameList, clientFd); //in graphics.h
 
-    displayGameList(win, &gameList, clientFd);
+    // if (!displayGameList(win, &gameList, clientFd)){
+    //     printf("Did not get to display game list.");
+    //     exit(1);
+    // }
+
+
+
 
     //displayGames()
    // createGame(&clientPlayer, clientFd);

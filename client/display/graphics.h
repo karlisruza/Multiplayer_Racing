@@ -56,14 +56,12 @@ char* enterNameMenu (WINDOW* win){
 		for (length = 0; length < 20; length++){
 			enter = getchar();
 			//if (!alnum(enter)) usableName = false;
-	 		if (enter == '\r' || enter == '\n') break; 
+	 		if (enter == '\r' || enter == '\n') {userName [length] = '\0'; break;} 
 	 		userName[length] = enter;
 			usableName = true;
 			printw("%c", enter);
 			refresh();
 	 	};
-
-	 	userName[length] = '\0';
 
 	 	if (!usableName){
 	 		return "";
@@ -86,6 +84,7 @@ void displayGameList (WINDOW * win, gamelist_t** list, int clientFd){
 	    	// game->curr = gameData->hostId;
 	        // game->status = gameData->status;
 	    }
+	    wrefresh(win);
 	    char enter;
 	    while (enter != '\n'){
 	    	enter = getchar();
@@ -94,11 +93,12 @@ void displayGameList (WINDOW * win, gamelist_t** list, int clientFd){
 }
 
  	//waits for player to resize the window if it is too small for the game. 
-void winSizeCheck (WINDOW* win){
-	while (COLS < MAP_WIDTH || LINES < MAP_HEIGHT+10){
 		//basically, before the game begins, it checks it the 
 		// race track fits on the screen and won't start the 
-		// game until everything is order. It's to prevent ncurses glitches. 
+		// game until everything is order. It's to prevent ncurses glitches.
+void winSizeCheck (WINDOW* win){
+	while (COLS < MAP_WIDTH || LINES < MAP_HEIGHT+10){
+ 
 	
 		mvwprintw(win, 1, 3, "You need to increase the window size.\nTry decreasing character size (ctrl + [-])\nor increasing the terminal window size.");
 		//outputs if the terminal width is not enough
