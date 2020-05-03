@@ -42,12 +42,36 @@ int main(int argc, char* argv[]){
     WINDOW* win = startGraphics();
 
     clientPlayer->name = enterNameMenu(win);
+    
+    clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response from server
 
-    // clientPlayer->name = enterNameMenu(win);
-    clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response
+        //game_t current iekš graphics.h
+        //if game list != null
+            //if game list head != null
+            // while current != null 
+                //displayGameList() graphics.h
+            //refresh 
+            // later getch (r) -> request game no jauna
+            // press number atbilstoši spelei, kurai pievienoties
+            // c izsauc create game funkciju
+            // join game create game rezultāts ir tāds pats
+                //display lobby
 
-    //requestGame(&gameList, clientFd);
-    displayGameList(win, &gameList, clientFd); //in graphics.h
+
+    refresh();
+    wrefresh(win);
+    
+    requestGame(&gameList, clientFd);
+    displayGameList(win, &gameList); //in graphics.h
+
+    char enter = 0;
+    while (enter != '\n'){
+        enter = getchar();
+    }
+
+
+    exit(1);
+    //
 
     // if (!displayGameList(win, &gameList, clientFd)){
     //     printf("Did not get to display game list.");
@@ -57,7 +81,7 @@ int main(int argc, char* argv[]){
 
 
 
-    //displayGames()
+    //displayGames();
    // createGame(&clientPlayer, clientFd);
    // int gameId = 4;
    // joinGame(&playerList, &clientPlayer, clientFd, gameId);

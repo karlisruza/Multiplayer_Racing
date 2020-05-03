@@ -71,24 +71,40 @@ char* enterNameMenu (WINDOW* win){
 		return userName;
 }
 
-void displayGameList (WINDOW * win, gamelist_t** list, int clientFd){
+	//takes list of games from client.c, and outputs the contents of the list on the screen
+void displayGameList (WINDOW * win, gamelist_t** list){
+	    
 	    werase(win);
-	    requestGame(list, clientFd);
-	    game_t* current = (*list)->head;
 
-	    for (int i = 0; i < (*list)->count; i++){
+	    if ((*list) != NULL && (*list) -> head != NULL){
+	    	game_t* current = (game_t*)malloc(sizeof(game_t));
+	    	current = (*list) -> head;
+	    	int entryCount = 0; 
+			
+			mvwprintw(win, 3, 3, "--- LIST OF GAMES ---");
 
-	    	mvwprintw(win, 4*i, 3, "ID: %d", current->gameid);
+	    	while (current != NULL){
+	    		wattron(win, A_BOLD);
+		    	mvwprintw(win, 5+4*entryCount, 3, "Game ID: %d", current -> gameid);
+		    	wattroff(win, A_BOLD);
 
-	    	current = current->next;
-	    	// game->curr = gameData->hostId;
-	        // game->status = gameData->status;
-	    }
+		    	wattron(win, A_DIM);
+		    	mvwprintw(win, 5+4*entryCount + 1, 6, "Host ID: %d", current -> hostId);
+		    	mvwprintw(win, 5+4*entryCount + 2, 6, "Status: %d", current -> status);
+		    	wattroff(win, A_DIM);
+
+		    	current = current -> next;
+		    	entryCount++;
+	    	}
 	    wrefresh(win);
-	    char enter;
-	    while (enter != '\n'){
-	    	enter = getchar();
+	    refresh();
 	    }
+	    else {
+	    	printf("games list is empty");
+	    	endwin();
+	    	exit(1);
+	    }
+
 	 return;
 }
 
@@ -239,7 +255,6 @@ void drawCar(WINDOW* win, struct car** player){
 
 	wattroff(win, PLAYER_ONE_COLOR);
 	wattroff(win, A_BOLD);
-
 }
 
 	//Creates the race track

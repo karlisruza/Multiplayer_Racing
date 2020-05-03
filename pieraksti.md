@@ -35,3 +35,25 @@ Alright. Es vienkārši šo pārlasīšu, kad ar to (at)sākšu cīnīties.
 jā un pēc recv ir
 msg_t* msgr = (msg_t*)buffer;
         handleDataS(msgr, fd);
+
+
+
+ir spēle, notiek keyPress
+	action
+	client thread instancē būs case move car, kas tajā threadā aprēķina
+	dabū spēlētāja vietu un leņķi,
+	aprēķina jaunās vērtības
+	sūtīs updated sarakstu
+	
+	spēle servera pusē ir simulēta spēle, kas vienk netiek renderēta. 
+
+	spēle posted by playername 
+	spēles nosaukums
+
+	spēles izvēle 
+	
+	//request game (un tad izsauc displayGame)
+	// un ielikt loopā
+	// 
+
+	input join game vai create game
