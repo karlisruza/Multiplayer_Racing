@@ -1,11 +1,10 @@
+#include "const.h"
 #ifndef GRAPHICS_H_INCLUDED
 #define GRAPHICS_H_INCLUDED
 
 #define MAP_COLOR     		COLOR_PAIR(1)
 #define PLAYER_ONE_COLOR    COLOR_PAIR(2)
 #define PLAYER_TWO_COLOR    COLOR_PAIR(3)
-
-
 
 WINDOW* winSetup(void){
 	initscr();

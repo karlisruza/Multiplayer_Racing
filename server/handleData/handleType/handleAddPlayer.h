@@ -4,11 +4,9 @@
 void handleAddPlayer(msg_t* message, int clientFd, playerlist_t** list){
     msg_t reply;
     int length;
-    char* playername[30]; 
-    strcpy((char*)message->payload, &playername);
+    char* playername = (char*)message->payload;
     player_t* current;
     playerlist_t* playerList = *list;
-    printf("pname: %s\n", playername);
 
     if(playerList != NULL && playerList->head != NULL){
         current = playerList->head;
