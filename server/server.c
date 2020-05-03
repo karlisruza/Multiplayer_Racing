@@ -17,20 +17,28 @@
 int main(void){
     int serverFd = startListen();
 
+	//creates a structure that holds the player list and game list. 
     playerlist_t* playerList = malloc(sizeof(playerlist_t));
     gamelist_t* gameList = malloc(sizeof(gamelist_t));
     gameList->count = 0;
+
+	//(temporary) populates the game list
     getTestingList(&gameList);
     printGameList(&gameList);
-
+	
+	//runs indefinitely
     while(true){
-        	struct sockaddr_in peerAddr;
-	        socklen_t addrSize = sizeof(peerAddr);
-	        int clientFd = accept(serverFd, (struct sockaddr *) &peerAddr, &addrSize);
+		
+		//
+            struct sockaddr_in peerAddr;
+	    socklen_t addrSize = sizeof(peerAddr);
+	    int clientFd = accept(serverFd, (struct sockaddr *) &peerAddr, &addrSize);
+
             if (clientFd == -1) {
                 perror("accept");
                 return -1;
             }
+
             printClient(clientFd);	
             player_t* player = malloc(sizeof(player_t));
             player->ID = clientFd;

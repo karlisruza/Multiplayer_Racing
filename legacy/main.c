@@ -1,65 +1,19 @@
-#include <stdlib.h>		
-#include <stdio.h>		
-#include <ncurses.h>	
-#include <stdbool.h>	
-#include <math.h> 		
 
-#include <ctype.h>		
-#include <termios.h>	
-#include <unistd.h>		
 
+#include "../client/display/const.h"
 #include "../client/display/car.h"
 #include "../client/display/graphics.h"
+#include "../client/display/controls.h"
 
 
 
 #define MAP_COLOR     		COLOR_PAIR(1)
 #define PLAYER_ONE_COLOR    COLOR_PAIR(2)
 #define PLAYER_TWO_COLOR    COLOR_PAIR(3)
-#define fps 				10
-#define accel				3
-
-
-
-	//function that determines if half of the lap is completed. 
-void checkLapCrosing(struct car** player, WINDOW* win);
-
-	//determines which key is pressed at a certain moment
-bool keyPress(struct car** player, WINDOW* win);
-
-
-struct termios orig_termios;	
-
-void die(const char *s) {
-  perror(s);
-  exit(1);
-}
-
-void disableRawMode() {
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
-    die("tcsetattr");
-}
-
-void enableRawMode() {
-  if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
-  atexit(disableRawMode);
-
-  struct termios raw = orig_termios;
-  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | IXON);
-  raw.c_oflag &= ~(OPOST);
-  raw.c_cflag |= (CS8);
-  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-
-  raw.c_cc[VMIN] = 0;
-  raw.c_cc[VTIME] = 1;
-
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
-}
 
 
 
 int main(void){
-	initscr();
 	enableRawMode();
 
     	//10 MAP_HEIGHT lines added for outputting the player information. 
@@ -77,7 +31,7 @@ int main(void){
 	drawCar(win, &player1);
 
 	wrefresh(win);
-
+	enableRawMode();
 
 	bool run = true;
 		//if a key is pressed, calls functions that move the car and read the pressed buttons.
@@ -96,13 +50,14 @@ int main(void){
 		drawCar(win, &player1);
 
 		playerStats(&player1, win);
+
 		wrefresh(win);
+
 		
 		drawFinishLine(win);
 	}
 		//once lap is finished, launches endScreen displaying the winner.
 
-	player1 -> velocity = 0;
 	if (player1 -> laps == 2){		
 		endScreen(win, &player1);
 	}
@@ -118,17 +73,17 @@ int main(void){
 	// CREATE A FUNCTION THAT GOES OVER THE WINDOW DIAGONALLY TO MORE 
 	// OR LESS FIGURE OUT WHERE THE LINE IS, AND PUT THE MIDMARK ON THE OPPOSITE SIDE.
 
-void checkLapCrosing(struct car** player, WINDOW* win){
-		if ((*player)->mid->x >= 73.0 && (*player)->mid->x >= 74.0){
+// void checkLapCrosing(struct car** player, WINDOW* win){
+// 		if ((*player)->mid->x >= 73.0 && (*player)->mid->x >= 74.0){
 
-			if ((*player)->mid->y <= 11.0){
-				(*player)->midMark = true; 
-			} else if ((*player)->mid->y >= MAP_HEIGHT - 10.0 && (*player)->midMark == true){
-				(*player)->laps++;
-				(*player)->midMark = false;		
-			};
-		};
-}
+// 			if ((*player)->mid->y <= 11.0){
+// 				(*player)->midMark = true; 
+// 			} else if ((*player)->mid->y >= MAP_HEIGHT - 10.0 && (*player)->midMark == true){
+// 				(*player)->laps++;
+// 				(*player)->midMark = false;		
+// 			};
+// 		};
+// }
 
 
 
@@ -165,41 +120,6 @@ void checkLapCrosing(struct car** player, WINDOW* win){
 
 
 
-bool keyPress(struct car** player, WINDOW* win){
-    char c = '\0';
-    read(STDIN_FILENO, &c, 1);
-
-
-	switch (c)
-	{
-	    case 119: //w
-	    case 87:  //W
-			moveCar(&(*player), win, true);
-	     	break;
-
-	    case 115: //s
-	    case 83: //S
-	    	moveCar(&(*player), win, false);
-	    	break;
-
-	    case 97: //a
-	    case 65:  //A
-	    	rotateCar(&(*player), win, true);
-	     	break;
-
-	    case 100: //d
-	    case 68:  //D
-	    	rotateCar(&(*player), win, false);
-	     	break;
-
-	    case 27: //esc
-	    	return false;
-
-		default:
-			break;
-	}
-	return true;
-}
 
 
 //basically, make a thread that constantly keeps reading keypresses. The code underneath takes from showkey.c and some stuff online.
