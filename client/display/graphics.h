@@ -105,32 +105,33 @@ void gameListNavDraw (WINDOW* win, int pos, int maxPos){
 }
 
 	//draws the lobby, lists the players.
-void drawLobby(WINDOW* win, playerlist_t** playerlist){
-
+void drawLobby(WINDOW* win, playerlist_t** playerlist, player_t* player){
+	playerlist_t* playerList = *playerlist;
     werase(win);
+    if (playerList != NULL){
+       if(playerList->head != NULL){
+			werase (win);
+			player_t* temp = playerList->head;
+			int entryCount = 1;
 
-    if (playerlist != NULL && (*playerlist)->head != NULL){
-        werase (win);
-        player_t* temp = (player_t*) malloc(sizeof(player_t));
-        temp = (*playerlist) -> head;
-        int entryCount = 1;
+			mvwprintw (win, 3, 3, "--- GAME LOBBY FOR GAME %d ---", player->gameID);
+			while (temp != NULL){
+				wattron(win, A_BOLD);
+				wattron(win, COLOR_PAIR(entryCount+1));		//paints the players in their respective car colors. 
+															//color codes are defined in startGraphics(...) in this file.
+			
+					// mvwprintw(win, 5*entryCount, 6, "Player name: %s", temp->name); // temp name brokenwattroff(win, COLOR_PAIR(entryCount+1));
+				wattroff(win, A_BOLD);
 
-        mvwprintw (win, 3, 3, "--- GAME LOBBY FOR GAME %d ---", (*playerlist)-> head ->gameID);
-        while (temp != NULL){
-            wattron(win, A_BOLD);
-            wattron(win, COLOR_PAIR(entryCount+1));		//paints the players in their respective car colors. 
-            											//color codes are defined in startGraphics(...) in this file.
-                mvwprintw(win, 5*entryCount, 6, "Player name: %s", temp -> name);
-            wattroff(win, COLOR_PAIR(entryCount+1));
-            wattroff(win, A_BOLD);
-
-            wattron(win, A_DIM);
-                mvwprintw(win, 5*entryCount + 1, 9, "Player ID: %d", temp -> gameID);
-            wattroff(win, A_DIM);
-            entryCount++;
-        }
-        //free temp
-        wrefresh(win);
+				wattron(win, A_DIM);
+				mvwprintw(win, 5*entryCount + 1, 9, "Player ID: %d", temp->ID);
+				wattroff(win, A_DIM);
+				entryCount++;
+				temp = temp->next;
+			}
+			//free temp
+			wrefresh(win);
+	   }
     }
 }
  	//waits for player to resize the window if it is too small for the game. 

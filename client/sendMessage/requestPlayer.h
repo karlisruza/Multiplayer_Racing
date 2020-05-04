@@ -22,7 +22,6 @@ int requestPlayer(playerlist_t** list, player_t** clientPlayer, int clientFd){
     int counter = 0;
 
     do{
-        printf("rqplayer\n");
         int ret =  recv(clientFd, buffer, sizeof(msg_t) - MAX_PAYLOAD_SIZE + sizeof(rl_pt), 0);
         msg_t* reply = (msg_t*)buffer;
         if(ret < 0 || reply->type != REQUEST_PLAYER){

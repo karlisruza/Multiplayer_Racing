@@ -16,43 +16,38 @@
 
 int main(void){
     int serverFd = startListen();
-
 	//creates a structure that holds the player list and game list. 
     playerlist_t* playerList = malloc(sizeof(playerlist_t));
     gamelist_t* gameList = malloc(sizeof(gamelist_t));
     gameList->count = 0;
-
+      
+    printf("hello\n");
 	//(temporary) populates the game list
     getTestingList(&gameList);
+
     printGameList(&gameList);
-	
 	//runs indefinitely
     while(true){
-		
-		//
-            struct sockaddr_in peerAddr;
+        struct sockaddr_in peerAddr;
 	    socklen_t addrSize = sizeof(peerAddr);
 	    int clientFd = accept(serverFd, (struct sockaddr *) &peerAddr, &addrSize);
+        if (clientFd == -1) {
+            perror("accept");
+            return -1;
+        }
 
-            if (clientFd == -1) {
-                perror("accept");
-                return -1;
-            }
-
-            printClient(clientFd);	
-            player_t* player = malloc(sizeof(player_t));
-            player->ID = clientFd;
-            playerlistPush(&playerList, &player);
-            // printPlayerList(&playerList);
-
-            //packs params for use in thread
-            params_t* params = malloc(sizeof(struct threadParam));
-            params->clientFd = clientFd;
-            params->serverFd = serverFd;
-            params->gameList = gameList;
-            params->playerList = playerList;
+        printClient(clientFd);	
+        player_t* player = malloc(sizeof(player_t));
+        player->ID = clientFd;
+        playerlistPush(&playerList, &player);
+        //packs params for use in thread
+        params_t* params = malloc(sizeof(struct threadParam));
+        params->clientFd = clientFd;
+        params->serverFd = serverFd;
+        params->gameList = gameList;
+        params->playerList = playerList;
             
-            pthread_t thread;
-	        pthread_create(&thread, NULL, clientThread, (void *) params);
+        pthread_t thread;
+	    pthread_create(&thread, NULL, clientThread, (void *) params);
     }
 }

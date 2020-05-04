@@ -11,13 +11,10 @@ void joinGame(playerlist_t** list, player_t** player, int clientFd){
     cg_pt payload;
     payload.gameID = clientPlayer->gameID;
     payload.playerID = clientPlayer->ID;
-
-    printf("payload gameid: %d\n payload playerID: %d \n", payload.playerID, payload.gameID);
-
+    
     memcpy((void*)&request.payload, (void*)&payload, sizeof(payload));
     int length = ((void*)&request.payload - (void*)&request.type) + sizeof(payload);
     sendData(clientFd, (void*)&request, length, NULL);
-    printf("join game executed\n");
 
     void* buffer = (void*)malloc(sizeof(msg_t));
     length = sizeof(msg_t);

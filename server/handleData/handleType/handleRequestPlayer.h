@@ -16,7 +16,6 @@ void handleRequestPlayer(msg_t* message, gamelist_t** list, int clientFd){
         if(gameList->head != NULL){
             current = gameList->head;
             while(current != NULL){
-                printf("current gameId:%d\n", current->gameid);
                 if(current->gameid == gameData->gameID){
                     playerList = current->playerList;
                     break;
