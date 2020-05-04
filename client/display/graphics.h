@@ -126,6 +126,8 @@ void drawLobbyPos (WINDOW* win, int pos, int maxPos){
 	return;
 }
 
+
+
  	//waits for player to resize the window if it is too small for the game. 
 		//basically, before the game begins, it checks it the 
 		// race track fits on the screen and won't start the 

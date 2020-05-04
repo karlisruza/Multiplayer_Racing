@@ -25,6 +25,37 @@
 #include "display/controls.h"
 
 
+typedef struct Game{
+    int gameid;
+    int status; //(0- WAITING_PLAYERS, 1- STARTED, -1- ENDED);
+    int hostId;
+    playerlist_t* playerList;
+    struct Game* next;
+    struct Game* prev;
+}game_t;
+
+typedef struct Game_list{
+    int count;
+    game_t* head;
+    game_t* tail;
+}gamelist_t;
+
+void displayGameCreator (WINDOW* win, gamelist_t** list){
+    clear(win);
+    attron(A_BOLD);
+    mvwprintw(win, 1, 3, "ENTER GAME CREDENTIALS");
+
+    game_t* newGame = (game_t*) malloc(sizeof(game_t));
+
+    newGame
+
+}
+
+int displayGameList (WINDOW * win, gamelist_t** list){
+    game_t* newGame = (game_t*) malloc(sizeof(game_t));
+
+}
+
 
 
 int main(int argc, char* argv[]){
@@ -75,12 +106,11 @@ int main(int argc, char* argv[]){
     
     requestGame(&gameList, clientFd);
     displayGameList(win, &gameList); //in graphics.h
+    unsigned int gameChoice = lobbyNav(win, gameList->count);
 
+    if (gameChoice == gameList->count + 1){
+        createGame
 
-    unsigned int yes = lobbyNav(win, gameList->count);
-
-    if (yes == gameList->count){
-        //create game
     } else {
         //join game
     }
