@@ -43,7 +43,7 @@ int main(void){
             player_t* player = malloc(sizeof(player_t));
             player->ID = clientFd;
             playerlistPush(&playerList, &player);
-            printPlayerList(&playerList);
+            // printPlayerList(&playerList);
 
             //packs params for use in thread
             params_t* params = malloc(sizeof(struct threadParam));

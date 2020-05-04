@@ -7,6 +7,7 @@ void handleAddPlayer(msg_t* message, int clientFd, playerlist_t** list){
     char* playername = (char*)message->payload;
     player_t* current;
     playerlist_t* playerList = *list;
+
     if(playerList != NULL && playerList->head != NULL){
         current = playerList->head;
     }

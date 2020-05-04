@@ -2,31 +2,43 @@
 #define REQUESTPLAYER_H_INCLUDED
 
 //return -1 error, 1 success
-int requestPlayer(playerlist_t** list, int clientFd){
+int requestPlayer(playerlist_t** list, player_t** clientPlayer, int clientFd){
     msg_t request;
     request.type = REQUEST_PLAYER;
-    int length = ((void*)&request.payload - (void*)&request.type);
+    
+    cg_pt payload;
+    payload.gameID = (*clientPlayer)->gameID;
+    payload.playerID = (*clientPlayer)->ID;
+    memcpy((void*)&request.payload, (void*)&payload, sizeof(payload));
+
+    int length = ((void*)&request.payload - (void*)&request.type) + sizeof(payload);
     sendData(clientFd, (void*)&request, length, NULL);
+
     playerlist_t* playerList = *list;
     void* buffer = (void*)malloc(MAX_PAYLOAD_SIZE + sizeof(msg_t));
-    rp_pt* playerData;
+    rl_pt* playerData;
 
     int playerCount;
     int counter = 0;
 
     do{
-        int ret =  recv(clientFd, buffer, sizeof(msg_t) - MAX_PAYLOAD_SIZE + sizeof(rp_pt), 0);
+        printf("rqplayer\n");
+        int ret =  recv(clientFd, buffer, sizeof(msg_t) - MAX_PAYLOAD_SIZE + sizeof(rl_pt), 0);
         msg_t* reply = (msg_t*)buffer;
-        if(ret < 0 || reply->type != REQUEST_GAME){
-            perror("REQUEST_GAME invalid response");
+        if(ret < 0 || reply->type != REQUEST_PLAYER){
+            perror("REQUEST_PLAYER invalid response");
             return -1;
         }
-        playerData = (rp_pt*)reply->payload;
+        playerData = (rl_pt*)reply->payload;
         playerCount = playerData->playerCount;
         if(playerCount == 0){
             return 1;
         }
-        player_t* player = playerData->player;
+        player_t* player = (player_t*)malloc(sizeof(player_t));
+        player->ID = playerData->ID;
+        player->name = playerData->name;
+        player->angle = 0;
+        player->laps = 0;
 
         playerlistPush(&playerList, &player);
         counter++;

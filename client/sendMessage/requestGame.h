@@ -16,8 +16,6 @@ int requestGame(gamelist_t** list, int clientFd){
 
     do{
         int ret =  recv(clientFd, buffer, sizeof(msg_t) - MAX_PAYLOAD_SIZE + sizeof(rg_pt), 0);
-        //printf("ret len: %d\n", ret);
-        //printf("iteration: %d\n", counter);
         msg_t* reply = (msg_t*)buffer;
         if(ret < 0 || reply->type != REQUEST_GAME){
             perror("REQUEST_GAME invalid response");
