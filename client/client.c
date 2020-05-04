@@ -88,23 +88,31 @@ int main(int argc, char* argv[]){
         //populate gamelist and then display it, and initialize navigator
     requestGame(&gameList, clientFd);
     displayGameList(win, &gameList); //in graphics.h
+    //clientPlayer->gameID = 
     clientPlayer->gameID = gameListNav(win, &gameList);
 
-
-    //game_t enteredGame = (game_t*) malloc (sizeof(game_t));
+        //gameListNav returns 0 if a new game is selected, 
     if (clientPlayer->gameID == 0){
-        // int createGame(player_t** player, int clientFd){
-        if (createGame(&clientPlayer, clientFd) < 1){
+            wrefresh(win);
+        clientPlayer -> gameID = createGame(&clientPlayer, clientFd);
+
+            //createGame changes clientPlayer -> gameID to the new game ID 
+        if (clientPlayer -> gameID < 1){
             exit(1);
         }
     } 
 
+        //joins the selected game
     joinGame (&playerList, &clientPlayer, clientFd);
-        //join game
-    //create listener thread
-    mvwprintw(win, 20, 20, "Player name: %s", playerList -> head -> name);
+    player_t* temp = (player_t*)malloc(sizeof(player_t)); 
 
-    drawLobby(win, &playerList);
+    mvwprintw(win, 13, 40, "Player list head name: %s", temp -> name);
+    wrefresh(win);
+
+      //TODO - create listener thread
+    //mvwprintw(win, 20, 20, "Player name: %s", playerList -> head -> name);
+        //draws lobby
+    //drawLobby(win, &playerList);
 
 
 //     void displayGameList (WINDOW * win, gamelist_t** list){

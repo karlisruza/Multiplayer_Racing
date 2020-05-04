@@ -61,7 +61,7 @@ void displayGameList (WINDOW * win, gamelist_t** list){
 
 					mvwprintw(win, 5*entryCount + 1, 6, "Game ID: %d", current -> gameid);
 			    	mvwprintw(win, 5*entryCount + 2, 6, "Host ID: %d", current -> hostId);
-			    	mvwprintw(win, 5*entryCount + 3, 6, "Status: %d", current -> status);
+			    	mvwprintw(win, 5*entryCount + 3, 6, "Status:  %d", current -> status);
 		    	wattroff(win, A_DIM);
 
 		    	current = current -> next;
