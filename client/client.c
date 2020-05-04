@@ -8,7 +8,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <ncurses.h>
-#include <math.h>       
+#include <math.h> 
+#include <pthread.h> 
+
 
 #include "../data/payload/payload.h"
 #include "../data/game/game.h"
@@ -26,33 +28,29 @@
 #include "display/graphics.h"
 #include "display/controls.h"
 
+struct playerListener {    
+    pthread_t threadID;        // ID returned by pthread_create()
+    int       charCount;       // printCount passed through Terminal
+};
 
-/*typedef struct Game{
-    int gameid;
-    int status; //(0- WAITING_PLAYERS, 1- STARTED, -1- ENDED);
-    int hostId;
-    playerlist_t* playerList;
-    struct Game* next;
-    struct Game* prev;
-}game_t;
+void *joinEvent(void *threadStructPointer){ 
 
-typedef struct Game_list{
-    int count;
-    game_t* head;
-    game_t* tail;
-}gamelist_t;
+    //makes threadInfo struct available
+    struct playerListener *tinfo = threadStructPointer;
 
-void displayGameCreator (WINDOW* win, gamelist_t** list){
-    clear(win);
-    attron(A_BOLD);
-    mvwprintw(win, 1, 3, "ENTER GAME CREDENTIALS");
+    printf("aaaaaaaaaaaaaaaa");
 
-    game_t* newGame = (game_t*) malloc(sizeof(game_t));
+    //most likely an infinte while loop that, upon recieving a note from the server, 
+        //updates the player list. 
 
-    newGame
+    //if possible, check like once a second or more rarely
 
-}*/
+    //once host forces game launch, recieves notif, updates the local playerList, and 
+        //allows game launch. 
 
+    //frees all resources the thread had taken up.
+    pthread_exit (NULL);
+} 
 
 
 
@@ -99,12 +97,27 @@ int main(int argc, char* argv[]){
         }
     } 
 
-    joinGame (&playerList, &clientPlayer, clientFd);
-        //join game
-    //create listener thread
-    mvwprintw(win, 20, 20, "Player name: %s", playerList -> head -> name);
+    //joinGame (&playerList, &clientPlayer, clientFd);
 
-    drawLobby(win, &playerList);
+    //########################create listener thread
+    struct playerListener *lobbyPlayerListener;
+
+    lobbyPlayerListener = malloc(sizeof(struct playerListener));
+        if (lobbyPlayerListener == NULL)
+        {
+            printf("Memory allocation was unsuccessful.\n");
+            exit(1);  
+        }
+        lobbyPlayerListener->charCount = 10;
+        pthread_create(&lobbyPlayerListener->threadID, NULL, joinEvent, &lobbyPlayerListener);
+        pthread_join(lobbyPlayerListener->threadID, NULL);
+
+
+
+
+   // mvwprintw(win, 21, 20, "Player name: %s", playerList -> head -> name);
+
+    //drawLobby(win, &playerList);
 
 
 //     void displayGameList (WINDOW * win, gamelist_t** list){
