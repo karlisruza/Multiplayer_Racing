@@ -21,12 +21,13 @@
 #include "sendMessage/requestPlayer.h"
 #include "sendMessage/ping.h"
 
+#include "display/const.h"
 #include "display/car.h"
 #include "display/graphics.h"
 #include "display/controls.h"
 
 
-typedef struct Game{
+/*typedef struct Game{
     int gameid;
     int status; //(0- WAITING_PLAYERS, 1- STARTED, -1- ENDED);
     int hostId;
@@ -50,12 +51,8 @@ void displayGameCreator (WINDOW* win, gamelist_t** list){
 
     newGame
 
-}
+}*/
 
-int displayGameList (WINDOW * win, gamelist_t** list){
-    game_t* newGame = (game_t*) malloc(sizeof(game_t));
-
-}
 
 
 
@@ -108,14 +105,67 @@ int main(int argc, char* argv[]){
     
     requestGame(&gameList, clientFd);
     displayGameList(win, &gameList); //in graphics.h
-    unsigned int gameChoice = lobbyNav(win, gameList->count);
+    clientPlayer->gameID = gameListNav(win, &gameList);
 
-    if (gameChoice == gameList->count + 1){
-        createGame
 
-    } else {
+    //game_t enteredGame = (game_t*) malloc (sizeof(game_t));
+    if (clientPlayer->gameID == 0){
+        // int createGame(player_t** player, int clientFd){
+        if (createGame(&clientPlayer, clientFd) < 1){
+            exit(1);
+        }
+    } 
+
+    joinGame (&playerList, &clientPlayer, clientFd);
         //join game
-    }
+    //create listener thread
+    mvwprintw(win, 20, 20, "Player name: %s", playerList -> head -> name);
+
+    drawLobby(win, &playerList);
+
+
+//     void displayGameList (WINDOW * win, gamelist_t** list){
+        
+//         werase(win);
+
+//         if ((*list) != NULL && (*list) -> head != NULL){
+//             game_t* current = (game_t*)malloc(sizeof(game_t));
+//             current = (*list) -> head;
+//             int entryCount = 1; 
+            
+//             mvwprintw(win, 3, 3, "--- LIST OF GAMES ---");
+
+//             while (current != NULL){
+//                 wattron(win, A_DIM);
+//                     mvwprintw(win, 5*entryCount, 3, "Game number: %d", entryCount);
+
+//                     mvwprintw(win, 5*entryCount + 1, 6, "Game ID: %d", current -> gameid);
+//                     mvwprintw(win, 5*entryCount + 2, 6, "Host ID: %d", current -> hostId);
+//                     mvwprintw(win, 5*entryCount + 3, 6, "Status: %d", current -> status);
+//                 wattroff(win, A_DIM);
+
+//                 current = current -> next;
+//                 entryCount++;
+//             }
+
+//         wattron(win, A_BOLD);
+//             mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME (PRESS C)");
+//         wattroff(win, A_BOLD);
+
+        
+//         //free (current);
+//         wrefresh(win);
+//         refresh();
+//         }
+//         else {
+//             printf("games list is empty");
+//             endwin();
+//             exit(1);
+//         }
+
+//     return;
+// }
+    
 
 
     exit(1);

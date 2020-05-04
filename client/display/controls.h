@@ -106,10 +106,15 @@ char* writePrompt(WINDOW* win, int y, int x){
 
 
  //
-int lobbyNav(WINDOW* win, int gameCount){
+int gameListNav(WINDOW* win, gamelist_t** list){
     char c = '\0';
     int pos = 1;
-    drawLobbyPos(win, pos, gameCount+1);
+    int gameCount = (*list)->count;
+    gameListNavDraw(win, pos, gameCount);
+    int tempID;
+
+    game_t* temp = (game_t*) malloc(sizeof(game_t));
+    temp = (*list)->head;
 
     while (1){
     	char c = 0;// = getchar();
@@ -119,30 +124,35 @@ int lobbyNav(WINDOW* win, int gameCount){
 		    case 'w': //w
 		    case 'W':  //W
 				if (pos == 1){
-					pos = gameCount+1;
+					pos = gameCount;
 				} 
 				else pos--;//go upwards function
-				drawLobbyPos(win, pos, gameCount+1);
+				gameListNavDraw(win, pos, gameCount);
 		     	break;
 
 		    case 's': //s
 		    case 'S': //S
-				if (pos == gameCount+1){
+				if (pos == gameCount){
 					pos = 1;
 				} 
 				else pos++;
-				drawLobbyPos(win, pos, gameCount+1);
+				gameListNavDraw(win, pos, gameCount);
 				break;
 
 			case 'c': //c
 		    case 'C': //C
-		    	return gameCount+1;
+		    	//free current
+		    	return 0;
 
 			case 13: //enter
 				//enter room/accept selection
-		    	return pos;
+				tempID = temp->gameid;
+				//free current
+		    	return tempID;
 
 		    case 27: //esc
+		    	//free current
+		    	//return -1;
 		    	exit(1);
 
 			default:

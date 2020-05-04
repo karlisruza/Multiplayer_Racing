@@ -2,9 +2,17 @@
 #ifndef GRAPHICS_H_INCLUDED
 #define GRAPHICS_H_INCLUDED
 
-#define MAP_COLOR     		COLOR_PAIR(1)
-#define PLAYER_ONE_COLOR    COLOR_PAIR(2)
-#define PLAYER_TWO_COLOR    COLOR_PAIR(3)
+#define MAP_COLOR     			COLOR_PAIR(1)
+#define PLAYER_ONE_COLOR    	COLOR_PAIR(2)
+#define PLAYER_TWO_COLOR    	COLOR_PAIR(3)
+#define PLAYER_THREE_COLOR    	COLOR_PAIR(4)
+#define PLAYER_FOUR_COLOR    	COLOR_PAIR(5)
+#define PLAYER_FIVE_COLOR    	COLOR_PAIR(6)
+#define PLAYER_SIX_COLOR   		COLOR_PAIR(7)
+#define PLAYER_SEVEN_COLOR   	COLOR_PAIR(8)
+#define PLAYER_EIGHT_COLOR    	COLOR_PAIR(9)
+
+
 
 WINDOW* winSetup(void){
 	initscr();
@@ -87,9 +95,9 @@ void displayGameList (WINDOW * win, gamelist_t** list){
 		    	entryCount++;
 	    	}
 
-		wattron(win, A_DIM);
-	    	mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME");
-		wattroff(win, A_DIM);
+		wattron(win, A_BOLD);
+	    	mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME (PRESS C)");
+		wattroff(win, A_BOLD);
 
 	    
 	    //free (current);
@@ -105,7 +113,7 @@ void displayGameList (WINDOW * win, gamelist_t** list){
 	return;
 }
 
-void drawLobbyPos (WINDOW* win, int pos, int maxPos){
+void gameListNavDraw (WINDOW* win, int pos, int maxPos){
 	if (pos == 1){
 		// int mvwchgat(int y, int x, int n, attr_t attr, short color, const void *opts)
 	
@@ -125,8 +133,35 @@ void drawLobbyPos (WINDOW* win, int pos, int maxPos){
 	return;
 }
 
+void drawLobby(WINDOW* win, playerlist_t** playerlist){
 
+    werase(win);
+    wattron(win, A_BOLD);
+    wattroff(win, A_BOLD);
 
+    if (playerlist != NULL && (*playerlist)->head != NULL){
+        werase (win);
+        player_t* temp = (player_t*) malloc(sizeof(player_t));
+        temp = (*playerlist) -> head;
+        int entryCount = 1;
+
+        mvwprintw (win, 3, 3, "--- GAME LOBBY FOR GAME %d ---", (*playerlist)-> head ->gameID);
+        while (temp != NULL){
+            wattron(win, A_BOLD);
+            wattron(win, COLOR_PAIR(entryCount+1));
+                mvwprintw(win, 5*entryCount, 6, "Player name: %s", temp -> name);
+            wattroff(win, COLOR_PAIR(entryCount+1));
+            wattroff(win, A_BOLD);
+
+            wattron(win, A_DIM);
+                mvwprintw(win, 5*entryCount + 1, 9, "Player ID: %d", temp -> gameID);
+            wattroff(win, A_DIM);
+            entryCount++;
+        }
+        //free temp
+        wrefresh(win);
+    }
+}
  	//waits for player to resize the window if it is too small for the game. 
 		//basically, before the game begins, it checks it the 
 		// race track fits on the screen and won't start the 
@@ -236,6 +271,13 @@ WINDOW* startGraphics (){
 	init_pair(1, COLOR_WHITE, COLOR_BLACK);
 	init_pair(2, COLOR_BLUE, COLOR_BLACK);
 	init_pair(3, COLOR_RED, COLOR_BLACK);
+	init_pair(4, COLOR_GREEN, COLOR_BLACK);
+	init_pair(5, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
+	init_pair(7, COLOR_CYAN, COLOR_BLACK);
+	init_pair(8, COLOR_WHITE, COLOR_BLACK);
+	//init_pair(9, COLOR_RED, COLOR_BLACK);
+
 
 		//sets default colour scheme for the window to be white text with
 			//a black background 
