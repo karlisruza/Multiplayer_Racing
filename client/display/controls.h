@@ -5,15 +5,17 @@
 #ifndef _CONTROLS_HEADER
 #define _CONTROLS_HEADER
 
-
+	//initial settings for terminal
 struct termios orig_termios;	
 
+	//taken from the text editor thing. Allows for the term to interpret 
+		// char by char, not string after pressing enter.
+		//https://github.com/snaptoken/kilo-src/blob/error-handling/kilo.c	
 void disableRawMode() {
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
     die("tcsetattr");
 }
 
-//taken from the text editor thing
 void enableRawMode() {
   if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
   atexit(disableRawMode);
@@ -30,7 +32,7 @@ void enableRawMode() {
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
 }
 
-	//determines which key is pressed at a certain moment
+	//car function that determines which wasd key was pressed
 bool keyPress(struct car** player, WINDOW* win){
     char c = '\0';
     read(STDIN_FILENO, &c, 1);
@@ -67,7 +69,9 @@ bool keyPress(struct car** player, WINDOW* win){
 	return true;
 }
 
-
+	//basically, on each keypress, a character is added to the
+		//user's input. enter to accept. Max length is 20. 
+		//Can be reused wherever prompts are needed.
 char* writePrompt(WINDOW* win, int y, int x){
 	const int maxLength = 20;
     char* input = malloc(maxLength+1);
@@ -105,7 +109,8 @@ char* writePrompt(WINDOW* win, int y, int x){
 }
 
 
- //
+ 	//navigator function during gameList
+		//w or s to go up or down; use c to create room
 int gameListNav(WINDOW* win, gamelist_t** list){
     char c = '\0';
     int pos = 1;
@@ -160,9 +165,46 @@ int gameListNav(WINDOW* win, gamelist_t** list){
 		}
 	}
 
-
-	
 	return gameCount;
+}
+
+
+	//incomplete at the moment but enter to force start, backspace to leave
+void lobbyControls(WINDOW* win){
+    char c = '\0';
+    int pos = 1;
+
+    while (1){
+    	char c = 0;// = getchar();
+    	read(STDIN_FILENO, &c, 1);
+
+        switch (c){
+
+			case 'r': //c
+		    case 'R': //C
+		    	//refresh lobby
+		    	return;
+
+			case 127: //backspace
+				//leave room
+				//free current
+		    	return;
+
+			case 13: //enter
+				//launch game
+		    	return;		    	
+
+		    case 27: //esc
+		    	//free current
+		    	//return -1;
+		    	exit(1);
+
+			default:
+				break;
+		}
+	}
+
+	return;
 }
 
 #endif

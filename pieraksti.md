@@ -57,3 +57,32 @@ ir spēle, notiek keyPress
 	// 
 
 	input join game vai create game
+
+
+
+
+
+//get games list
+	//join room or create room
+//if join lobby 
+	//get playerslist
+//if player host
+	//iespēja force startot iekš lobby
+//iekš lobby ir getchar, kas ļauj hostam force startēt
+	//event listener, kad pievienojas jauns spēlētājs un/vai force start
+//request player tiek izsaukta lobby, tā tiek 
+//client pusē ir klausīšanāš funckija inputam, bet paralēli gaida message
+//struct paramtri - win, dabū sig, ka sākas spēle, loops jābeidz. 
+
+
+        //game_t current iekš graphics.h
+        //if game list != null
+            //if game list head != null
+            // while current != null 
+                //displayGameList() graphics.h
+            //refresh 
+            // later getch (r) -> request game no jauna
+            // press number atbilstoši spelei, kurai pievienoties
+            // c izsauc create game funkciju
+            // join game create game rezultāts ir tāds pats
+                //display lobby

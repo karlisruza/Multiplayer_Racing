@@ -71,14 +71,12 @@ int main(int argc, char* argv[]){
     playerlist_t* playerList = (playerlist_t*)malloc(sizeof(playerlist_t)); //contains all players in lobby
     gamelist_t* gameList = (gamelist_t*)malloc(sizeof(gamelist_t));
 
-    WINDOW* win = startGraphics();
-    enableRawMode();
+    WINDOW* win = startGraphics();  //graphics.h
+    enableRawMode();                //controls.h
 
-    enterName(win);
-    clientPlayer->name = writePrompt(win, 3, 4);
 
-    refresh();
-    wrefresh(win);
+    enterName(win);                 //in graphics.h
+    clientPlayer->name = writePrompt(win, 3, 4); //in controls.h
 
 
     if(clientPlayer->name != NULL){
@@ -86,23 +84,8 @@ int main(int argc, char* argv[]){
     } else {
         exit(1);
     };
-
-        //game_t current iekš graphics.h
-        //if game list != null
-            //if game list head != null
-            // while current != null 
-                //displayGameList() graphics.h
-            //refresh 
-            // later getch (r) -> request game no jauna
-            // press number atbilstoši spelei, kurai pievienoties
-            // c izsauc create game funkciju
-            // join game create game rezultāts ir tāds pats
-                //display lobby
-
-
-    refresh();
-    wrefresh(win);
     
+        //populate gamelist and then display it, and initialize navigator
     requestGame(&gameList, clientFd);
     displayGameList(win, &gameList); //in graphics.h
     clientPlayer->gameID = gameListNav(win, &gameList);
