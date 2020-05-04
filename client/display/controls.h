@@ -111,15 +111,13 @@ char* writePrompt(WINDOW* win, int y, int x){
 
  	//navigator function during gameList
 		//w or s to go up or down; use c to create room
-int gameListNav(WINDOW* win, gamelist_t** list){
-    char c = '\0';
+int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd){
+    player_t* clientPlayer = *player;
+	char c = '\0';
     int pos = 1;
     int gameCount = (*list)->count;
     gameListNavDraw(win, pos, gameCount);
     int tempID;
-
-    game_t* temp = (game_t*) malloc(sizeof(game_t));
-    temp = (*list)->head;
 
     while (1){
     	char c = 0;// = getchar();
@@ -171,20 +169,34 @@ int gameListNav(WINDOW* win, gamelist_t** list){
 				break;
 
 			case 'c': //c
-		    case 'C': //C
-		    	//free current
+		    case 'C':{ //C
+				if(createGame(&clientPlayer, clientFd) < 1){
+					perror("create game failed\n");
+					exit(1);
+				}
+				else{
+					return 0;
+				}
+			}
+			case 13:{ //enter
+				int counter = 1;
+				game_t* temp = (*list)->head;
+				while(temp != NULL){
+					if(counter == pos){
+						clientPlayer->gameID = temp->gameid;
+						return 0;
+					}
+					counter++;
+					temp = temp->next;
+				}
 		    	return 0;
-
-			case 13: //enter
-				//enter room/accept selection
-				//free current
-		    	return temp->gameid;
-
+			}
 		    case 27: //esc
 		    	//free current
 		    	//return -1;
 		    	exit(1);
-
+			// case 'q':
+			// case 'Q:'
 			default:
 				break;
 		}

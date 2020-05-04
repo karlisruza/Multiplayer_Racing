@@ -48,9 +48,9 @@ void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, in
     int length = ((void*)&reply.payload - (void*)&reply.type);
     sendData(clientFd, (void*)&reply, length, NULL);
 
+    printf("hello from join game\n");
     playerlistPush(&currentGame->playerList, &currentPlayer);
     printGameById(&gameList, joinData->gameID);
-    printf("hello from join game\n");
     return; 
 }
 
