@@ -8,7 +8,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <ncurses.h>
-#include <math.h>       
+#include <math.h> 
+#include <pthread.h> 
+
 
 #include "../data/payload/payload.h"
 #include "../data/game/game.h"
@@ -26,33 +28,29 @@
 #include "display/graphics.h"
 #include "display/controls.h"
 
+struct playerListener {    
+    pthread_t threadID;        // ID returned by pthread_create()
+    int       charCount;       // printCount passed through Terminal
+};
 
-/*typedef struct Game{
-    int gameid;
-    int status; //(0- WAITING_PLAYERS, 1- STARTED, -1- ENDED);
-    int hostId;
-    playerlist_t* playerList;
-    struct Game* next;
-    struct Game* prev;
-}game_t;
+void *joinEvent(void *threadStructPointer){ 
 
-typedef struct Game_list{
-    int count;
-    game_t* head;
-    game_t* tail;
-}gamelist_t;
+    //makes threadInfo struct available
+    struct playerListener *tinfo = threadStructPointer;
 
-void displayGameCreator (WINDOW* win, gamelist_t** list){
-    clear(win);
-    attron(A_BOLD);
-    mvwprintw(win, 1, 3, "ENTER GAME CREDENTIALS");
+    printf("aaaaaaaaaaaaaaaa");
 
-    game_t* newGame = (game_t*) malloc(sizeof(game_t));
+    //most likely an infinte while loop that, upon recieving a note from the server, 
+        //updates the player list. 
 
-    newGame
+    //if possible, check like once a second or more rarely
 
-}*/
+    //once host forces game launch, recieves notif, updates the local playerList, and 
+        //allows game launch. 
 
+    //frees all resources the thread had taken up.
+    pthread_exit (NULL);
+} 
 
 
 
@@ -74,103 +72,42 @@ int main(int argc, char* argv[]){
     WINDOW* win = startGraphics();  //graphics.h
     enableRawMode();                //controls.h
 
-
     enterName(win);                 //in graphics.h
     clientPlayer->name = writePrompt(win, 3, 4); //in controls.h
 
 
     if(clientPlayer->name != NULL){
         clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response from server
-    } else {
+    } 
+    else{
         exit(1);
-    };
+    }
     
-        //populate gamelist and then display it, and initialize navigator
+    //populate gamelist and then display it, and initialize navigator
     requestGame(&gameList, clientFd);
     displayGameList(win, &gameList); //in graphics.h
-    //clientPlayer->gameID = 
-    clientPlayer->gameID = gameListNav(win, &gameList);
 
-        //gameListNav returns 0 if a new game is selected, 
-    if (clientPlayer->gameID == 0){
-            wrefresh(win);
-        clientPlayer -> gameID = createGame(&clientPlayer, clientFd);
+    //create game function called in gameListNav, joinGame if returns 0;
+    if(gameListNav(win, &gameList, &clientPlayer, clientFd) == 0){
+        joinGame(&playerList, &clientPlayer, clientFd);
+    }
+    else{
+        endwin();
+        exit(1);
+    }
+    // endwin();
+    requestPlayer(&playerList, &clientPlayer, clientFd);
 
-            //createGame changes clientPlayer -> gameID to the new game ID 
-        if (clientPlayer -> gameID < 1){
-            exit(1);
-        }
-    } 
+    drawLobby(win, &playerList, clientPlayer);
 
-        //joins the selected game
-    joinGame (&playerList, &clientPlayer, clientFd);
-    player_t* temp = (player_t*)malloc(sizeof(player_t)); 
+    while(true){
 
-    mvwprintw(win, 13, 40, "Player list head name: %s", temp -> name);
-    wrefresh(win);
+    }
 
-      //TODO - create listener thread
-    //mvwprintw(win, 20, 20, "Player name: %s", playerList -> head -> name);
-        //draws lobby
-    //drawLobby(win, &playerList);
+    //draw lobby
 
 
-//     void displayGameList (WINDOW * win, gamelist_t** list){
-        
-//         werase(win);
-
-//         if ((*list) != NULL && (*list) -> head != NULL){
-//             game_t* current = (game_t*)malloc(sizeof(game_t));
-//             current = (*list) -> head;
-//             int entryCount = 1; 
-            
-//             mvwprintw(win, 3, 3, "--- LIST OF GAMES ---");
-
-//             while (current != NULL){
-//                 wattron(win, A_DIM);
-//                     mvwprintw(win, 5*entryCount, 3, "Game number: %d", entryCount);
-
-//                     mvwprintw(win, 5*entryCount + 1, 6, "Game ID: %d", current -> gameid);
-//                     mvwprintw(win, 5*entryCount + 2, 6, "Host ID: %d", current -> hostId);
-//                     mvwprintw(win, 5*entryCount + 3, 6, "Status: %d", current -> status);
-//                 wattroff(win, A_DIM);
-
-//                 current = current -> next;
-//                 entryCount++;
-//             }
-
-//         wattron(win, A_BOLD);
-//             mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME (PRESS C)");
-//         wattroff(win, A_BOLD);
-
-        
-//         //free (current);
-//         wrefresh(win);
-//         refresh();
-//         }
-//         else {
-//             printf("games list is empty");
-//             endwin();
-//             exit(1);
-//         }
-
-//     return;
-// }
-    
 
 
-    exit(1);
-
-
-    //displayGames();
-   // createGame(&clientPlayer, clientFd);
-   // int gameId = 4;
-   // joinGame(&playerList, &clientPlayer, clientFd, gameId);
-
-    // while(true){
-    //     //WaitForInput(&playerlist)-> either joingGame() or createGame()
-    //     //displayLobby(&playerlist)
-    //     //
-    //     //waitForStart(); 
-    // }     
+  
 }

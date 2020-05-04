@@ -22,6 +22,7 @@ void handleRequestGame(gamelist_t** list, int clientFd){
             game.gameId = current->gameid;
             // game.hostId = current->playerlist->head->ID;
             game.gamecount = gameList->count;
+            game.hostId = current->hostId;
             game.status = current->status;
 
             memcpy((void*)&reply.payload, (void*)&game, sizeof(game));
