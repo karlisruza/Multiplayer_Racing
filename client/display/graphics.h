@@ -2,9 +2,17 @@
 #ifndef GRAPHICS_H_INCLUDED
 #define GRAPHICS_H_INCLUDED
 
-#define MAP_COLOR     		COLOR_PAIR(1)
-#define PLAYER_ONE_COLOR    COLOR_PAIR(2)
-#define PLAYER_TWO_COLOR    COLOR_PAIR(3)
+#define MAP_COLOR     			COLOR_PAIR(1)
+#define PLAYER_ONE_COLOR    	COLOR_PAIR(2)
+#define PLAYER_TWO_COLOR    	COLOR_PAIR(3)
+#define PLAYER_THREE_COLOR    	COLOR_PAIR(4)
+#define PLAYER_FOUR_COLOR    	COLOR_PAIR(5)
+#define PLAYER_FIVE_COLOR    	COLOR_PAIR(6)
+#define PLAYER_SIX_COLOR   		COLOR_PAIR(7)
+#define PLAYER_SEVEN_COLOR   	COLOR_PAIR(8)
+#define PLAYER_EIGHT_COLOR    	COLOR_PAIR(9)
+
+
 
 WINDOW* winSetup(void){
 	initscr();
@@ -14,112 +22,148 @@ WINDOW* winSetup(void){
 	return win;
 }
 
-//get games list
-	//join room or create room
+	//creates header for the name entering prompt;
+void enterName (WINDOW* win){
+	clear();
+	mvwprintw(win, 1, 1, "ENTER YOUR NAME: ");	
+	wrefresh(win);
 
-//if join lobby 
-	//get playerslist
+	move (3,4);
+	clrtoeol();
 
-//if player host
-	//iespēja force startot iekš lobby
-
-//iekš lobby ir getchar, kas ļauj hostam force startēt
-	//event listener, kad pievienojas jauns spēlētājs un/vai force start
-
-//request player tiek izsaukta lobby, tā tiek 
-
-//client pusē ir klausīšanāš funckija inputam, bet paralēli gaida message
-
-
-//struct paramtri - win, dabū sig, ka sākas spēle, loops jābeidz. 
-
-
-
-
-
-
-//didn't figure out how to allow one to write - you can't use backspace yet or 
-//see what you type. Otherwise, works just fine for now while i'm still figuring
-// out the other terminal system.
-char* enterNameMenu (WINDOW* win){
-		mvwprintw(win, 1, 1, "ENTER YOUR NAME: ");	
-		refresh();
-		wrefresh(win);
-		move(3,4);
-
-		char* userName = malloc(20);
-		bool usableName = false;
-		char enter = 0;
-
-		int length;
-		for (length = 0; length < 20; length++){
-			enter = getchar();
-			//if (!alnum(enter)) usableName = false;
-	 		if (enter == '\r' || enter == '\n') {userName [length] = '\0'; break;} 
-	 		userName[length] = enter;
-			usableName = true;
-			printw("%c", enter);
-			refresh();
-	 	};
-
-	 	if (!usableName){
-	 		return "";
-	 	}
-
-		werase(win);
-		return userName;
+	return;
+}
+	//displays info written by writePrompt in controls.h
+void displayInput (WINDOW* win, char* input, int y, int x){
+	wattron (win, A_BOLD);
+	mvwprintw(win, y, x, "%s", input);
+	wattroff (win, A_BOLD);
+	
+	wrefresh(win);
+	return;
 }
 
-void displayGameList (WINDOW * win, gamelist_t** list, int clientFd){
+	//takes list of games from client.c, and outputs the contents of the list on the screen
+void displayGameList (WINDOW * win, gamelist_t** list){
+	    
 	    werase(win);
-	    requestGame(list, clientFd);
-	    game_t* current = (*list)->head;
 
-	    for (int i = 0; i < (*list)->count; i++){
+	    if ((*list) != NULL && (*list) -> head != NULL){
+	    	game_t* current = (game_t*)malloc(sizeof(game_t));
+	    	current = (*list) -> head;
+	    	int entryCount = 1; 
+			
+			mvwprintw(win, 3, 3, "--- LIST OF GAMES ---");
 
-	    	mvwprintw(win, 4*i, 3, "ID: %d", current->gameid);
+	    	while (current != NULL){
+	    		wattron(win, A_DIM);
+	    			mvwprintw(win, 5*entryCount, 3, "Game number: %d", entryCount);
 
-	    	current = current->next;
-	    	// game->curr = gameData->hostId;
-	        // game->status = gameData->status;
-	    }
+					mvwprintw(win, 5*entryCount + 1, 6, "Game ID: %d", current -> gameid);
+			    	mvwprintw(win, 5*entryCount + 2, 6, "Host ID: %d", current -> hostId);
+			    	mvwprintw(win, 5*entryCount + 3, 6, "Status: %d", current -> status);
+		    	wattroff(win, A_DIM);
+
+		    	current = current -> next;
+		    	entryCount++;
+	    	}
+
+		wattron(win, A_BOLD);
+	    	mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME (PRESS C)");
+		wattroff(win, A_BOLD);
+
+	    
 	    wrefresh(win);
-	    char enter;
-	    while (enter != '\n'){
-	    	enter = getchar();
 	    }
-	 return;
+	    else {
+	    	printf("games list is empty");
+	    	endwin();
+	    	exit(1);
+	    }
+	return;
 }
 
+	//highlights the games from the list
+		//called from gameListNav(...) in controls.h
+void gameListNavDraw (WINDOW* win, int pos, int maxPos){
+	if (pos == 1){ 				//if at the top, dims the bottom and second element
+		mvwchgat(win, 5*maxPos 	, 2, -1, A_DIM, MAP_COLOR, NULL);
+		mvwchgat(win, 5*(pos+1) , 2, -1, A_DIM, MAP_COLOR, NULL);
+	} else if (pos == maxPos){	//if at the bottom, dims top and second to last element
+		mvwchgat(win, 5*(pos-1) , 2, -1, A_DIM, MAP_COLOR, NULL);
+		mvwchgat(win, 5			, 2, -1, A_DIM, MAP_COLOR, NULL); 
+	} else {					//if in the middle, dims the surrounding elements
+		mvwchgat(win, 5*(pos+1) , 2, -1, A_DIM, MAP_COLOR, NULL);
+		mvwchgat(win, 5*(pos-1) , 2, -1, A_DIM, MAP_COLOR, NULL);
+	}
+
+	//highlights the element in pos
+	mvwchgat(win, 5*pos 	, 2, -1, A_BOLD, PLAYER_ONE_COLOR, NULL);
+
+	wrefresh(win);
+	return;
+}
+
+	//draws the lobby, lists the players.
+void drawLobby(WINDOW* win, playerlist_t** playerlist){
+
+    werase(win);
+
+    if (playerlist != NULL && (*playerlist)->head != NULL){
+        werase (win);
+        player_t* temp = (player_t*) malloc(sizeof(player_t));
+        temp = (*playerlist) -> head;
+        int entryCount = 1;
+
+        mvwprintw (win, 3, 3, "--- GAME LOBBY FOR GAME %d ---", (*playerlist)-> head ->gameID);
+        while (temp != NULL){
+            wattron(win, A_BOLD);
+            wattron(win, COLOR_PAIR(entryCount+1));		//paints the players in their respective car colors. 
+            											//color codes are defined in startGraphics(...) in this file.
+                mvwprintw(win, 5*entryCount, 6, "Player name: %s", temp -> name);
+            wattroff(win, COLOR_PAIR(entryCount+1));
+            wattroff(win, A_BOLD);
+
+            wattron(win, A_DIM);
+                mvwprintw(win, 5*entryCount + 1, 9, "Player ID: %d", temp -> gameID);
+            wattroff(win, A_DIM);
+            entryCount++;
+        }
+        //free temp
+        wrefresh(win);
+    }
+}
  	//waits for player to resize the window if it is too small for the game. 
 		//basically, before the game begins, it checks it the 
 		// race track fits on the screen and won't start the 
 		// game until everything is order. It's to prevent ncurses glitches.
 void winSizeCheck (WINDOW* win){
 	while (COLS < MAP_WIDTH || LINES < MAP_HEIGHT+10){
- 
-	
-		mvwprintw(win, 1, 3, "You need to increase the window size.\nTry decreasing character size (ctrl + [-])\nor increasing the terminal window size.");
+		mvwprintw(win, 1, 3, "You need to increase the window size.\n Try decreasing character size (ctrl + [-])\n or increasing the terminal window size.");
+
+		move(4,3);
+		clrtoeol();
+
+		move(5,3);
+		clrtoeol();
+
 		//outputs if the terminal width is not enough
 		if (COLS < MAP_WIDTH){
-			mvwprintw(win, 4, 3, "Window width should increase to %d. Increase it by %d.", MAP_WIDTH, MAP_WIDTH - COLS);
-		}
-		else {
-			move(4, 3);
-			clrtoeol();	//this removes all chars from the cursor
+			mvwprintw(win, 4, 3, "Window width should increase to %d. Increase it by %d.", 
+				MAP_WIDTH, MAP_WIDTH - COLS);
 		}
 		//outputs if the terminal height is not enough
 		if (LINES < MAP_HEIGHT + 10){
-			mvwprintw(win, 5, 3, "Window height should increase to %d. Increase it by %d.", MAP_HEIGHT + 10, MAP_HEIGHT - LINES+10);
+			mvwprintw(win, 5, 3, "Window height should increase to %d. Increase it by %d.", 
+				MAP_HEIGHT + 10, MAP_HEIGHT - LINES+10);
 		}
-		else {
-			move(5, 3);
-			clrtoeol();
-		}
+
 		mvwprintw(win, 7, 1, "Press [enter] to check again.");
 		refresh();
 		wrefresh(win);
 		//loop for pressing enter
+			//basically, without enter, it may glitch 
+			//the window launched by ncurses, causing graphics issues.
 		char enter = 0;
 		while (enter != '\r' && enter != '\n') {
 	 		enter = getchar(); 
@@ -130,7 +174,6 @@ void winSizeCheck (WINDOW* win){
 }
 
 //After the game is done, displays the winner and directs the player back to the lobby.
-
 void endScreen(WINDOW* win, struct car** player){
 
 	werase(win);
@@ -197,9 +240,16 @@ WINDOW* startGraphics (){
     }
 
     start_color();
-	init_pair(1, COLOR_WHITE, COLOR_BLACK);
-	init_pair(2, COLOR_BLUE, COLOR_BLACK);
-	init_pair(3, COLOR_RED, COLOR_BLACK);
+	init_pair(1, COLOR_WHITE, COLOR_BLACK); //map colors
+	init_pair(2, COLOR_BLUE, COLOR_BLACK);	//player one
+	init_pair(3, COLOR_RED, COLOR_BLACK);	//player two
+	init_pair(4, COLOR_GREEN, COLOR_BLACK);	//	...
+	init_pair(5, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
+	init_pair(7, COLOR_CYAN, COLOR_BLACK);
+	init_pair(8, COLOR_WHITE, COLOR_BLACK);	//player seven
+	//init_pair(9, COLOR_RED, COLOR_BLACK);
+
 
 		//sets default colour scheme for the window to be white text with
 			//a black background 
@@ -238,7 +288,6 @@ void drawCar(WINDOW* win, struct car** player){
 
 	wattroff(win, PLAYER_ONE_COLOR);
 	wattroff(win, A_BOLD);
-
 }
 
 	//Creates the race track
@@ -289,7 +338,8 @@ void drawFinishLine (WINDOW * win){
 
 		return;
 }
-
+	
+	//
 void playerStats (struct car** player, WINDOW* win){
 
 	wattron(win, A_BOLD);
@@ -330,7 +380,7 @@ void playerDebugStats (struct car** player, WINDOW* win){
 		//head
 	double hx = ((*player)->mid->x) + 1*cos((*player)->angle * M_PI);
 	double hy = ((*player)->mid->y) + 1*sin((*player)->angle * M_PI);
-	//tail
+		//tail
 	double tx = ((*player)->mid->x) - 1*cos((*player)->angle * M_PI);
 	double ty = ((*player)->mid->y) - 1*sin((*player)->angle * M_PI);
 

@@ -2,7 +2,9 @@
 Final Project for LU LSP course
 
 Compile with with gcc:
+
 Server:
-gcc server.c -o server -lpthread
+gcc server/server.c -o s -lpthread && ./s
+
 Client:
-gcc client.c -o client -lncurses
+gcc client/client.c -o c -lncurses -lm -lpthread && ./c
