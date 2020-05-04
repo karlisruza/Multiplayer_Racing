@@ -86,13 +86,16 @@ int main(int argc, char* argv[]){
         //populate gamelist and then display it, and initialize navigator
     requestGame(&gameList, clientFd);
     displayGameList(win, &gameList); //in graphics.h
+    //clientPlayer->gameID = 
     clientPlayer->gameID = gameListNav(win, &gameList);
 
-
-    //game_t enteredGame = (game_t*) malloc (sizeof(game_t));
+        //gameListNav returns 0 if a new game is selected, 
     if (clientPlayer->gameID == 0){
-        // int createGame(player_t** player, int clientFd){
-        if (createGame(&clientPlayer, clientFd) < 1){
+            wrefresh(win);
+        clientPlayer -> gameID = createGame(&clientPlayer, clientFd);
+
+            //createGame changes clientPlayer -> gameID to the new game ID 
+        if (clientPlayer -> gameID < 1){
             exit(1);
         }
     } 

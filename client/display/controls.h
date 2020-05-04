@@ -125,23 +125,49 @@ int gameListNav(WINDOW* win, gamelist_t** list){
     	char c = 0;// = getchar();
     	read(STDIN_FILENO, &c, 1);
 
+
+
+
         switch (c){
 		    case 'w': //w
 		    case 'W':  //W
 				if (pos == 1){
 					pos = gameCount;
-				} 
-				else pos--;//go upwards function
+					temp = (*list)->tail;
+				} else {
+					pos--;//go upwards function
+					temp = temp -> prev;
+				}
 				gameListNavDraw(win, pos, gameCount);
+
+				    	wattron(win, A_DIM);
+	    					mvwprintw(win, 5, 40, "Game number: %d", pos);
+
+							mvwprintw(win, 5 + 1, 40, "Game ID: %d", temp -> gameid);
+					    	mvwprintw(win, 5 + 2, 40, "Host ID: %d", temp -> hostId);
+				    	wattroff(win, A_DIM);
+						wrefresh(win);
 		     	break;
 
 		    case 's': //s
 		    case 'S': //S
 				if (pos == gameCount){
 					pos = 1;
+					temp = (*list)->head;
 				} 
-				else pos++;
+				else {
+					pos++;
+					temp = temp -> next;
+				}
 				gameListNavDraw(win, pos, gameCount);
+				    	wattron(win, A_DIM);
+	    					mvwprintw(win, 5, 40, "Game number: %d", pos);
+
+							mvwprintw(win, 5 + 1, 40, "Game ID: %d", temp -> gameid);
+					    	mvwprintw(win, 5 + 2, 40, "Host ID: %d", temp -> hostId);
+					    	mvwprintw(win, 5 + 3, 40, "Status:  %d", temp -> status);
+				    	wattroff(win, A_DIM);
+						wrefresh(win);
 				break;
 
 			case 'c': //c
@@ -151,9 +177,8 @@ int gameListNav(WINDOW* win, gamelist_t** list){
 
 			case 13: //enter
 				//enter room/accept selection
-				tempID = temp->gameid;
 				//free current
-		    	return tempID;
+		    	return temp->gameid;
 
 		    case 27: //esc
 		    	//free current
@@ -164,8 +189,6 @@ int gameListNav(WINDOW* win, gamelist_t** list){
 				break;
 		}
 	}
-
-	return gameCount;
 }
 
 
