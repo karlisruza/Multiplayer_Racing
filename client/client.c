@@ -37,23 +37,7 @@
 //     int       charCount;       // printCount passed through Terminal
 // };
 
-typedef struct tparams{
-    player_t* clientPlayer;
-    int clientFd;
-}tparams_t;
 
-void *userInput(void* params){ 
-    int clientFd = ((tparams_t*)params)->clientFd;
-    player_t* clientPlayer = ((tparams_t*)params)->clientPlayer;
-    char c = getchar();
-    switch (c){
-        case 's':
-            requestGameStart(clientPlayer, clientFd);
-            break;
-        default:
-            break;
-    }
-}
 
 int main(int argc, char* argv[]){
     // ./c 8015 10.0.2.15 8014
@@ -71,7 +55,7 @@ int main(int argc, char* argv[]){
     gamelist_t* gameList = (gamelist_t*)malloc(sizeof(gamelist_t));
 
     // WINDOW* win = startGraphics();  //graphics.h
-    // enableRawMode();                //controls.h
+    enableRawMode();                //controls.h
 
     // enterName(win);                 //in graphics.h
     // writePrompt(win, 3, 4, &clientPlayer); //in controls.h
@@ -114,14 +98,22 @@ int main(int argc, char* argv[]){
     char* buffer = (void*)malloc(sizeof(msg_t));
     int length = (sizeof(msg_t));
 
-    // //thread for user key input;
-    // tparams_t* params = (tparams_t*)malloc(sizeof(tparams_t));
-    // params->clientPlayer = clientPlayer;
-    // params->clientFd = clientFd;
-    // pthread_t thread;
-    // pthread_create(&thread, NULL, userInput, (void*)params);
 
-    while(true){
+    // //thread for user key input;
+    tparams_t* params = (tparams_t*)malloc(sizeof(tparams_t));
+    params->clientPlayer = clientPlayer;
+    params->clientFd = clientFd;
+    params->isHost = true; //This applies to the game creator - could provide it to the player 
+                //via server or when create game > join game 
+
+    pthread_t thread;
+    pthread_create(&thread, NULL, lobbyInput, (void*)params);      
+                                //^ former userInput, now lobbyInput now lives in contols.h
+
+
+    int step = 0;
+    while(thread){
+            //gaida incoming msgs (start game msg vai newPlayerMsg)
         int retLen = recv(clientFd, (void*)buffer, length, 0);
         if(retLen < 0){
             printf("fail \n");
@@ -129,10 +121,24 @@ int main(int argc, char* argv[]){
         fflush(stdout);
         msg_t* msgr = (msg_t*)buffer;
         printf("message type: %d\n", msgr->type);
-        handleData(msgr, &playerList, clientPlayer, clientFd);
-        printf("---------updated-list----------\n");
-        printPlayerList(&playerList);
-        // handleStartGame();
+        handleData(msgr, &playerList, clientFd);
+        printf("---------updated list----------\n"); 
+        printPlayerList(&playerList); //printPlayerList
+
+        sleep(1);
+  
+
+        //will check once every second but will terminate the thread after 5
+                //seconds by using the pthread_cancel (thread). 
+                //http://man7.org/linux/man-pages/man3/pthread_cancel.3.html
+        printf("%d", ++step);
+        if(step == 5){
+            if (pthread_cancel(thread) == 0){
+                printf("pthread cancellation initialized and/or successful");
+                break;
+            }
+        }  
+
     }
     
 
