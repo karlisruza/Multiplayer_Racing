@@ -34,6 +34,7 @@ void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, in
     }
 
     player_t* current = playerList->head;
+    //remove player from playerList and add to games playerlist
     while(current != NULL){
         if(current->ID = clientFd){
             removePlayer(&playerList, clientFd);
@@ -49,10 +50,31 @@ void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, in
         current = current->next;
     }
 
+    //confirmation reply
     msg_t reply;
     reply.type = JOIN_GAME;
     int length = ((void*)&reply.payload - (void*)&reply.type);
     sendData(clientFd, (void*)&reply, length, NULL);
+
+    //send new player to all
+    rl_pt player;
+    msg_t playerUpdate;
+    playerUpdate.type = PLAYER_JOINED;
+    player.ID = clientFd;
+    strcpy(player.name, current->name);
+    player.playerCount = 1;
+    memcpy((void*)&playerUpdate.payload, (void*)&player, sizeof(player));
+    length = ((void*)&playerUpdate.payload - (void*)&playerUpdate.type) + sizeof(player);
+
+    current = currentGame->playerList->head;
+    //exclude player who just joined and send to all in lobby
+    while(current != NULL){
+        if(current->ID != player.ID){
+            sendData(current->ID, (void*)&playerUpdate, length, NULL);
+        }
+        current = current->next;
+    }
+
     return; 
 }
 

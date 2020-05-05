@@ -3,6 +3,7 @@
 #include "./handleType/handleCreateGame.h"
 #include "./handleType/handleJoinGame.h"
 #include "./handleType/handleRequestPlayer.h"
+#include "./handleType/handleStartGame.h"
 
 #ifndef HANDLEDATA_H_INCLUDED
 #define HANDLEDATA_H_INCLUDED
@@ -25,8 +26,6 @@ void handleData(msg_t *message, params_t* params){
             // printf("keypress x: %d", data->action.x);
             // printf("keypress y: %d", data->action.y);
             // printf("lmao\n");
-            break;
-        case 3:
             break;
         case 4:
             break;
@@ -60,6 +59,9 @@ void handleData(msg_t *message, params_t* params){
         case JOIN_GAME:{
             handleJoinGame(message, &gameList, &playerList, clientFd);  
             break;
+        }
+        case START_GAME:{
+            handleStartGame(message, &gameList, clientFd);
         }
         default:
             perror("invalid message");

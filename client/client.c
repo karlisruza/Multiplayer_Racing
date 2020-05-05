@@ -11,9 +11,9 @@
 #include <math.h> 
 #include <pthread.h> 
 
-
 #include "../data/payload/payload.h"
 #include "../data/game/game.h"
+#include "../data/message.h"
 #include "connect/connect.h"
 #include "handleData/handleData.h"
 #include "sendMessage/sendName.h"
@@ -22,37 +22,36 @@
 #include "sendMessage/joinGame.h"
 #include "sendMessage/requestPlayer.h"
 #include "sendMessage/ping.h"
+#include "sendMessage/requestGameStart.h"
+#include "handleData/handleData.h"
 
 #include "display/const.h"
 #include "display/car.h"
 #include "display/graphics.h"
 #include "display/controls.h"
 
-struct playerListener {    
-    pthread_t threadID;        // ID returned by pthread_create()
-    int       charCount;       // printCount passed through Terminal
-};
+// struct playerListener {    
+//     pthread_t threadID;        // ID returned by pthread_create()
+//     int       charCount;       // printCount passed through Terminal
+// };
 
-void *joinEvent(void *threadStructPointer){ 
+typedef struct tparams{
+    player_t* clientPlayer;
+    int clientFd;
+}tparams_t;
 
-    //makes threadInfo struct available
-    struct playerListener *tinfo = threadStructPointer;
-
-    printf("aaaaaaaaaaaaaaaa");
-
-    //most likely an infinte while loop that, upon recieving a note from the server, 
-        //updates the player list. 
-
-    //if possible, check like once a second or more rarely
-
-    //once host forces game launch, recieves notif, updates the local playerList, and 
-        //allows game launch. 
-
-    //frees all resources the thread had taken up.
-    pthread_exit (NULL);
-} 
-
-
+void *userInput(void* params){ 
+    int clientFd = ((tparams_t*)params)->clientFd;
+    player_t* clientPlayer = ((tparams_t*)params)->clientPlayer;
+    char c = getchar();
+    switch (c){
+        case 's':
+            requestGameStart(clientPlayer, clientFd);
+            break;
+        default:
+            break;
+    }
+}
 
 int main(int argc, char* argv[]){
     // ./c 8015 10.0.2.15 8014
@@ -87,7 +86,9 @@ int main(int argc, char* argv[]){
     // //populate gamelist and then display it, and initialize navigator
     requestGame(&gameList, clientFd);
     // displayGameList(win, &gameList); //in graphics.h
+    printf("---------------------------------game--list-------------------------\n");
     printGameList(&gameList);
+
     if(argc > 4){
         if(createGame(&clientPlayer, clientFd) != 0){
             perror("createGame failed\n");
@@ -98,14 +99,40 @@ int main(int argc, char* argv[]){
     else{
         clientPlayer->gameID = 1;
     }
+    fflush(stdout);
+    printf("..joined game\n");
     joinGame(&playerList, &clientPlayer, clientFd);
+
     requestPlayer(&playerList, &clientPlayer, clientFd);
-
     printPlayerList(&playerList);
-    requestGame(&gameList, clientFd);
-    printGameList(&gameList);
 
+    //start game
+    // requestGameStart(&clientPlayer, clientFd);
 
+    char* buffer = (void*)malloc(sizeof(msg_t));
+    int length = (sizeof(msg_t));
+
+    // //thread for user key input;
+    // tparams_t* params = (tparams_t*)malloc(sizeof(tparams_t));
+    // params->clientPlayer = clientPlayer;
+    // params->clientFd = clientFd;
+    // pthread_t thread;
+    // pthread_create(&thread, NULL, userInput, (void*)params);
+
+    while(true){
+        int retLen = recv(clientFd, (void*)buffer, length, 0);
+        if(retLen < 0){
+            printf("fail \n");
+        }
+        fflush(stdout);
+        msg_t* msgr = (msg_t*)buffer;
+        printf("message type: %d\n", msgr->type);
+        handleData(msgr, &playerList, clientFd);
+        printf("---------updated list----------\n");
+        printPlayerList(&playerList);
+    }
+    
+    // close(clientFd);
 
     // //create game function called in gameListNav, joinGame if returns 0;
     // if(gameListNav(win, &gameList, &clientPlayer, clientFd) == 0){
