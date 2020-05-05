@@ -28,7 +28,7 @@ typedef struct Player_list{
 }playerlist_t;
 
 void playerlistPush(playerlist_t** list, player_t** player){
-        if((*list)->head == NULL){
+    if((*list)->head == NULL){
         (*list)->head = *player;
         (*list)->tail = *player;
         (*list)->count++;
@@ -41,6 +41,45 @@ void playerlistPush(playerlist_t** list, player_t** player){
     }
     return;
 }
+void removePlayer(playerlist_t** list, int playerId){
+    player_t* current = (*list)->head;
+    while(current != NULL){
+        if(current->ID == playerId){
+            if(current == (*list)->head && current == (*list)->tail){
+                (*list)->head = NULL;
+                (*list)->tail = NULL;
+                current->next = NULL;
+                current->prev = NULL;
+                (*list)->count--;
+            }
+            else if(current == (*list)->head){
+                (*list)->head = (*list)->head->next;
+                (*list)->head->prev = NULL;
+                current->next = NULL;
+                current->prev = NULL;
+                (*list)->count--;
+            }
+            else if(current == (*list)->tail){
+                (*list)->tail = (*list)->tail->prev;
+                (*list)->tail->next = NULL;
+                current->next = NULL;
+                current->prev = NULL;
+                (*list)->count--;
+            }
+            else{
+                current->prev->next = current->next;
+                current->next->prev = current->prev;
+                current->next = NULL;
+                current->prev = NULL;
+                (*list)->count--;
+            }
+            return;    
+        }
+        current = current->next;
+    }
+    return;
+}
+
 void deletePlayer(playerlist_t** list, int playerId){
     player_t* current = (*list)->tail;
     while(current != NULL){
@@ -66,6 +105,7 @@ void deletePlayer(playerlist_t** list, int playerId){
     }
     return;
 }
+
 char* getPlayerName(playerlist_t** list, int clientFd){
     playerlist_t* playerList = *list;
     player_t* current;

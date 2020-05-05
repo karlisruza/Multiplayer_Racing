@@ -7,7 +7,7 @@
 
 void printPlayer(player_t* player){
     printf("    Player ID: %d\n", player->ID);
-    printf("    gameID: %d\n", player->ID);
+    printf("    gameID: %d\n", player->gameID);
     printf("    name: %s\n", player->name);
     printf("    position x: %f\n", player->position.x);
     printf("    position y: %f\n", player->position.y);
@@ -49,6 +49,10 @@ void printGameById(gamelist_t** list, int id){
 
 void printGameList(gamelist_t** list){
     game_t* current = (*list)->head;
+    if((*list)->head == NULL){
+        printf("gamelist empty\n");
+        return;
+    }
     while(current != NULL){
         printGame(current);
         current = current->next;
@@ -66,13 +70,13 @@ void getTestingList(gamelist_t** list){
     gamelistPush(&gamelist, &game);
 
 	    player_t* player = (player_t*)malloc(sizeof(player_t*));
-	    player->name = "hostplayer";
+	    strcpy(player->name, "hostplayer");
 	    player->ID = 1;
 	    player->gameID = 1;
 	    playerlistPush(&game->playerList, &player);
 
 	    player = (player_t*)malloc(sizeof(player_t*));
-	    player->name = "pleb";
+	    strcpy(player->name, "pleb");
 	    player->ID = 2;
 	    player->gameID = 1;
 	    playerlistPush(&game->playerList, &player);

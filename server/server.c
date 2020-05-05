@@ -14,18 +14,21 @@
 #include "../data/game/listtest.h"
 #include "./clientthread/clientthread.h"
 
+pthread_mutex_t lock;
+
 int main(void){
     int serverFd = startListen();
 	//creates a structure that holds the player list and game list. 
     playerlist_t* playerList = malloc(sizeof(playerlist_t));
     gamelist_t* gameList = malloc(sizeof(gamelist_t));
     gameList->count = 0;
-      
-    printf("hello\n");
-	//(temporary) populates the game list
-    getTestingList(&gameList);
+    playerList->count = 0;
 
-    printGameList(&gameList);
+    if (pthread_mutex_init(&lock, NULL) != 0) { 
+        printf("\n mutex init has failed\n"); 
+        return -1; 
+    } 
+
 	//runs indefinitely
     while(true){
         struct sockaddr_in peerAddr;
@@ -40,12 +43,16 @@ int main(void){
         player_t* player = malloc(sizeof(player_t));
         player->ID = clientFd;
         playerlistPush(&playerList, &player);
+        printf("\n");
+        printGameList(&gameList);
+        printf("\n");
         //packs params for use in thread
         params_t* params = malloc(sizeof(struct threadParam));
         params->clientFd = clientFd;
         params->serverFd = serverFd;
         params->gameList = gameList;
         params->playerList = playerList;
+        params->lock = &lock;
             
         pthread_t thread;
 	    pthread_create(&thread, NULL, clientThread, (void *) params);

@@ -8,6 +8,7 @@ typedef struct threadParam{
     int serverFd;
     playerlist_t* playerList;
     gamelist_t* gameList;
+    pthread_mutex_t* lock;
 }params_t;
 
 #endif

@@ -47,7 +47,7 @@ void handleData(msg_t *message, params_t* params){
             return;
             break;
         case CREATE_GAME:
-            handleCreateGame(&gameList, clientFd);
+            handleCreateGame(&gameList, &playerList, clientFd);
             break;
         case ADD_PLAYER:{
             handleAddPlayer(message, clientFd, &playerList);

@@ -6,12 +6,10 @@ void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, in
     gamelist_t* gameList = *glist;
     playerlist_t* playerList = *plist;
     game_t* currentGame;
-    player_t* currentPlayer;
     
     //checks valid lists
     if(gameList != NULL && playerList != NULL){
         if(playerList->head != NULL && gameList->head != NULL){
-            currentPlayer = playerList->head;
             currentGame = gameList->head;
         }
         else{
@@ -24,33 +22,37 @@ void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, in
         return;
     }
 
-
-    while(currentPlayer != NULL){
-        if(currentPlayer->ID == joinData->playerID){
-            break;
-        }
-        currentPlayer = currentPlayer->next;
-    }
     while(currentGame != NULL){
         if(currentGame->gameid == joinData->gameID){
             break;
         }
         currentGame = currentGame->next;
     }
-    if(currentGame == NULL || currentPlayer == NULL){
+    if(currentGame == NULL){
         perror("Failed to join game");
         return;
     }
-    printf("loopsdone\n");
+
+    player_t* current = playerList->head;
+    while(current != NULL){
+        if(current->ID = clientFd){
+            removePlayer(&playerList, clientFd);
+            playerlistPush(&currentGame->playerList, &current);
+            printPlayerList(&currentGame->playerList);
+            current->gameID = currentGame->gameid;
+            break;
+        }
+        else{
+            perror("The game you wanted to join doesn't exist");
+            return;
+        }
+        current = current->next;
+    }
 
     msg_t reply;
     reply.type = JOIN_GAME;
     int length = ((void*)&reply.payload - (void*)&reply.type);
     sendData(clientFd, (void*)&reply, length, NULL);
-
-    printf("hello from join game\n");
-    playerlistPush(&currentGame->playerList, &currentPlayer);
-    printGameById(&gameList, joinData->gameID);
     return; 
 }
 

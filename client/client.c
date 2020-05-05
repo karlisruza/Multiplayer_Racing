@@ -69,13 +69,14 @@ int main(int argc, char* argv[]){
     playerlist_t* playerList = (playerlist_t*)malloc(sizeof(playerlist_t)); //contains all players in lobby
     gamelist_t* gameList = (gamelist_t*)malloc(sizeof(gamelist_t));
 
-    WINDOW* win = startGraphics();  //graphics.h
-    enableRawMode();                //controls.h
+    // WINDOW* win = startGraphics();  //graphics.h
+    // enableRawMode();                //controls.h
 
-    enterName(win);                 //in graphics.h
-    writePrompt(win, 3, 4, &clientPlayer); //in controls.h
+    // enterName(win);                 //in graphics.h
+    // writePrompt(win, 3, 4, &clientPlayer); //in controls.h
     
     // strcpy(clientPlayer->name, "karlisxx");
+    strcpy(clientPlayer->name, "karlis");
     if(clientPlayer->name != NULL){
         clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response from server
     } 
@@ -85,19 +86,37 @@ int main(int argc, char* argv[]){
     
     // //populate gamelist and then display it, and initialize navigator
     requestGame(&gameList, clientFd);
-    displayGameList(win, &gameList); //in graphics.h
-
-    // //create game function called in gameListNav, joinGame if returns 0;
-    if(gameListNav(win, &gameList, &clientPlayer, clientFd) == 0){
-        joinGame(&playerList, &clientPlayer, clientFd);
+    // displayGameList(win, &gameList); //in graphics.h
+    printGameList(&gameList);
+    if(argc > 3){
+        if(createGame(&clientPlayer, clientFd) != 0){
+            perror("createGame failed\n");
+            close(clientFd);
+            return -1;
+        }
     }
     else{
-        endwin();
-        exit(1);
+        clientPlayer->gameID = 0;
     }
-    // // endwin();
+    joinGame(&playerList, &clientPlayer, clientFd);
     requestPlayer(&playerList, &clientPlayer, clientFd);
-    drawLobby(win, &playerList, clientPlayer);
+
+    printPlayerList(&playerList);
+    printGameList(&gameList);
+
+
+
+    // //create game function called in gameListNav, joinGame if returns 0;
+    // if(gameListNav(win, &gameList, &clientPlayer, clientFd) == 0){
+    //     joinGame(&playerList, &clientPlayer, clientFd);
+    // }
+    // else{
+    //     endwin();
+    //     exit(1);
+    // }
+    // // // endwin();
+    // requestPlayer(&playerList, &clientPlayer, clientFd);
+    // drawLobby(win, &playerList, clientPlayer);
 
     while(true){
 

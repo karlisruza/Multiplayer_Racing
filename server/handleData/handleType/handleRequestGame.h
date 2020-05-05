@@ -6,7 +6,8 @@ void handleRequestGame(gamelist_t** list, int clientFd){
     reply.type = REQUEST_GAME;
     int length;
     gamelist_t* gameList = *list;
-
+    printGameList(&gameList);
+    printf("gc from rg: %d\n", gameList->count);
 
     if(gameList->head == NULL){
         rg_pt game;
@@ -31,6 +32,7 @@ void handleRequestGame(gamelist_t** list, int clientFd){
             current = current->next;
         }
     }
+    printf("jajaja\n");
     return;
 }
 
