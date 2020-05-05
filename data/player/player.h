@@ -11,7 +11,7 @@ typedef struct Coordinates{
 typedef struct Player_info{
     int ID; /*Spēlētāja ID*/
     int gameID;
-    char* name;/* Spēlētāja vārds */
+    char name[20];/* Spēlētāja vārds */
     coordinate_t position; /* Spēlētāja koordinātas */
     float angle; /* Spēlētāja leņķis */
     float speed; /*Spēlētāja ātrums*/

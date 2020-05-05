@@ -2,6 +2,8 @@
 #ifndef CLIENTTHREAD_H_INCLUDED
 #define CLIENTTHREAD_H_INCLUDED
 
+pthread_mutex_t lock;
+
 void *clientThread(void* param){
         char* buffer = (void*)malloc(sizeof(msg_t));
         int length = (sizeof(msg_t));
@@ -14,7 +16,9 @@ void *clientThread(void* param){
             printf("return length: %d\n", retLen);
 
             msg_t* msgr = (msg_t*)buffer;
+            pthread_mutex_lock(&lock);
             handleData(msgr, (params_t*)param);
+            pthread_mutex_unlock(&lock);
         }
 }
 

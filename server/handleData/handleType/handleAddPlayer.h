@@ -15,13 +15,18 @@ void handleAddPlayer(msg_t* message, int clientFd, playerlist_t** list){
         perror("handleAddPlayer invalid list");
         return;
     }
+
+    printf("playername: %s\n", playername);
     //set player name to received name in playerList
     while(current != NULL){
         if(current->ID == clientFd){
-            current->name = playername;
+            // current->name = playername;
+            strcpy(current->name, playername);
+            printf("new player name: %s\n", current->name);
         }
         current=current->next;
     }
+    printPlayerList(&playerList);
 
     //send back player Id 
     reply.type = ADD_PLAYER;

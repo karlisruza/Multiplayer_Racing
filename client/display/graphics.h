@@ -45,41 +45,33 @@ void displayInput (WINDOW* win, char* input, int y, int x){
 
 	//takes list of games from client.c, and outputs the contents of the list on the screen
 void displayGameList (WINDOW * win, gamelist_t** list){
-	    
-	    werase(win);
+	werase(win);
+    if ((*list) != NULL && (*list)->head != NULL){
+	    game_t* current = (game_t*)malloc(sizeof(game_t));
+	    current = (*list) -> head;
+		int entryCount = 1; 	
+		mvwprintw(win, 3, 3, "--- LIST OF GAMES ---");
 
-	    if ((*list) != NULL && (*list) -> head != NULL){
-	    	game_t* current = (game_t*)malloc(sizeof(game_t));
-	    	current = (*list) -> head;
-	    	int entryCount = 1; 
-			
-			mvwprintw(win, 3, 3, "--- LIST OF GAMES ---");
-
-	    	while (current != NULL){
-	    		wattron(win, A_DIM);
-	    			mvwprintw(win, 5*entryCount, 3, "Game number: %d", entryCount);
-
-					mvwprintw(win, 5*entryCount + 1, 6, "Game ID: %d", current -> gameid);
-			    	mvwprintw(win, 5*entryCount + 2, 6, "Host ID: %d", current -> hostId);
-			    	mvwprintw(win, 5*entryCount + 3, 6, "Status:  %d", current -> status);
-		    	wattroff(win, A_DIM);
-
-		    	current = current -> next;
-		    	entryCount++;
-	    	}
-
+	    while (current != NULL){
+	    	wattron(win, A_DIM);
+	    	mvwprintw(win, 5*entryCount, 3, "Game number: %d", entryCount);
+			mvwprintw(win, 5*entryCount + 1, 6, "Game ID: %d", current->gameid);
+			mvwprintw(win, 5*entryCount + 2, 6, "Host ID: %d", current->hostId);
+			mvwprintw(win, 5*entryCount + 3, 6, "Status: %d", current->status);
+		    wattroff(win, A_DIM);
+			current = current -> next;
+		    entryCount++;
+	    }
 		wattron(win, A_BOLD);
-	    	mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME (PRESS C)");
+	    mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME (PRESS C)");
 		wattroff(win, A_BOLD);
-
-	    
-	    wrefresh(win);
-	    }
-	    else {
-	    	printf("games list is empty");
-	    	endwin();
-	    	exit(1);
-	    }
+    	wrefresh(win);
+	}
+    else {
+		printf("games list is empty");
+	    endwin();
+    	exit(1);
+	}
 	return;
 }
 
@@ -117,10 +109,8 @@ void drawLobby(WINDOW* win, playerlist_t** playerlist, player_t* player){
 			mvwprintw (win, 3, 3, "--- GAME LOBBY FOR GAME %d ---", player->gameID);
 			while (temp != NULL){
 				wattron(win, A_BOLD);
-				wattron(win, COLOR_PAIR(entryCount+1));		//paints the players in their respective car colors. 
-															//color codes are defined in startGraphics(...) in this file.
-			
-					// mvwprintw(win, 5*entryCount, 6, "Player name: %s", temp->name); // temp name brokenwattroff(win, COLOR_PAIR(entryCount+1));
+				wattron(win, COLOR_PAIR(entryCount+1));		//paints the players in their respective car colors. color codes are defined in startGraphics(...) in this file.
+				mvwprintw(win, 5*entryCount, 6, "Player name: %s", temp->name); // temp name brokenwattroff(win, COLOR_PAIR(entryCount+1));
 				wattroff(win, A_BOLD);
 
 				wattron(win, A_DIM);
