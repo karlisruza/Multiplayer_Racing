@@ -88,7 +88,7 @@ int main(int argc, char* argv[]){
     requestGame(&gameList, clientFd);
     // displayGameList(win, &gameList); //in graphics.h
     printGameList(&gameList);
-    if(argc > 3){
+    if(argc > 4){
         if(createGame(&clientPlayer, clientFd) != 0){
             perror("createGame failed\n");
             close(clientFd);
@@ -96,12 +96,13 @@ int main(int argc, char* argv[]){
         }
     }
     else{
-        clientPlayer->gameID = 0;
+        clientPlayer->gameID = 1;
     }
     joinGame(&playerList, &clientPlayer, clientFd);
     requestPlayer(&playerList, &clientPlayer, clientFd);
 
     printPlayerList(&playerList);
+    requestGame(&gameList, clientFd);
     printGameList(&gameList);
 
 
