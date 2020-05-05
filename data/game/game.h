@@ -61,4 +61,37 @@ void deleteGame(gamelist_t** list, int gameId){
     return;
 }
 
+void printGame(game_t* game){
+    printf("Game ID: %d\n", game->gameid);
+    printf("Status: %d\n", game->status);
+    if(game->playerList != NULL){
+        printf("Player Count: %d\n", game->playerList->count);
+        printPlayerList(&game->playerList);  
+    } 
+}
+
+void printGameById(gamelist_t** list, int id){
+    game_t* current = (*list)->head;
+    while(current != NULL){
+        if(current->gameid == id){
+            printGame(current);
+        }
+        current = current->next;
+    }
+    return;
+}
+
+void printGameList(gamelist_t** list){
+    game_t* current = (*list)->head;
+    if((*list)->head == NULL){
+        printf("gamelist empty\n");
+        return;
+    }
+    while(current != NULL){
+        printGame(current);
+        current = current->next;
+    }
+    return;
+}
+
 #endif

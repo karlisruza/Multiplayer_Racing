@@ -10,15 +10,8 @@
 
 typedef enum{
     //messages sent by client
-    UP = 1, 
-    //sends current player data
-    //Payload contents
-    //int playerID;
-    //int gameID;
-    //action_t action
-
+    UPDATE_PLAYER = 1, 
     JOIN_GAME = 2,
-
     //messages sent by server
     START_GAME = 3,
     STOP_GAME = 4,
@@ -31,6 +24,8 @@ typedef enum{
     CREATE_GAME = 10,
     ADD_PLAYER = 11,
     REQUEST_PLAYER = 12,
+    PLAYER_JOINED = 13,
+    PLAYER_LEFT = 14,
 }mtype_e;
 
 typedef struct msg_s{

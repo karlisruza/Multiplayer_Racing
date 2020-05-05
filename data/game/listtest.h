@@ -5,61 +5,6 @@
 #ifndef LISTTEST_H_INCLUDED
 #define LISTTEST_H_INCLUDED
 
-void printPlayer(player_t* player){
-    printf("    Player ID: %d\n", player->ID);
-    printf("    gameID: %d\n", player->gameID);
-    printf("    name: %s\n", player->name);
-    printf("    position x: %f\n", player->position.x);
-    printf("    position y: %f\n", player->position.y);
-    printf("    speed: %f\n", player->speed);
-    printf("    acceleration: %f\n", player->acceleration);
-    printf("    laps: %d\n", player->laps);
-    printf("\n");
-    return;
-}
-
-void printPlayerList(playerlist_t** list){
-    player_t* current = (*list)->head;
-    while(current != NULL){
-        printPlayer(current);
-        current = current->next;
-    }
-    return;
-}
-
-void printGame(game_t* game){
-    printf("Game ID: %d\n", game->gameid);
-    printf("Status: %d\n", game->status);
-    if(game->playerList != NULL){
-        printf("Player Count: %d\n", game->playerList->count);
-        printPlayerList(&game->playerList);  
-    } 
-}
-
-void printGameById(gamelist_t** list, int id){
-    game_t* current = (*list)->head;
-    while(current != NULL){
-        if(current->gameid == id){
-            printGame(current);
-        }
-        current = current->next;
-    }
-    return;
-}
-
-void printGameList(gamelist_t** list){
-    game_t* current = (*list)->head;
-    if((*list)->head == NULL){
-        printf("gamelist empty\n");
-        return;
-    }
-    while(current != NULL){
-        printGame(current);
-        current = current->next;
-    }
-    return;
-}
-
 void getTestingList(gamelist_t** list){
     gamelist_t* gamelist = *list;
     	
