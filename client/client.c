@@ -17,11 +17,13 @@
 #include "connect/connect.h"
 #include "handleData/handleData.h"
 #include "sendMessage/sendName.h"
-#include "sendMessage/requestGame.h"
 #include "sendMessage/createGame.h"
 #include "sendMessage/joinGame.h"
 #include "sendMessage/requestPlayer.h"
 #include "sendMessage/ping.h"
+#include "sendMessage/requestGame.h"
+#include "sendMessage/requestGameStart.h"
+#include "handleData/handleData.h"
 #include "sendMessage/requestGameStart.h"
 #include "handleData/handleData.h"
 
@@ -73,8 +75,8 @@ int main(int argc, char* argv[]){
 
     // enterName(win);                 //in graphics.h
     // writePrompt(win, 3, 4, &clientPlayer); //in controls.h
-    
     // strcpy(clientPlayer->name, "karlisxx");
+
     strcpy(clientPlayer->name, "karlis");
     if(clientPlayer->name != NULL){
         clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response from server
@@ -127,24 +129,12 @@ int main(int argc, char* argv[]){
         fflush(stdout);
         msg_t* msgr = (msg_t*)buffer;
         printf("message type: %d\n", msgr->type);
-        handleData(msgr, &playerList, clientFd);
-        printf("---------updated list----------\n");
+        handleData(msgr, &playerList, clientPlayer, clientFd);
+        printf("---------updated-list----------\n");
         printPlayerList(&playerList);
+        // handleStartGame();
     }
     
-    // close(clientFd);
-
-    // //create game function called in gameListNav, joinGame if returns 0;
-    // if(gameListNav(win, &gameList, &clientPlayer, clientFd) == 0){
-    //     joinGame(&playerList, &clientPlayer, clientFd);
-    // }
-    // else{
-    //     endwin();
-    //     exit(1);
-    // }
-    // // // endwin();
-    // requestPlayer(&playerList, &clientPlayer, clientFd);
-    // drawLobby(win, &playerList, clientPlayer);
 
     while(true){
 

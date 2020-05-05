@@ -7,7 +7,7 @@
 #ifndef HANDLEDATA_H_INCLUDED
 #define HANDLEDATA_H_INCLUDED
 
-void handleData(msg_t* message, playerlist_t** list, int clientFd){
+void handleData(msg_t* message, playerlist_t** list, player_t* clientPlayer, int clientFd){
     playerlist_t* playerList = *list; 
     switch (message->type){
         case PLAYER_JOINED:
@@ -17,10 +17,10 @@ void handleData(msg_t* message, playerlist_t** list, int clientFd){
             handlePlayerLeft(message, &playerList, clientFd);
             break;
         case START_GAME:
-            handleStartGame(message, &playerList, clientFd);
+            handleStartGame(&playerList, clientPlayer, clientFd);
             break;
         case UPDATE_PLAYER:
-            handleUpdatePlayer(message, &playerList, clientFd);
+            handleUpdatePlayer(&playerList, clientPlayer, clientFd);
             break;
         default:
             perror("invalid message");

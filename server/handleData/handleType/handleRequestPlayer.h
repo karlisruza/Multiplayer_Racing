@@ -12,6 +12,7 @@ void handleRequestPlayer(msg_t* message, gamelist_t** list, int clientFd){
 
     printf("req_player gameId: %d\n", gameData->gameID);
 
+    //checks if gameslist empty
     if(gameList != NULL){
         if(gameList->head != NULL){
             current = gameList->head;
@@ -28,27 +29,26 @@ void handleRequestPlayer(msg_t* message, gamelist_t** list, int clientFd){
             }
         }
     }
-
-    if(playerList->head == NULL){
+    if(playerList->head == NULL){ //checks if playerlist empty
         rl_pt player;
         player.playerCount = playerList->count;
         memcpy((void*)&reply.payload, (void*)&player, sizeof(player));
         length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(player);
         sendData(clientFd, (void*)&reply, length, NULL);
     }
-    else{
+    else{ //send each individual player
         player_t* current = playerList->head;
         rl_pt player;
+        int counter = 0;
         while(current != NULL){
             player.ID = current->ID;
-            // player.name = current->name;
             strcpy(player.name, current->name);
             player.playerCount = playerList->count;
-
             memcpy((void*)&reply.payload, (void*)&player, sizeof(player));
             length = ((void*)&reply.payload - (void*)&reply.type) + sizeof(player);
             sendData(clientFd, (void*)&reply, length, NULL);
             current = current->next;
+            counter++;
         }
     }
     return;
