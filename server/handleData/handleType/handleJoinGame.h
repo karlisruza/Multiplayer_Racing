@@ -8,8 +8,8 @@ void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, in
     game_t* currentGame;
     
     //checks valid lists
-    if(gameList != NULL && playerList != NULL){
-        if(playerList->head != NULL && gameList->head != NULL){
+    if(gameList != NULL){
+        if(gameList->head != NULL){
             currentGame = gameList->head;
         }
         else{

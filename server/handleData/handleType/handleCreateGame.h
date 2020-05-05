@@ -7,7 +7,8 @@ void handleCreateGame(gamelist_t** list, playerlist_t** plist, int clientFd){
     playerlist_t* playerList = *plist;
 
     game_t* game = (game_t*)malloc(sizeof(game_t));
-    game->gameid = gameList->count++;
+    game->gameid = gameList->count;
+    game->gameid++;
     game->hostId = clientFd;
     game->status = 0;
     game->playerList = (playerlist_t*)malloc(sizeof(playerlist_t));
