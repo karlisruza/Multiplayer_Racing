@@ -8,7 +8,7 @@
 void printPlayer(player_t* player){
     printf("    Player ID: %d\n", player->ID);
     printf("    gameID: %d\n", player->ID);
-    printf("    name: %c\n", player->ID);
+    printf("    name: %s\n", player->name);
     printf("    position x: %f\n", player->position.x);
     printf("    position y: %f\n", player->position.y);
     printf("    speed: %f\n", player->speed);
@@ -82,7 +82,8 @@ void getTestingList(gamelist_t** list){
     gamelistPush(&gamelist, &game);
 
     player_t* host = (player_t*)malloc(sizeof(player_t*));
-    host->name = "hostplayer";
+    char* Name = "hostplayer99";
+	strcpy(host->name, Name);
     host->ID = 99;
     host->gameID = 4;
     playerlistPush(&game->playerList, &host);

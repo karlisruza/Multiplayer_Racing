@@ -35,7 +35,8 @@ int requestPlayer(playerlist_t** list, player_t** clientPlayer, int clientFd){
         }
         player_t* player = (player_t*)malloc(sizeof(player_t));
         player->ID = playerData->ID;
-        player->name = playerData->name;
+        strcpy(player->name, playerData->name);
+        
         player->angle = 0;
         player->laps = 0;
 

@@ -26,7 +26,7 @@ typedef struct request_game_payload_type{
 
 typedef struct request_lobby_payload_type{
     int ID; /*Spēlētāja ID*/
-    char* name;/* Spēlētāja vārds */
+    char name[20];/* Spēlētāja vārds */
     int playerCount;
 }rl_pt;
 

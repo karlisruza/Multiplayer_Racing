@@ -72,7 +72,7 @@ bool keyPress(struct car** player, WINDOW* win){
 	//basically, on each keypress, a character is added to the
 		//user's input. enter to accept. Max length is 20. 
 		//Can be reused wherever prompts are needed.
-char* writePrompt(WINDOW* win, int y, int x){
+char* writePrompt(WINDOW* win, int y, int x, player_t** clientPlayer){
 	const int maxLength = 20;
     char* input = malloc(maxLength+1);
     int length = 0;
@@ -98,6 +98,7 @@ char* writePrompt(WINDOW* win, int y, int x){
 	        
 			if (c == 13 && length > 0){ //enter
 				input[length] = '\0';
+				strcpy((*clientPlayer)->name, input);
 	        	return input;
 	        }
 	        
@@ -115,10 +116,10 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
     player_t* clientPlayer = *player;
 	char c = '\0';
     int pos = 1;
-    int gameCount = (*list)->count;
+    int gameCount = (*list)->count; //err check needed
     gameListNavDraw(win, pos, gameCount);
     int tempID;
-
+	game_t* temp;
     while (1){
     	char c = 0;// = getchar();
     	read(STDIN_FILENO, &c, 1);
@@ -128,18 +129,33 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 		    case 'W':  //W
 				if (pos == 1){
 					pos = gameCount;
-				} 
-				else pos--;//go upwards function
+				} else {
+					pos--;//go upwards function
+				}
 				gameListNavDraw(win, pos, gameCount);
+			    // wattron(win, A_DIM);
+	    		// mvwprintw(win, 5, 40, "Game number: %d", pos);
+				// mvwprintw(win, 5 + 1, 40, "Game ID: %d", temp->gameid);
+			    // mvwprintw(win, 5 + 2, 40, "Host ID: %d", temp->hostId);
+			    // wattroff(win, A_DIM);
+				wrefresh(win);
 		     	break;
-
 		    case 's': //s
 		    case 'S': //S
 				if (pos == gameCount){
 					pos = 1;
 				} 
-				else pos++;
+				else {
+					pos++;
+				}
 				gameListNavDraw(win, pos, gameCount);
+				// wattron(win, A_DIM);
+	    		// mvwprintw(win, 5, 40, "Game number: %d", pos);
+				// mvwprintw(win, 5 + 1, 40, "Game ID: %d", temp->gameid);
+				// mvwprintw(win, 5 + 2, 40, "Host ID: %d", temp->hostId);
+				// mvwprintw(win, 5 + 3, 40, "Status:  %d", temp->status);
+				// wattroff(win, A_DIM);
+				wrefresh(win);
 				break;
 
 			case 'c': //c
@@ -153,6 +169,8 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 				}
 			}
 			case 13:{ //enter
+				// clientPlayer->gameID = temp->gameid;
+				// return 0;
 				int counter = 1;
 				game_t* temp = (*list)->head;
 				while(temp != NULL){
@@ -175,8 +193,6 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 				break;
 		}
 	}
-
-	return gameCount;
 }
 
 

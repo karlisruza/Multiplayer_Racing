@@ -41,7 +41,8 @@ void handleRequestPlayer(msg_t* message, gamelist_t** list, int clientFd){
         rl_pt player;
         while(current != NULL){
             player.ID = current->ID;
-            player.name = current->name;
+            // player.name = current->name;
+            strcpy(player.name, current->name);
             player.playerCount = playerList->count;
 
             memcpy((void*)&reply.payload, (void*)&player, sizeof(player));

@@ -73,9 +73,9 @@ int main(int argc, char* argv[]){
     enableRawMode();                //controls.h
 
     enterName(win);                 //in graphics.h
-    clientPlayer->name = writePrompt(win, 3, 4); //in controls.h
-
-
+    writePrompt(win, 3, 4, &clientPlayer); //in controls.h
+    
+    // strcpy(clientPlayer->name, "karlisxx");
     if(clientPlayer->name != NULL){
         clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response from server
     } 
@@ -83,11 +83,11 @@ int main(int argc, char* argv[]){
         exit(1);
     }
     
-    //populate gamelist and then display it, and initialize navigator
+    // //populate gamelist and then display it, and initialize navigator
     requestGame(&gameList, clientFd);
     displayGameList(win, &gameList); //in graphics.h
 
-    //create game function called in gameListNav, joinGame if returns 0;
+    // //create game function called in gameListNav, joinGame if returns 0;
     if(gameListNav(win, &gameList, &clientPlayer, clientFd) == 0){
         joinGame(&playerList, &clientPlayer, clientFd);
     }
@@ -95,9 +95,8 @@ int main(int argc, char* argv[]){
         endwin();
         exit(1);
     }
-    // endwin();
+    // // endwin();
     requestPlayer(&playerList, &clientPlayer, clientFd);
-
     drawLobby(win, &playerList, clientPlayer);
 
     while(true){
