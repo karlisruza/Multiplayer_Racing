@@ -28,7 +28,9 @@ int main(void){
         printf("\n mutex init has failed\n"); 
         return -1; 
     } 
-
+    // getTestingList(&gameList);
+    // printGameList(&gameList);
+    // printf("------------------\n");
 	//runs indefinitely
     while(true){
         struct sockaddr_in peerAddr;
@@ -43,9 +45,6 @@ int main(void){
         player_t* player = malloc(sizeof(player_t));
         player->ID = clientFd;
         playerlistPush(&playerList, &player);
-        printf("\n");
-        printGameList(&gameList);
-        printf("\n");
         //packs params for use in thread
         params_t* params = malloc(sizeof(struct threadParam));
         params->clientFd = clientFd;

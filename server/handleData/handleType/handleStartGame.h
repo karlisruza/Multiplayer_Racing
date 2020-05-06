@@ -20,9 +20,12 @@ void handleStartGame(msg_t* message, gamelist_t** glist, int clientFd){
 
     player_t* currentPlayer = currentGame->playerList->head;
     while(currentPlayer != NULL){
-        sendData(currentPlayer->ID, (void*)&reply, length, NULL);
+        if(currentPlayer->ID == clientFd){ //if just for testing
+            sendData(currentPlayer->ID, (void*)&reply, length, NULL);
+        }
         currentPlayer = currentPlayer->next;
     }
+
     return;
 }
 

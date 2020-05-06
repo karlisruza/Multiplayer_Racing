@@ -2,8 +2,8 @@
 #define HANDLEJOINGAME_H_INCLUDED
 
 #define START_ANGLE 0;
-#define START_X 20;
-#define START_Y 120;
+#define START_X 20.0;
+#define START_Y 120.0;
 
 void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, int clientFd){
     cg_pt* joinData = (cg_pt*)message->payload;
@@ -38,21 +38,18 @@ void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, in
         return;
     }
 
-    //remove player from playerList and add to games' playerlist
+    //remove from playerList and push in to the games playerlist
     player_t* current = playerList->head;
-    int counter = 0; //for start_y offset
     while(current != NULL){
         if(current->ID == clientFd){
-            //remove from playerList and push in to the games playerlist
             removePlayer(&playerList, clientFd);
-            //set start coords and angle;
+            playerlistPush(&(currentGame)->playerList, &current);
             current->gameID = currentGame->gameid;
-            current->position.x = START_X;
-            current->position.y = START_Y + counter * 2;
-            current->angle = START_ANGLE;
-            current->speed = 0;
+            current->x = 20;
+            current->y = 40;
+            current->angle = 77;
+            current->speed = 88;
             current->acceleration = 0;
-            playerlistPush(&currentGame->playerList, &current);
             break;
         }
         else{
@@ -60,8 +57,8 @@ void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, in
             return;
         }
         current = current->next;
-        counter++;
     }
+    printGame(currentGame);
 
     //confirmation reply
     msg_t reply;

@@ -26,8 +26,6 @@ void handleAddPlayer(msg_t* message, int clientFd, playerlist_t** list){
         }
         current=current->next;
     }
-    printPlayerList(&playerList);
-
     //send back player Id 
     reply.type = ADD_PLAYER;
     cg_pt data;

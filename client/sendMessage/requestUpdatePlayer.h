@@ -11,6 +11,7 @@ int requestUpdatePlayer(playerlist_t** list, player_t* clientPlayer, int clientF
     move.gameID = clientPlayer->gameID;
     move.action.x = x;
     move.action.y = y;
+    memcpy((void*)&request.payload, (void*)&move, sizeof(move));
     int length = ((void*)&request.payload - (void*)&request.type) + sizeof(move);
     sendData(clientFd, (void*)&request, length, NULL);
 

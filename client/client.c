@@ -77,7 +77,7 @@ int main(int argc, char* argv[]){
     // writePrompt(win, 3, 4, &clientPlayer); //in controls.h
     // strcpy(clientPlayer->name, "karlisxx");
 
-    strcpy(clientPlayer->name, "karlis");
+    strcpy(clientPlayer->name, "karliskarlis");
     if(clientPlayer->name != NULL){
         clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response from server
     } 
@@ -121,19 +121,20 @@ int main(int argc, char* argv[]){
     // pthread_t thread;
     // pthread_create(&thread, NULL, userInput, (void*)params);
 
+    requestGameStart(clientPlayer, clientFd);
     while(true){
         int retLen = recv(clientFd, (void*)buffer, length, 0);
         if(retLen < 0){
             printf("fail \n");
         }
-        fflush(stdout);
         msg_t* msgr = (msg_t*)buffer;
         printf("message type: %d\n", msgr->type);
         handleData(msgr, &playerList, clientPlayer, clientFd);
         printf("---------updated-list----------\n");
         printPlayerList(&playerList);
-        // handleStartGame();
     }
+
+
     
 
     while(true){
