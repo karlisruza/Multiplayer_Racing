@@ -89,10 +89,6 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
     while (1){
     	char c = 0;// = getchar();
     	read(STDIN_FILENO, &c, 1);
-
-
-
-
         switch (c){
 		    case 'w': //w
 		    case 'W':  //W
@@ -130,7 +126,7 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 
 			case 'c': //c
 		    case 'C':{ //C
-				if(createGame(&clientPlayer, clientFd) < 1){
+				if(createGame(&clientPlayer, clientFd) < 0){
 					perror("create game failed\n");
 					exit(1);
 				}
@@ -276,7 +272,7 @@ void *lobbyInput(void* params){
 
 
 			default:
-				printf("%c\n", c);
+				// printf("%c\n", c);
 				break;
 		}
 	}

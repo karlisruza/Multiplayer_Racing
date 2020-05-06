@@ -46,10 +46,10 @@ void displayInput (WINDOW* win, char* input, int y, int x){
 	//takes list of games from client.c, and outputs the contents of the list on the screen
 void displayGameList (WINDOW * win, gamelist_t** list){
 	werase(win);
+	int entryCount = 1; 
     if ((*list) != NULL && (*list)->head != NULL){
 	    game_t* current = (game_t*)malloc(sizeof(game_t));
-	    current = (*list) -> head;
-		int entryCount = 1; 	
+	    current = (*list) -> head;	
 		mvwprintw(win, 3, 3, "--- LIST OF GAMES ---");
 
 	    while (current != NULL){
@@ -68,9 +68,10 @@ void displayGameList (WINDOW * win, gamelist_t** list){
     	wrefresh(win);
 	}
     else {
-		printf("games list is empty");
-	    endwin();
-    	exit(1);
+		wattron(win, A_BOLD);
+	    mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME (PRESS C)");
+		wattroff(win, A_BOLD);
+    	wrefresh(win);
 	}
 	return;
 }

@@ -14,7 +14,6 @@ int requestUpdatePlayer(playerlist_t** list, player_t* clientPlayer, int clientF
     memcpy((void*)&request.payload, (void*)&move, sizeof(move));
     int length = ((void*)&request.payload - (void*)&request.type) + sizeof(move);
     sendData(clientFd, (void*)&request, length, NULL);
-
     return 0;
 }
 #endif // !REQUESTGAME_H_INCLUDED

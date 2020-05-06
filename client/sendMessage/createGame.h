@@ -16,7 +16,6 @@ int createGame(player_t** player, int clientFd){
     }
     cg_pt* gameData = (cg_pt*)reply->payload;
     (*player)->gameID= gameData->gameID;
-    printf("CG\n");
     return 0;
 }
 

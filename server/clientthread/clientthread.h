@@ -9,8 +9,9 @@ void *clientThread(void* param){
 
         while(true){
             int retLen = recv(((params_t*)param)->clientFd, (void*)buffer, length, 0);
-            if(retLen < 0){
+            if(retLen < sizeof(int)){
                 printf("fail \n");
+                return NULL;
             }
             msg_t* msgr = (msg_t*)buffer;
             pthread_mutex_lock(lock);
