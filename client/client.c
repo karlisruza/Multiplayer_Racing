@@ -55,7 +55,16 @@ int main(int argc, char* argv[]){
     gamelist_t* gameList = (gamelist_t*)malloc(sizeof(gamelist_t));
 
     // WINDOW* win = startGraphics();  //graphics.h
-    enableRawMode();                //controls.h
+    enableRawMode();  
+
+    udp_params* paramsTwo = (udp_params*)malloc(sizeof(udp_params));
+    paramsTwo->clientPlayer = clientPlayer;
+    paramsTwo->clientFd = clientFd;
+
+    pthread_t threadTwo;
+    pthread_create(&threadTwo, NULL, clientUdp, (void*)paramsTwo);      
+                                //^ former userInput, now lobbyInput now lives in contols.h
+          //controls.h
 
     // enterName(win);                 //in graphics.h
     // writePrompt(win, 3, 4, &clientPlayer); //in controls.h
@@ -120,7 +129,7 @@ int main(int argc, char* argv[]){
         }
         msg_t* msgr = (msg_t*)buffer;
         printf("message type: %d\n", msgr->type);
-        handleData(msgr, &playerList, clientFd);
+        handleData(msgr, &playerList, clientPlayer, clientFd);
         printf("---------updated list----------\n"); 
         printPlayerList(&playerList); //printPlayerList
 
@@ -140,12 +149,9 @@ int main(int argc, char* argv[]){
 
     }
 
-
-    
-
-    while(true){
-
-    }
+    sleep(3);
+    pthread_cancel(threadTwo);
+    sleep (1);
 
     //draw lobby
 

@@ -28,6 +28,17 @@ int main(void){
         printf("\n mutex init has failed\n"); 
         return -1; 
     } 
+
+    params_t* params = malloc(sizeof(struct threadParam));
+    params->clientFd = 100000;
+    params->serverFd = serverFd;
+    params->gameList = gameList;
+    params->playerList = playerList;
+    params->lock = &lock;
+    
+    pthread_t threadUdp;
+    pthread_create(&threadUdp, NULL, serverUdp, (void *) params);
+    
     // getTestingList(&gameList);
     // printGameList(&gameList);
     // printf("------------------\n");

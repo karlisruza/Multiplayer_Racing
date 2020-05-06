@@ -285,12 +285,8 @@ void *lobbyInput(void* params){
 
 
 	//new car function that is a thread
-void* carControl (void* params){
+char carControl (){
 
-	int clientFd = ((tparams_t*)params)->clientFd;
-	player_t* clientPlayer = ((tparams_t*)params)->clientPlayer;
-
-	while (1){
 		char c = '\0';
 		read(STDIN_FILENO, &c, 1);
 	
@@ -305,16 +301,16 @@ void* carControl (void* params){
 		    case 65:  //A
 		    case 100: //d
 		    case 68:  //D
-		    	//sendCarControl(clientPlayer->ID, clientFd, c);
-		    break;
+				return c;
+	    		break;
 	
 		    case 27: //esc
-		    	//quit Game function if possible. 
-	
+				//but also send exit signal
+				return 0;	
+
 		    default:
-		    break;
+		    return 0;
 		}
-	}
 }
 
 	//legacy car function that determines which wasd key was pressed
