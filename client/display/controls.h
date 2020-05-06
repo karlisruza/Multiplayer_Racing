@@ -5,25 +5,12 @@
 #ifndef _CONTROLS_HEADER
 #define _CONTROLS_HEADER
 
-	//initial settings for terminal
-struct termios orig_termios;	
-
 	//taken from the text editor thing. Allows for the term to interpret 
 		// char by char, not string after pressing enter.
 		//https://github.com/snaptoken/kilo-src/blob/error-handling/kilo.c	
 
-
-void fixTerminal() {
-		//de-allocates the resources taken by the window
-		//https://pubs.opengroup.org/onlinepubs/007908799/xcurses/endwin.html
-	endwin();
-	delscreen();
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
-    die("tcsetattr");
-}
-
 void enableRawMode() {
-  if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
+  if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr failed\n");
 
 //http://man7.org/linux/man-pages/man3/termios.3.html -- Raw mode
   struct termios raw = orig_termios;
@@ -35,7 +22,7 @@ void enableRawMode() {
   raw.c_cc[VMIN] = 0;
   raw.c_cc[VTIME] = 1;
 
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr failed\n");
 }
 
 
@@ -88,7 +75,7 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
     player_t* clientPlayer = *player;
 	char c = '\0';
     int pos = 1;
-    int gameCount = (*list)->count; //err check needed
+    int gameCount = (*list)->count; 
 
     bool allowNav;
     if ((*list) != NULL && (*list)->head != NULL){
@@ -103,6 +90,7 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
     while (1){
     	char c = 0;// = getchar();
     	read(STDIN_FILENO, &c, 1);
+
         switch (c){
 		    case 'w': //w
 		    case 'W':  //W
@@ -131,36 +119,47 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 				}
 				break;
 
+				//if C is pressed, creates game and subsequently joins it
 			case 'c': //c
 		    case 'C':{ //C
 				if(createGame(&clientPlayer, clientFd) < 0){
-					perror("create game failed\n");
-					exit(1);
+					die("create game failed\n");
 				}
 				else{
 					return 0;
 				}
 			}
 			case 13:{ //enter
-				// clientPlayer->gameID = temp->gameid;
-				// return 0;
-				if (allowNav) return 0;
+				if (!allowNav){
+					if(createGame(&clientPlayer, clientFd) < 0){
+						die("create game failed\n");
+					} else {
+						return 0;
+					}
+				}
+
+
 				int counter = 1;
 				game_t* temp = (*list)->head;
-				while(temp != NULL){
-					if(counter == pos){
-						clientPlayer->gameID = temp->gameid;
-						return clientPlayer->gameID;
-					}
+					//goes through list until the game within the list is found
+				while(counter != pos){
 					counter++;
 					temp = temp->next;
+				}	
+
+					//if the ponter turns out to be null, returns -1 for error
+				if (temp == NULL){
+					die("faulty game list; chosen game does not exist\n");
+				} else { 
+					//makes the gameID for the player the temp game ID
+					(*player)->gameID = temp->gameid;
+					return 0;
 				}
 		    	return 0;
 			}
 		    case 27: //esc
-		    	//free current
-		    	//return -1;
-		    	exit(1);
+		    	die("exitted\n");
+		    	return -1;
 
 			default:
 				break;
@@ -169,46 +168,8 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 }
 
 
-	//incomplete at the moment but enter to force start, backspace to leave
-void lobbyControls(WINDOW* win){
-    char c = '\0';
-    int pos = 1;
 
-    while (1){
-    	char c = 0;// = getchar();
-    	read(STDIN_FILENO, &c, 1);
-
-        switch (c){
-
-			case 'r': //c
-		    case 'R': //C
-		    	//refresh lobby
-		    	return;
-
-			case 127: //backspace
-				//leave room
-				//free current
-		    	return;
-
-			case 13: //enter
-				//launch game
-		    	return;		    	
-
-		    case 27: //esc
-		    	//free current
-		    	//return -1;
-		    	exit(1);
-
-			default:
-				break;
-		}
-	}
-
-	return;
-}
-
-
-//name more coherently
+//thread struct to for lobby
 typedef struct tparams{
     player_t* clientPlayer;
     int clientFd;
@@ -241,7 +202,6 @@ void *lobbyInput(void* params){
 		    		//exitLobby
 		    	}
 		    	pthread_exit(NULL);
-		    	break;
 
 
 			default:

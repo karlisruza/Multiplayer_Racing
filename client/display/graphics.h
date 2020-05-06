@@ -14,14 +14,6 @@
 
 
 
-WINDOW* winSetup(void){
-	initscr();
-	noecho();
-    //10 MAP_HEIGHT lines added for outputting the player information. 
-	WINDOW * win = newwin(MAP_HEIGHT + 10, MAP_WIDTH, 0, 0);
-	return win;
-}
-
 	//creates header for the name entering prompt;
 void enterName (WINDOW* win){
 	clear();
@@ -121,6 +113,7 @@ void drawLobby(WINDOW* win, playerlist_t** playerlist, player_t* player){
 				wattron(win, A_DIM);
 				mvwprintw(win, 5*entryCount + 1, 9, "Player ID: %d", temp->ID);
 				wattroff(win, A_DIM);
+				wattroff(win, COLOR_PAIR(entryCount+1));
 				entryCount++;
 				temp = temp->next;
 			}

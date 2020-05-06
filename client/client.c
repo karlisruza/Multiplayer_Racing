@@ -48,18 +48,18 @@ int main(int argc, char* argv[]){
     playerlist_t* playerList = (playerlist_t*)malloc(sizeof(playerlist_t)); //contains all players in lobby
     gamelist_t* gameList = (gamelist_t*)malloc(sizeof(gamelist_t));
 
-    WINDOW* win = startGraphics();  //graphics.h
-    enableRawMode();  
+    atexit(fixTerminal);			//const.h
+    WINDOW* win = startGraphics();  //graphics.h- launches ncurses and screen
+    enableRawMode();  				//controls.h - allows reading by character not by line
 
-    enterName(win);                 //in graphics.h
-    writePrompt(win, 3, 4, &clientPlayer); //in controls.h
-    // strcpy(clientPlayer->name, "karlisxx");
+    enterName(win);                 //graphics.h - shows the "enter your name" prompt.
+    writePrompt(win, 3, 4, &clientPlayer); //in controls.h - displays the name you enter.
 
     if(clientPlayer->name != NULL){
         clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response from server
     } 
     else{
-        exit(1);
+        die("Couldn't properly send player name");
     }
     
     // //populate gamelist and then display it, and initialize navigator
@@ -70,13 +70,10 @@ int main(int argc, char* argv[]){
         joinGame(&playerList, &clientPlayer, clientFd);
     }
     else{
-        endwin();
         close(clientFd);
-        perror("join game failed\n");
-        return -1;
+        die("join game failed\n");
     }
 
-    requestPlayer(&playerList, &clientPlayer, clientFd);
     //start game
 
     // //thread for user key input;
@@ -88,7 +85,8 @@ int main(int argc, char* argv[]){
     pthread_t thread;
     pthread_create(&thread, NULL, lobbyInput, (void*)params);     
 
-    
+    requestPlayer(&playerList, &clientPlayer, clientFd);
+
     drawLobby(win, &playerList, clientPlayer);   
     char* buffer = (void*)malloc(sizeof(msg_t));
     int length = (sizeof(msg_t));
@@ -105,6 +103,7 @@ int main(int argc, char* argv[]){
         if(msgr->type = PLAYER_JOINED){
             drawLobby(win, &playerList, clientPlayer);
         }
+        sleep (3);
     }
 
     // requestGameStart(&clientPlayer, clientFd);
