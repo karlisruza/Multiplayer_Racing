@@ -11,14 +11,19 @@ struct termios orig_termios;
 	//taken from the text editor thing. Allows for the term to interpret 
 		// char by char, not string after pressing enter.
 		//https://github.com/snaptoken/kilo-src/blob/error-handling/kilo.c	
-void disableRawMode() {
+
+
+void fixTerminal() {
+		//de-allocates the resources taken by the window
+		//https://pubs.opengroup.org/onlinepubs/007908799/xcurses/endwin.html
+	endwin();
+	delscreen();
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
     die("tcsetattr");
 }
 
 void enableRawMode() {
   if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
-  atexit(disableRawMode);
 
 //http://man7.org/linux/man-pages/man3/termios.3.html -- Raw mode
   struct termios raw = orig_termios;
