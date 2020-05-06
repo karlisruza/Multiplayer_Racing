@@ -62,17 +62,16 @@ void displayGameList (WINDOW * win, gamelist_t** list){
 			current = current -> next;
 		    entryCount++;
 	    }
-		wattron(win, A_BOLD);
-	    mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME (PRESS C)");
-		wattroff(win, A_BOLD);
-    	wrefresh(win);
 	}
-    else {
-		wattron(win, A_BOLD);
-	    mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME (PRESS C)");
-		wattroff(win, A_BOLD);
-    	wrefresh(win);
+	else {
+		mvwprintw(win, 3, 3, "--- START THE FIRST GAME ON THIS SERVER ---");
 	}
+	
+	wattron(win, A_BOLD);
+	mvwprintw(win, 5*entryCount, 3, "CREATE YOUR OWN GAME (PRESS C)");
+	wattroff(win, A_BOLD);
+    wrefresh(win);
+
 	return;
 }
 
@@ -109,6 +108,11 @@ void drawLobby(WINDOW* win, playerlist_t** playerlist, player_t* player){
 
 			mvwprintw (win, 3, 3, "--- GAME LOBBY FOR GAME %d ---", player->gameID);
 			while (temp != NULL){
+				move(5*entryCount,5);
+				clrtoeol();
+				move(5*entryCount+1,8);
+				clrtoeol();
+
 				wattron(win, A_BOLD);
 				wattron(win, COLOR_PAIR(entryCount+1));		//paints the players in their respective car colors. color codes are defined in startGraphics(...) in this file.
 				mvwprintw(win, 5*entryCount, 6, "Player name: %s", temp->name); // temp name brokenwattroff(win, COLOR_PAIR(entryCount+1));

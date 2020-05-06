@@ -25,7 +25,7 @@ void enableRawMode() {
   raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | IXON);
   raw.c_oflag &= ~(OPOST);
   raw.c_cflag |= (CS8);
-  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN); //| ISIG);
 
   raw.c_cc[VMIN] = 0;
   raw.c_cc[VTIME] = 1;
@@ -79,10 +79,19 @@ char* writePrompt(WINDOW* win, int y, int x, player_t** clientPlayer){
  	//navigator function during gameList
 		//w or s to go up or down; use c to create room
 int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd){
+    
     player_t* clientPlayer = *player;
 	char c = '\0';
     int pos = 1;
     int gameCount = (*list)->count; //err check needed
+
+    bool allowNav;
+    if ((*list) != NULL && (*list)->head != NULL){
+    	allowNav=true;
+    } else {
+    	allowNav=false;
+    }
+
     gameListNavDraw(win, pos, gameCount);
     int tempID;
 	game_t* temp;
@@ -92,36 +101,29 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
         switch (c){
 		    case 'w': //w
 		    case 'W':  //W
-				if (pos == 1){
-					pos = gameCount;
-				} else {
-					pos--;//go upwards function
-				}
-				gameListNavDraw(win, pos, gameCount);
-			    // wattron(win, A_DIM);
-	    		// mvwprintw(win, 5, 40, "Game number: %d", pos);
-				// mvwprintw(win, 5 + 1, 40, "Game ID: %d", temp->gameid);
-			    // mvwprintw(win, 5 + 2, 40, "Host ID: %d", temp->hostId);
-			    // wattroff(win, A_DIM);
-				wrefresh(win);
+		    	if(allowNav){
+		    			if (pos == 1){
+		    				pos = gameCount;
+		    			} else {
+		    				pos--;//go upwards function
+		    			}
+		    			gameListNavDraw(win, pos, gameCount);
+		    			wrefresh(win);
+		    		}
 		     	break;
 		    case 's': //s
 		    case 'S': //S
-				if (pos == gameCount){
-					pos = 1;
-					temp = (*list)->head;
-				} 
-				else {
-					pos++;
+		    	if (allowNav){
+					if (pos == gameCount){
+						pos = 1;
+						temp = (*list)->head;
+					} 
+					else {
+						pos++;
+					}
+					gameListNavDraw(win, pos, gameCount);
+					wrefresh(win);
 				}
-				gameListNavDraw(win, pos, gameCount);
-				// wattron(win, A_DIM);
-	    		// mvwprintw(win, 5, 40, "Game number: %d", pos);
-				// mvwprintw(win, 5 + 1, 40, "Game ID: %d", temp->gameid);
-				// mvwprintw(win, 5 + 2, 40, "Host ID: %d", temp->hostId);
-				// mvwprintw(win, 5 + 3, 40, "Status:  %d", temp->status);
-				// wattroff(win, A_DIM);
-				wrefresh(win);
 				break;
 
 			case 'c': //c
@@ -137,12 +139,13 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 			case 13:{ //enter
 				// clientPlayer->gameID = temp->gameid;
 				// return 0;
+				if (allowNav) return 0;
 				int counter = 1;
 				game_t* temp = (*list)->head;
 				while(temp != NULL){
 					if(counter == pos){
 						clientPlayer->gameID = temp->gameid;
-						return 0;
+						return clientPlayer->gameID;
 					}
 					counter++;
 					temp = temp->next;
@@ -153,8 +156,7 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 		    	//free current
 		    	//return -1;
 		    	exit(1);
-			// case 'q':
-			// case 'Q:'
+
 			default:
 				break;
 		}
@@ -208,40 +210,6 @@ typedef struct tparams{
     bool isHost;
 }tparams_t;
 
-void *userInput(void* params){ 
-    int clientFd = ((tparams_t*)params)->clientFd;
-    player_t* clientPlayer = ((tparams_t*)params)->clientPlayer;
-
-	while (1){
-		char c = '\0';
-    	read(STDIN_FILENO, &c, 1);
-
-		switch (c)
-		{
-		    case 13:  //ent
-		    	printf("enter was pressed");
-		    	if (((tparams_t*)params)->isHost){
-		    		requestGameStart(clientPlayer, clientFd);
-		    		pthread_exit(NULL);
-		    	}
-		    	break;
-
-		    case 27: //esc
-		    	if (((tparams_t*)params)->isHost){
-		    		//if is host, delete Lobby?
-		    	} else {
-		    		//exitLobby
-		    	}
-		    	pthread_exit(NULL);
-		    	break;
-
-
-			default:
-				printf("%c\n", c);
-				break;
-		}
-	}
-}
 
 void *lobbyInput(void* params){ 
     int clientFd = ((tparams_t*)params)->clientFd;

@@ -96,10 +96,13 @@ void* clientUdp (void* udpParams) {
             {
                 case 119: //w
                 case 87:  //W
+                    //
                 case 115: //s
                 case 83: //S
+                    //
                 case 97: //a
                 case 65:  //A
+                    //
                 case 100: //d
                 case 68:  //D
                     carMessage->button = c;
@@ -114,7 +117,10 @@ void* clientUdp (void* udpParams) {
         
             default:
             break;
-        }      
+        } 
+        //requestUpdatePlayer9()     
+            //x  -1 pa labi    -pa kreisi
+            //y  1 fwd,  -1 bckw
     }
 
           
