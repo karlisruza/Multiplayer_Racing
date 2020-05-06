@@ -30,4 +30,14 @@ typedef struct request_lobby_payload_type{
     int playerCount;
 }rl_pt;
 
+typedef struct update_pos_type{
+    int ID; /*Spēlētāja ID*/
+    float x;
+    float y;
+    float angle;
+}updpos_pt;
+
+
+
+
 #endif

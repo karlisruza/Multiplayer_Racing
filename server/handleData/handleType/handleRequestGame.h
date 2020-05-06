@@ -6,7 +6,7 @@ void handleRequestGame(gamelist_t** list, int clientFd){
     reply.type = REQUEST_GAME;
     int length;
     gamelist_t* gameList = *list;
-
+    printGameList(&gameList);
 
     if(gameList->head == NULL){
         rg_pt game;

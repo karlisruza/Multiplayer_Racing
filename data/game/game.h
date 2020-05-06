@@ -61,29 +61,37 @@ void deleteGame(gamelist_t** list, int gameId){
     return;
 }
 
-// int servergamelistPush(gamelist_t** list){
-//     game_t* game = (game_t*)malloc(sizeof(game_t));
-//     game->playerlist = malloc(sizeof(playerlist_t));
-//     game->hostId = 1;
-//     playerlistPush(&game->playerlist);
-//     if((*list)->head == NULL){
-//         game->gameid = 1;
-//         game->prev = (*list)->tail;
-//         (*list)->head = game;
-//         (*list)->tail = game;
-//         (*list)->count++;
-//     }
-//     else{
-//         game->gameid = (*list)->tail->gameid + 1;
-//         (*list)->tail->next = game;
-//         game->prev = (*list)->tail;
-//         (*list)->tail = game;
-//         (*list)->count++;
-//     }
-//     return game->gameid;
-//     //TODO SEND GAME ID TO PLAYER
-// }
+void printGame(game_t* game){
+    printf("Game ID: %d\n", game->gameid);
+    printf("Status: %d\n", game->status);
+    if(game->playerList != NULL){
+        printf("Player Count: %d\n", game->playerList->count);
+        printPlayerList(&game->playerList);  
+    } 
+}
 
+void printGameById(gamelist_t** list, int id){
+    game_t* current = (*list)->head;
+    while(current != NULL){
+        if(current->gameid == id){
+            printGame(current);
+        }
+        current = current->next;
+    }
+    return;
+}
 
+void printGameList(gamelist_t** list){
+    game_t* current = (*list)->head;
+    if((*list)->head == NULL){
+        printf("gamelist empty\n");
+        return;
+    }
+    while(current != NULL){
+        printGame(current);
+        current = current->next;
+    }
+    return;
+}
 
 #endif
