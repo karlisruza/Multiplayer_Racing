@@ -3,22 +3,26 @@
 #ifndef PLAYER_H_INCLUDED
 #define PLAYER_H_INCLUDED
 
-typedef struct Coordinates{
-    float x;
-    float y;
-}coordinate_t;
+// typedef struct Coordinates{
+//     float x;
+//     float y;
+// }coordinate_t;
 
 typedef struct Player_info{
     int ID; /*Spēlētāja ID*/
     int gameID;
-    char name[20];/* Spēlētāja vārds */
-    coordinate_t position; /* Spēlētāja koordinātas */
+    // coordinate_t* position; /* Spēlētāja koordinātas */
+
+    float x;
+    float y;
     float angle; /* Spēlētāja leņķis */
     float speed; /*Spēlētāja ātrums*/
     float acceleration; /*Spēlētāja paātrinājums*/
     int laps; /* Cik reizes spēlētājs jau apbraucis apkārt kartei */
     struct Player_info* next;
     struct Player_info* prev;
+    char name[20];/* Spēlētāja vārds */
+
 }player_t;
 
 typedef struct Player_list{
@@ -31,8 +35,9 @@ void printPlayer(player_t* player){
     printf("    Player ID: %d\n", player->ID);
     printf("    gameID: %d\n", player->gameID);
     printf("    name: %s\n", player->name);
-    printf("    position x: %f\n", player->position.x);
-    printf("    position y: %f\n", player->position.y);
+    printf("    position x: %f\n", player->x);
+    printf("    position y: %f\n", player->y);
+    printf("    angle: %f\n", player->angle);
     printf("    speed: %f\n", player->speed);
     printf("    acceleration: %f\n", player->acceleration);
     printf("    laps: %d\n", player->laps);

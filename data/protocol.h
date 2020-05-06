@@ -16,9 +16,9 @@ typedef struct Action{ // domāts kā arrow key inputs
     int y; //( 1 uz priekšu, -1 atpakaļ 0 bez virziena)
 }action_t;
 
-struct Line{
-    struct Coordinates beggining;
-    struct Coordinates end;
-};
+// struct Line{
+//     struct Coordinates beggining;
+//     struct Coordinates end;
+// };
 
 #endif

@@ -20,7 +20,7 @@ void handleData(msg_t* message, playerlist_t** list, player_t* clientPlayer, int
             handleStartGame(&playerList, clientPlayer, clientFd);
             break;
         case UPDATE_PLAYER:
-            handleUpdatePlayer(&playerList, clientPlayer, clientFd);
+            handleUpdatePlayer(message, &playerList);
             break;
         default:
             perror("invalid message");

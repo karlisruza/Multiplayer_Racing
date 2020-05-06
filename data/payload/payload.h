@@ -35,7 +35,6 @@ typedef struct update_pos_type{
     float x;
     float y;
     float angle;
-    int playerCount;
 }updpos_pt;
 
 
