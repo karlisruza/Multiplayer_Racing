@@ -12,6 +12,9 @@
 #define PLAYER_SEVEN_COLOR   	COLOR_PAIR(8)
 #define PLAYER_EIGHT_COLOR    	COLOR_PAIR(9)
 
+#define MAP_HEIGHT 				 40;
+#define MAP_WIDTH  				150;
+
 
 
 	//creates header for the name entering prompt;
