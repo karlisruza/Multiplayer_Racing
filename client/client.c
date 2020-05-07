@@ -28,7 +28,7 @@
 #include "handleData/handleData.h"
 
 #include "display/const.h"
-#include "display/car.h"
+//#include "display/car.h"
 #include "display/graphics.h"
 #include "display/controls.h"
 
