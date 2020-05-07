@@ -22,6 +22,7 @@ typedef struct Player_info{
     struct Player_info* next;
     struct Player_info* prev;
     char name[20];/* Spēlētāja vārds */
+    int midMark; /*vai ir nobraucis vairāk par pusi*/
 
 }player_t;
 

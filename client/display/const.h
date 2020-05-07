@@ -12,12 +12,8 @@
 #include <unistd.h>	
 
 
-#define MAP_HEIGHT = 40;
-#define  MAP_WIDTH  = 150;
-
-
 void die(const char *s) {
-  printf(s);
+  printf("%s", s);
   exit(1);
 }
 

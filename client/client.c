@@ -28,7 +28,7 @@
 #include "handleData/handleData.h"
 
 #include "display/const.h"
-#include "display/car.h"
+//#include "display/car.h"
 #include "display/graphics.h"
 #include "display/controls.h"
 
@@ -137,6 +137,15 @@ int main(int argc, char* argv[]){
     if (pthread_create(&thread, NULL, carControl, (void*)paramsTwo) < 0){
         die("failed the second thread\n");
     }
+
+
+    player_t* current = playerList->head;
+    int iter = 1; 
+    while (current != NULL){
+        drawPlayer(win, current, iter);
+        current = current -> next;
+    }
+
     
     drawMap(win);
     wrefresh(win);
@@ -157,20 +166,24 @@ int main(int argc, char* argv[]){
             playerData = (updpos_pt*)msgr->payload;
 
             //find player and update data
-            player_t* current = playerList->head;
+            current = playerList->head;
+            int iter=1;
             while(current != NULL){
                 if(current->ID == playerData->ID){
+                    removeOldCar(win, current);
                     current->x = playerData->x;
                     current->y = playerData->y;
                     current->angle = playerData->angle;
+                    drawPlayer(win, current, iter);
                     break;
                 }
+                iter++;
                 current = current->next;
+                
             }
             // mvwprintw(win, 37, 37, "x: %f, y:%f, a:%f ", current->x, current->y, current->angle);
             // sleep(2);
             // wrefresh(win);
-            drawPlayer(win, current);
             wrefresh(win);
         }
         if(msgr->type == STOP_GAME){
