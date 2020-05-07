@@ -165,7 +165,7 @@ int main(int argc, char* argv[]){
                 // mvwprintw(win, 37, 37, "x: %f, y:%f, a:%f ", current->x, current->y, current->angle);
                 // sleep(2);
                 // wrefresh(win);
-                removePlayer(win, current, 2);
+                removePlayerDraw(win, current, 2);
 
                 drawPlayer(win, current, 2);
                 wrefresh(win);

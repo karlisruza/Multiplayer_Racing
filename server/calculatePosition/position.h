@@ -48,52 +48,46 @@ void updatePosition(player_t** player, action_t action){
     player_t* currentPlayer = *player;
 
         //decrease of speed naturally
-    if (((*player) -> speed) > 0.01){
-        (*player) -> speed -= FRICTION;
-    } else if (((*player) -> speed) < -0.01){
-        (*player) -> speed += FRICTION;
-    } else 
-        (*player) -> speed = 0;
-
 
     float tempVelocity = (*player) -> speed;
     float tempAngle = (*player) -> angle;
 
         //if w or s was input, add acceleration in this direction
-    if (action.x != 0){
-        if(tempVelocity >= MAX_SPEED || tempVelocity <= MAX_REV_SPEED){
-            tempVelocity += ACCELERATION*action.x;
-        }
-    }
-        //if a or d was pressed, add a turn in the said direction
-    else 
-        tempAngle += TURN_SPEED*action.y;
+     tempVelocity += ACCELERATION*action.y;
+    
+     tempAngle += TURN_SPEED*action.x;
+
+        if (tempVelocity > MAX_SPEED)
+        tempVelocity = MAX_SPEED;
+    else if (tempVelocity < MAX_REV_SPEED)
+        tempVelocity = MAX_REV_SPEED;
 
         
         //is basically the x and y components 
             //added + speed in the angle direction
             ///should be cos/sin^2 but want to save resouces.
-    double newXHead = ((*player)->x)       //midmark
+    float newXHead = ((*player)->x)       //midmark
         + cos(tempAngle * M_PI)                 //comepnsation of the angle for the body
         + tempVelocity * cos(tempAngle * M_PI); //to be added in order to move forwards
 
-    double newYHead = ((*player)->y) 
+    float newYHead = ((*player)->y) 
         + sin(tempAngle * M_PI)
         + tempVelocity * sin(tempAngle * M_PI);
 
-    double newXTail = ((*player)->x) 
+    float newXTail = ((*player)->x) 
         - cos(tempAngle * M_PI)
         + tempVelocity * cos(tempAngle * M_PI);
 
-    double newYTail = ((*player)->y) 
+    float newYTail = ((*player)->y) 
         - sin(tempAngle * M_PI)
         + tempVelocity * sin(tempAngle * M_PI);
+
 
         //if the new coordinates of the head and tail don't collide,
             //parameters get updated
     if(checkMove(newYHead, newXHead, newYTail, newXTail)){
-        (*player)->x = newXHead - 1*cos((*player)->angle * M_PI);
-        (*player)->y = newYHead - 1*sin((*player)->angle * M_PI);
+        (*player)->x += 1*cos((*player)->angle * M_PI);
+        (*player)->y += 1*sin((*player)->angle * M_PI);
         (*player)->angle = tempAngle;
         (*player)->speed = tempVelocity;
     } else { //otherwise, collision detected and speed is zero. 
