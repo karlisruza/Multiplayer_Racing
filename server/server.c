@@ -39,8 +39,6 @@ int main(void){
     pthread_t threadUdp;
     pthread_create(&threadUdp, NULL, serverUdp, (void *) params);
     
-
-    return 0;
 	//runs indefinitely
     while(true){
         struct sockaddr_in peerAddr;
