@@ -28,7 +28,7 @@
 #include "handleData/handleData.h"
 
 #include "display/const.h"
-#include "display/car.h"
+//#include "display/car.h"
 #include "display/graphics.h"
 #include "display/controls.h"
 
@@ -116,9 +116,9 @@ int main(int argc, char* argv[]){
             handleData(msgr, &playerList, clientPlayer, clientFd);
 
             //if player joined, then refreshes lobby
-            if(msgr->type == PLAYER_JOINED){
+            if(msgr->type == PLAYER_JOINED || msgr->type == PLAYER_LEFT){
                 drawLobby(win, &playerList, clientPlayer);
-            } 
+            }
             else if(msgr->type == START_GAME){ //game has started
                 break;       
             }

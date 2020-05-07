@@ -12,6 +12,9 @@
 #define PLAYER_SEVEN_COLOR   	COLOR_PAIR(8)
 #define PLAYER_EIGHT_COLOR    	COLOR_PAIR(9)
 
+#define MAP_HEIGHT 				 40
+#define MAP_WIDTH  				150
+
 
 
 	//creates header for the name entering prompt;
@@ -39,19 +42,19 @@ void displayInput (WINDOW* win, char* input, int y, int x){
 void displayGameList (WINDOW * win, gamelist_t** list){
 	werase(win);
 	int entryCount = 1; 
-    if ((*list) != NULL && (*list)->head != NULL){
+    if ((*list) != NULL && (*list) -> head != NULL){
 	    game_t* current = (game_t*)malloc(sizeof(game_t));
-	    current = (*list) -> head;	
+	    current = (*list)  ->  head;	
 		mvwprintw(win, 3, 3, "--- LIST OF GAMES ---");
 
 	    while (current != NULL){
 	    	wattron(win, A_DIM);
 	    	mvwprintw(win, 5*entryCount, 3, "Game number: %d", entryCount);
-			mvwprintw(win, 5*entryCount + 1, 6, "Game ID: %d", current->gameid);
-			mvwprintw(win, 5*entryCount + 2, 6, "Host ID: %d", current->hostId);
-			mvwprintw(win, 5*entryCount + 3, 6, "Status: %d", current->status);
+			mvwprintw(win, 5*entryCount + 1, 6, "Game ID: %d", current -> gameid);
+			mvwprintw(win, 5*entryCount + 2, 6, "Host ID: %d", current -> hostId);
+			mvwprintw(win, 5*entryCount + 3, 6, "Status: %d", current -> status);
 		    wattroff(win, A_DIM);
-			current = current -> next;
+			current = current  ->  next;
 		    entryCount++;
 	    }
 	}
@@ -92,12 +95,12 @@ void gameListNavDraw (WINDOW* win, int pos, int maxPos){
 void drawLobby(WINDOW* win, playerlist_t** playerlist, player_t* player){
 	playerlist_t* playerList = *playerlist;
     if (playerList != NULL){
-       if(playerList->head != NULL){
+       if(playerList -> head != NULL){
 			werase (win);
-			player_t* temp = playerList->head;
+			player_t* temp = playerList -> head;
 			int entryCount = 1;
 
-			mvwprintw (win, 3, 3, "--- GAME LOBBY FOR GAME %d ---", player->gameID);
+			mvwprintw (win, 3, 3, "--- GAME LOBBY FOR GAME %d ---", player -> gameID);
 			while (temp != NULL){
 				move(5*entryCount,5);
 				clrtoeol();
@@ -106,15 +109,15 @@ void drawLobby(WINDOW* win, playerlist_t** playerlist, player_t* player){
 
 				wattron(win, A_BOLD);
 				wattron(win, COLOR_PAIR(entryCount+1));		//paints the players in their respective car colors. color codes are defined in startGraphics(...) in this file.
-				mvwprintw(win, 5*entryCount, 6, "Player name: %s", temp->name); // temp name brokenwattroff(win, COLOR_PAIR(entryCount+1));
+				mvwprintw(win, 5*entryCount, 6, "Player name: %s", temp -> name); // temp name brokenwattroff(win, COLOR_PAIR(entryCount+1));
 				wattroff(win, A_BOLD);
 
 				wattron(win, A_DIM);
-				mvwprintw(win, 5*entryCount + 1, 9, "Player ID: %d", temp->ID);
+				mvwprintw(win, 5*entryCount + 1, 9, "Player ID: %d", temp -> ID);
 				wattroff(win, A_DIM);
 				wattroff(win, COLOR_PAIR(entryCount+1));
 				entryCount++;
-				temp = temp->next;
+				temp = temp -> next;
 			}
 			//free temp
 			wrefresh(win);
@@ -176,7 +179,7 @@ void endScreen(WINDOW* win, player_t* player){
 	//outputs info about the winner.
 	wattron(win, PLAYER_ONE_COLOR);
 	mvwprintw(win, 24, 4, 
-		"%s", player->name);
+		"%s", player -> name);
 
 	wattroff(win, PLAYER_ONE_COLOR);
 	wattroff (win, A_BOLD);	
@@ -184,7 +187,7 @@ void endScreen(WINDOW* win, player_t* player){
 		// if player one
 	//gets player list, finds the player who first reached 3 laps
 		//wattron player_color and bold
-		//mvwprintw(win, 24, 4, "%s ==0", player->playerName);
+		//mvwprintw(win, 24, 4, "%s ==0", player -> playerName);
 		//wattroff player_color and bold
 
 	wattron(win, A_DIM);
@@ -247,19 +250,20 @@ WINDOW* startGraphics (){
 	return win;
 }
 
-	//Places symbols after each completion of the moveCar function and rotateCar functions
-void drawCar(WINDOW* win, struct car** player){
-		//creates the int value for the car head
-	int hx = round(((*player)->mid->x) + 1*cos((*player)->angle * M_PI));
-	int hy = round(((*player)->mid->y) + 1*sin((*player)->angle * M_PI));
-	
-		//creates the int value for the car middle
-	int mx = round((*player)->mid->x);
-	int my = round((*player)->mid->y);
 
-		//creates the int value for the car tail
-	int tx = round(((*player)->mid->x) - 1*cos((*player)->angle * M_PI));
-	int ty = round(((*player)->mid->y) - 1*sin((*player)->angle * M_PI));
+
+void drawPlayer(WINDOW * win, player_t* player, int iter){
+	//creates the int value for the car head
+	int hx = round((player -> x) + 1*cos(player -> angle * M_PI));
+	int hy = round((player -> y) + 1*sin(player -> angle * M_PI));
+	
+	//creates the int value for the car middle
+	int mx = round(player -> x);
+	int my = round(player -> y);
+
+	//creates the int value for the car tail
+	int tx = round((player -> x) - 1*cos(player -> angle * M_PI));
+	int ty = round((player -> y) - 1*sin(player -> angle * M_PI));
 
 
 		
@@ -267,13 +271,13 @@ void drawCar(WINDOW* win, struct car** player){
 			//in this case, the car is outlined and coloured according 
 			//to the player.
 	wattron(win, A_BOLD);
-	wattron(win, PLAYER_ONE_COLOR);
+	wattron(win, COLOR_PAIR(iter+1));
 
 		mvwprintw(win, ty, tx, "=");
 		mvwprintw(win, my, mx, "=");
 		mvwprintw(win, hy, hx, "0");
 
-	wattroff(win, PLAYER_ONE_COLOR);
+	wattroff(win, COLOR_PAIR(iter+1));
 	wattroff(win, A_BOLD);
 }
 
@@ -283,12 +287,12 @@ void drawPlayer(WINDOW* win, player_t* player, i){
 	int hy = round((player->y) + 1*sin(player->angle * M_PI));
 	
 	//creates the int value for the car middle
-	int mx = round(player->x);
-	int my = round(player->y);
+	int mx = round(player -> x);
+	int my = round(player -> y);
 
 	//creates the int value for the car tail
-	int tx = round((player->x) - 1*cos(player->angle * M_PI));
-	int ty = round((player->y) - 1*sin(player->angle * M_PI));
+	int tx = round((player -> x) - 1*cos(player -> angle * M_PI));
+	int ty = round((player -> y) - 1*sin(player -> angle * M_PI));
 
 
 		
@@ -337,11 +341,10 @@ void removePlayer(WINDOW* win, player_t* player, i){
 
 	//Creates the race track
 void drawMap(WINDOW * win){
-	int realx, realy;
-
 	werase(win);
-	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
 
+	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
+	int realx, realy;
 
 	wattron(win, A_DIM);
 		//creates the upper and lower bound.
@@ -388,27 +391,36 @@ void drawFinishLine (WINDOW * win){
 		return;
 }
 	
-	//
-void playerStats (struct car** player, WINDOW* win){
 
-	wattron(win, A_BOLD);
-	wattron(win, PLAYER_ONE_COLOR);
-	mvwprintw(win, MAP_HEIGHT + 2, 10, 
-		"Player one:");
-	wattroff(win, PLAYER_ONE_COLOR);
-		mvwprintw(win, MAP_HEIGHT + 4, 10, 
-			"Lap count: %d", (*player)->laps);
-		
-		mvwprintw(win, MAP_HEIGHT + 6, 10, 
-			"midMark: %d", (*player)->midMark);
+void playerStats (playerlist_t** playerList, player_t** player, WINDOW* win){
+	player_t* temp = (*playerList) -> head;
+	int iter = 0;
+	while (temp != 0){
+		wattron(win, COLOR_PAIR(iter+2));
+	
+		wattron(win, A_BOLD);
+			mvwprintw(win, MAP_HEIGHT + 2 + ((iter%2) * 5), 10 + ((iter%2) * 25), 
+				"%s", (*player)->name);
+		wattroff(win, A_BOLD);
+	
+			mvwprintw(win, MAP_HEIGHT + 4 + ((iter%2) * 5), 10 + ((iter%2) * 25),
+				"Player %d:", iter + 1);
+	
+			mvwprintw(win, MAP_HEIGHT + 5 + ((iter%2) * 5), 10 + ((iter%2) * 25), 
+				"Lap count: %d", (*player) -> laps);
+	
+		wattroff(win, COLOR_PAIR(iter+2));
+		iter++;
+	}
 
-	wattroff(win, A_BOLD);
+
 	
 	return;
 }
 
+
 	//outputs stats such as player color, lap count, etc. 
-void playerDebugStats (struct car** player, WINDOW* win){
+void playerDebugStats (playerlist_t** playerlist, player_t** player, WINDOW* win){
 
 	wattron(win, A_BOLD);
 	wattron(win, PLAYER_ONE_COLOR);
@@ -416,22 +428,22 @@ void playerDebugStats (struct car** player, WINDOW* win){
 		"Player one:");
 	wattroff(win, PLAYER_ONE_COLOR);
 		mvwprintw(win, MAP_HEIGHT + 4, 30, 
-			"Lap count: %d", (*player)->laps);
+			"Lap count: %d", (*player) -> laps);
 		mvwprintw(win, MAP_HEIGHT + 5, 30, 
-			"Velocity: %f", (*player)->velocity);
+			"Velocity: %f", (*player) -> speed);
 		mvwprintw(win, MAP_HEIGHT + 6, 30, 
-			"Angle: %f", (*player)->angle * M_PI);
+			"Angle: %f", (*player) -> angle * M_PI);
 		mvwprintw(win, MAP_HEIGHT + 7, 30, 
-			"X axis: %f", (*player)->mid->x);
+			"X axis: %f", (*player) -> x);
 		mvwprintw(win, MAP_HEIGHT + 8, 30, 
-			"Y axis: %f", (*player)->mid->y);
+			"Y axis: %f", (*player) -> y);
 
 		//head
-	double hx = ((*player)->mid->x) + 1*cos((*player)->angle * M_PI);
-	double hy = ((*player)->mid->y) + 1*sin((*player)->angle * M_PI);
+	double hx = ((*player) -> x) + 1*cos((*player) -> angle * M_PI);
+	double hy = ((*player) -> y) + 1*sin((*player) -> angle * M_PI);
 		//tail
-	double tx = ((*player)->mid->x) - 1*cos((*player)->angle * M_PI);
-	double ty = ((*player)->mid->y) - 1*sin((*player)->angle * M_PI);
+	double tx = ((*player) -> x) - 1*cos((*player) -> angle * M_PI);
+	double ty = ((*player) -> y) - 1*sin((*player) -> angle * M_PI);
 
 		mvwprintw(win, MAP_HEIGHT + 4, 50, 
 			"hx: %f", hx);

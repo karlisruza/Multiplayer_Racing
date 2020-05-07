@@ -206,7 +206,6 @@ void *lobbyInput(void* params){
 
 	//new car function that is a thread
 void* carControl (void* params){
-		printf("thread launch");
 	    int clientFd = ((tparams_t*)params)->clientFd;
 	    player_t* clientPlayer = ((tparams_t*)params)->clientPlayer;
 		playerlist_t* list = ((tparams_t*)params)->playerList;
@@ -248,41 +247,5 @@ void* carControl (void* params){
 		}
 }
 
-	//legacy car function that determines which wasd key was pressed
-bool keyPress(struct car** player, WINDOW* win){
-    char c = '\0';
-    read(STDIN_FILENO, &c, 1);
-
-
-	switch (c)
-	{
-	    case 119: //w
-	    case 87:  //W
-			moveCar(&(*player), win, true);
-	     	break;
-
-	    case 115: //s
-	    case 83: //S
-	    	moveCar(&(*player), win, false);
-	    	break;
-
-	    case 97: //a
-	    case 65:  //A
-	    	rotateCar(&(*player), win, true);
-	     	break;
-
-	    case 100: //d
-	    case 68:  //D
-	    	rotateCar(&(*player), win, false);
-	     	break;
-
-	    case 27: //esc
-	    	return false;
-
-		default:
-			break;
-	}
-	return true;
-}
 
 #endif 
