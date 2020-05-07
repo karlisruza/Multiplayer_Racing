@@ -154,21 +154,24 @@ int main(int argc, char* argv[]){
                 //find player and update data
                 player_t* current = playerList->head;
                 while(current != NULL){
+                    int iter = 1;
+                    removePlayerDraw(win, current, iter);
+
                     if(current->ID == playerData->ID){
                         current->x = playerData->x;
                         current->y = playerData->y;
                         current->angle = playerData->angle;
+                        
                         break;
                     }
+                    drawPlayer(win, current, iter);
+                    iter++;
                     current = current->next;
                 }
                 // mvwprintw(win, 37, 37, "x: %f, y:%f, a:%f ", current->x, current->y, current->angle);
                 // sleep(2);
                 // wrefresh(win);
-                removePlayerDraw(win, current, 2);
 
-                drawPlayer(win, current, 2);
-                wrefresh(win);
             }
             if(msgr->type == STOP_GAME){//Breaks loop
                 cg_pt* payload = (cg_pt*)msgr->payload;

@@ -47,15 +47,18 @@ bool checkMove (double y1, double x1, double y2, double x2){
 void updatePosition(player_t** player, action_t action){
     player_t* currentPlayer = *player;
 
-        //decrease of speed naturally
+    if ((*player)->speed > 0.01){
+        (*player)->speed -= FRICTION;
+    } else if ((*player)->speed < 0.01){
+        (*player)->speed += FRICTION;
+    }
 
     float tempVelocity = (*player) -> speed;
     float tempAngle = (*player) -> angle;
 
         //if w or s was input, add acceleration in this direction
      tempVelocity += ACCELERATION*action.y;
-    
-     tempAngle += TURN_SPEED*action.x;
+     tempAngle -= TURN_SPEED*action.x;
 
         if (tempVelocity > MAX_SPEED)
         tempVelocity = MAX_SPEED;
@@ -66,11 +69,13 @@ void updatePosition(player_t** player, action_t action){
         //is basically the x and y components 
             //added + speed in the angle direction
             ///should be cos/sin^2 but want to save resouces.
-    float newXHead = ((*player)->x)       //midmark
+    float newXHead = 
+          ((*player)->x)       //midmark
         + cos(tempAngle * M_PI)                 //comepnsation of the angle for the body
         + tempVelocity * cos(tempAngle * M_PI); //to be added in order to move forwards
 
-    float newYHead = ((*player)->y) 
+    float newYHead = 
+           ((*player)->y) 
         + sin(tempAngle * M_PI)
         + tempVelocity * sin(tempAngle * M_PI);
 
@@ -86,12 +91,12 @@ void updatePosition(player_t** player, action_t action){
         //if the new coordinates of the head and tail don't collide,
             //parameters get updated
     if(checkMove(newYHead, newXHead, newYTail, newXTail)){
-        (*player)->x += 1*cos((*player)->angle * M_PI);
-        (*player)->y += 1*sin((*player)->angle * M_PI);
+        (*player)->x += tempVelocity*cos(tempAngle * M_PI);
+        (*player)->y += tempVelocity*sin(tempAngle * M_PI);
         (*player)->angle = tempAngle;
         (*player)->speed = tempVelocity;
     } else { //otherwise, collision detected and speed is zero. 
-        (*player)->speed = 0;
+        (*player)-> speed = 0;
     }
 
     return;

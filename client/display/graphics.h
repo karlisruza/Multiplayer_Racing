@@ -311,6 +311,7 @@ void removePlayerDraw(WINDOW* win, player_t* player, int iter){
 
 	wattroff(win, COLOR_PAIR(iter));
 	wattroff(win, A_BOLD);
+	wrefresh(win);
 	return;
 }
 
