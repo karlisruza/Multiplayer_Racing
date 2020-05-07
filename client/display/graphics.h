@@ -277,7 +277,7 @@ void drawCar(WINDOW* win, struct car** player){
 	wattroff(win, A_BOLD);
 }
 
-void drawPlayer(WINDOW* win, player_t* player){
+void drawPlayer(WINDOW* win, player_t* player, i){
 	//creates the int value for the car head
 	int hx = round((player->x) + 1*cos(player->angle * M_PI));
 	int hy = round((player->y) + 1*sin(player->angle * M_PI));
@@ -296,13 +296,42 @@ void drawPlayer(WINDOW* win, player_t* player){
 			//in this case, the car is outlined and coloured according 
 			//to the player.
 	wattron(win, A_BOLD);
-	wattron(win, PLAYER_ONE_COLOR);
+	wattron(win, COLOR_PAIR(i));
 
 		mvwprintw(win, ty, tx, "=");
 		mvwprintw(win, my, mx, "=");
 		mvwprintw(win, hy, hx, "0");
 
-	wattroff(win, PLAYER_ONE_COLOR);
+	wattroff(win, COLOR_PAIR(i));
+	wattroff(win, A_BOLD);
+}
+
+void removePlayer(WINDOW* win, player_t* player, i){
+	//creates the int value for the car head
+	int hx = round((player->x) + 1*cos(player->angle * M_PI));
+	int hy = round((player->y) + 1*sin(player->angle * M_PI));
+	
+	//creates the int value for the car middle
+	int mx = round(player->x);
+	int my = round(player->y);
+
+	//creates the int value for the car tail
+	int tx = round((player->x) - 1*cos(player->angle * M_PI));
+	int ty = round((player->y) - 1*sin(player->angle * M_PI));
+
+
+		
+		//wattron intiates the ability to use ncurses formatting properties
+			//in this case, the car is outlined and coloured according 
+			//to the player.
+	wattron(win, A_BOLD);
+	wattron(win, COLOR_PAIR(i));
+
+		mvwprintw(win, ty, tx, " ");
+		mvwprintw(win, my, mx, " ");
+		mvwprintw(win, hy, hx, " ");
+
+	wattroff(win, COLOR_PAIR(i));
 	wattroff(win, A_BOLD);
 }
 
