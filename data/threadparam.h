@@ -11,5 +11,14 @@ typedef struct threadParam{
     pthread_mutex_t* lock;
 }params_t;
 
+
+//thread struct for client
+typedef struct tparams{
+	playerlist_t* playerList;
+    player_t* clientPlayer;
+    int clientFd;
+    bool isHost;
+}tparams_t;
+
 #endif
 

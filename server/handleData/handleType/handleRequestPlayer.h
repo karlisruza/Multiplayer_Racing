@@ -29,7 +29,10 @@ void handleRequestPlayer(msg_t* message, gamelist_t** list, int clientFd){
             }
         }
     }
+    printf("\n\nhead is %d, %s\n", playerList->head->ID, playerList->head->name);
+
     if(playerList->head == NULL){ //checks if playerlist empty
+        printf("list is empty before sending\n");
         rl_pt player;
         player.playerCount = playerList->count;
         memcpy((void*)&reply.payload, (void*)&player, sizeof(player));
@@ -37,10 +40,15 @@ void handleRequestPlayer(msg_t* message, gamelist_t** list, int clientFd){
         sendData(clientFd, (void*)&reply, length, NULL);
     }
     else{ //send each individual player
+        printf("sending indiv players\n");
         player_t* current = playerList->head;
         rl_pt player;
+
         int counter = 0;
+
         while(current != NULL){
+            printf("counter - %d, user - %d ; id  %s \n",counter, current->ID, current->name);
+
             player.ID = current->ID;
             strcpy(player.name, current->name);
             player.playerCount = playerList->count;

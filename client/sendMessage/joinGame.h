@@ -2,7 +2,7 @@
 #ifndef JOINGAME_H_INCLUDED
 #define JOINGAME_H_INCLUDED
 
-void joinGame(playerlist_t** list, player_t** player, int clientFd){
+int joinGame(playerlist_t** list, player_t** player, int clientFd){
     msg_t request;
     request.type = JOIN_GAME;
     playerlist_t* playerList = *list;
@@ -20,10 +20,10 @@ void joinGame(playerlist_t** list, player_t** player, int clientFd){
     length = sizeof(msg_t);
     int retLen = recv(clientFd, (void*)buffer, length, 0);
     if(retLen < 0){
-        printf("fail \n");
+        return -1;
     }
     
-    return;
+    return 0;
 }
 
 #endif

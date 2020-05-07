@@ -9,7 +9,7 @@ void *clientThread(void* param){
 
         while(true){
             int retLen = recv(((params_t*)param)->clientFd, (void*)buffer, length, 0);
-            if(retLen < sizeof(int)){
+            if(retLen < 0){
                 printf("fail \n");
                 return NULL;
             }

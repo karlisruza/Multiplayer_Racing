@@ -91,7 +91,6 @@ void gameListNavDraw (WINDOW* win, int pos, int maxPos){
 	//draws the lobby, lists the players.
 void drawLobby(WINDOW* win, playerlist_t** playerlist, player_t* player){
 	playerlist_t* playerList = *playerlist;
-    werase(win);
     if (playerList != NULL){
        if(playerList->head != NULL){
 			werase (win);
@@ -281,7 +280,11 @@ void drawCar(WINDOW* win, struct car** player){
 
 	//Creates the race track
 void drawMap(WINDOW * win){
-	double realx, realy;
+	int realx, realy;
+
+	werase(win);
+	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
+
 
 	wattron(win, A_DIM);
 		//creates the upper and lower bound.

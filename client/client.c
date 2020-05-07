@@ -64,53 +64,99 @@ int main(int argc, char* argv[]){
     
     // //populate gamelist and then display it, and initialize navigator
     requestGame(&gameList, clientFd);
+
     displayGameList(win, &gameList); //in graphics.h
 
-    if(gameListNav(win, &gameList, &clientPlayer, clientFd) == 0){
-        joinGame(&playerList, &clientPlayer, clientFd);
-    }
-    else{
-        close(clientFd);
-        die("join game failed\n");
-    }
-
-    //start game
 
     // //thread for user key input;
     tparams_t* params = (tparams_t*)malloc(sizeof(tparams_t));
-    params->clientPlayer = clientPlayer;
-    params->clientFd = clientFd;
-    params->isHost = true; //This applies to the game creator - could provide it to the player 
                 //via server or when create game > join game 
-    pthread_t thread;
-    pthread_create(&thread, NULL, lobbyInput, (void*)params);     
 
-    requestPlayer(&playerList, &clientPlayer, clientFd);
+    	//if 0, then is host. If 1, then simply joins a game.
+    int gameListRet = gameListNav(win, &gameList, &clientPlayer, clientFd);
+    if(gameListRet == 0){
+    	params->isHost = true;
+    } else if (gameListRet == 1){
+    	params->isHost = false;
+    } else {
+        close(clientFd);
+        die("game list navigator made an error\n");
+    }
+    
+    if (joinGame(&playerList, &clientPlayer, clientFd) < 0){
+    	die("join game failed\n");
+    }
+    //start game
+    params->clientPlayer = clientPlayer;
+    params->playerList = playerList;
+    params->clientFd = clientFd;
+    
+
+    if (requestPlayer(&playerList, &clientPlayer, clientFd)<0){
+    	die("requestPlayerFailed");
+    }
 
     drawLobby(win, &playerList, clientPlayer);   
     char* buffer = (void*)malloc(sizeof(msg_t));
     int length = (sizeof(msg_t));
-    while(true){
-        //gaida incoming msgs (start game msg vai newPlayerMsg)
-        int retLen = recv(clientFd, (void*)buffer, length, 0);
-        if(retLen < 0){
-            printf("fail \n");
-        }
 
-        msg_t* msgr = (msg_t*)buffer;
-        // printf("message type: %d\n", msgr->type);
-        handleData(msgr, &playerList, clientPlayer, clientFd);
-        if(msgr->type = PLAYER_JOINED){
-            drawLobby(win, &playerList, clientPlayer);
-        }
-        sleep (3);
+    pthread_t thread;
+    pthread_create(&thread, NULL, lobbyInput, (void*)params);
+
+    // while(1){
+    //     //gaida incoming msgs (start game msg vai newPlayerMsg)
+    //     int retLen = recv(clientFd, (void*)buffer, length, 0);
+
+    //     if(retLen < 0){
+    //         printf("fail \n");
+    //     }
+
+    //     msg_t* msgr = (msg_t*)buffer;
+    //     handleData(msgr, &playerList, clientPlayer, clientFd);
+
+    //     if(msgr->type = PLAYER_JOINED){
+    //         drawLobby(win, &playerList, clientPlayer);
+
+    //     } else if (msgr->type = START_GAME){
+    //         //game start signal
+    //         //
+    //     }
+    // }
+
+    pthread_join(thread, NULL);
+    free(params);
+
+    wrefresh(win);
+
+    tparams_t* paramsTwo = (tparams_t*)malloc(sizeof(tparams_t));
+
+    paramsTwo->clientPlayer = clientPlayer;
+    paramsTwo->playerList = playerList;
+    paramsTwo->clientFd = clientFd;
+    pthread_t threadTwo;
+
+    if (pthread_create(&thread, NULL, carControl, (void*)paramsTwo) < 0){
+        die("failed the second thread\n");
     }
+
+
+    drawMap(win);
+    
+    while (thread){
+        clientPlayer->x += 2.432;
+        mvwprintw(win, 37, 37, "%f", clientPlayer->x);
+        sleep(2);
+        wrefresh(win);
+    }
+
+    pthread_join(thread, NULL);
+
 
     // requestGameStart(&clientPlayer, clientFd);
     //draw lobby
 
 
-
+    die("got to end successfully.");
 
   
 }
