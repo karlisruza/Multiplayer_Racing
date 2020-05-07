@@ -22,7 +22,7 @@ extern const float TURN_SPEED  = 0.097;
 extern const float FRICTION  = 0.03;
 
 void die(const char *s) {
-  perror(s);
+  printf(s);
   exit(1);
 }
 

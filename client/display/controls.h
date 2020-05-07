@@ -130,6 +130,8 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 				}
 			}
 			case 13:{ //enter
+
+				//if no games are loaded, enter will create a game
 				if (!allowNav){
 					if(createGame(&clientPlayer, clientFd) < 0){
 						die("create game failed\n");
@@ -138,7 +140,7 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 					}
 				}
 
-
+				//otherwise, joins a game
 				int counter = 1;
 				game_t* temp = (*list)->head;
 					//goes through list until the game within the list is found
@@ -146,16 +148,14 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 					counter++;
 					temp = temp->next;
 				}	
-
 					//if the ponter turns out to be null, returns -1 for error
 				if (temp == NULL){
 					die("faulty game list; chosen game does not exist\n");
 				} else { 
 					//makes the gameID for the player the temp game ID
 					(*player)->gameID = temp->gameid;
-					return 0;
+					return 1;
 				}
-		    	return 0;
 			}
 		    case 27: //esc
 		    	die("exitted\n");
@@ -166,15 +166,6 @@ int gameListNav(WINDOW* win, gamelist_t** list, player_t** player, int clientFd)
 		}
 	}
 }
-
-
-
-//thread struct to for lobby
-typedef struct tparams{
-    player_t* clientPlayer;
-    int clientFd;
-    bool isHost;
-}tparams_t;
 
 
 void *lobbyInput(void* params){ 

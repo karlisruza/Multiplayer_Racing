@@ -25,7 +25,7 @@ int requestPlayer(playerlist_t** list, player_t** clientPlayer, int clientFd){
         int ret =  recv(clientFd, buffer, sizeof(msg_t) - MAX_PAYLOAD_SIZE + sizeof(rl_pt), 0);
         msg_t* reply = (msg_t*)buffer;
         if(ret < 0 || reply->type != REQUEST_PLAYER){
-            perror("REQUEST_PLAYER invalid response");
+            perror("REQUEST_PLAYER-invalid-response");
             return -1;
         }
         playerData = (rl_pt*)reply->payload;

@@ -64,53 +64,83 @@ int main(int argc, char* argv[]){
     
     // //populate gamelist and then display it, and initialize navigator
     requestGame(&gameList, clientFd);
+
     displayGameList(win, &gameList); //in graphics.h
 
-    if(gameListNav(win, &gameList, &clientPlayer, clientFd) == 0){
-        joinGame(&playerList, &clientPlayer, clientFd);
-    }
-    else{
-        close(clientFd);
-        die("join game failed\n");
-    }
-
-    //start game
 
     // //thread for user key input;
     tparams_t* params = (tparams_t*)malloc(sizeof(tparams_t));
     params->clientPlayer = clientPlayer;
     params->clientFd = clientFd;
-    params->isHost = true; //This applies to the game creator - could provide it to the player 
                 //via server or when create game > join game 
-    pthread_t thread;
-    pthread_create(&thread, NULL, lobbyInput, (void*)params);     
 
-    requestPlayer(&playerList, &clientPlayer, clientFd);
+    	//if 0, then is host. If 1, then simply joins a game.
+    int gameListRet = gameListNav(win, &gameList, &clientPlayer, clientFd);
+    if(gameListRet == 0){
+    	params->isHost = true;
+    } else if (gameListRet == 1){
+    	params->isHost = false;
+    } else {
+        close(clientFd);
+        die("game list navigator made an error\n");
+    }
+    
+    if (joinGame(&playerList, &clientPlayer, clientFd) < 0){
+    	die("join game failed\n");
+    }
+    //start game
+
+
+    pthread_t thread;
+ 	pthread_create(&thread, NULL, lobbyInput, (void*)params);
+    
+
+    if (requestPlayer(&playerList, &clientPlayer, clientFd)<0){
+    	die("requestPlayerFailed");
+    }
+
 
     drawLobby(win, &playerList, clientPlayer);   
     char* buffer = (void*)malloc(sizeof(msg_t));
     int length = (sizeof(msg_t));
-    while(true){
+
+    int steps = 0;
+    while(1){
         //gaida incoming msgs (start game msg vai newPlayerMsg)
+        mvwprintw(win, 30, 30, "%d - start", steps);
+        wrefresh(win);
         int retLen = recv(clientFd, (void*)buffer, length, 0);
+
         if(retLen < 0){
             printf("fail \n");
         }
+        mvwprintw(win, 31, 31, "recv - %d", steps);
+        wrefresh(win);
 
         msg_t* msgr = (msg_t*)buffer;
-        // printf("message type: %d\n", msgr->type);
         handleData(msgr, &playerList, clientPlayer, clientFd);
+        mvwprintw(win, 32, 32, "handleData-dledata - %d", steps);
+        wrefresh(win);
+
         if(msgr->type = PLAYER_JOINED){
             drawLobby(win, &playerList, clientPlayer);
+            mvwprintw(win, 33, 33, "during draw lobby - %d", steps);
+            wrefresh(win);
+
         }
-        sleep (3);
+		mvwprintw(win, 34, 34, "after draw lobby - %d", steps);
+
+		wrefresh(win);
+
+		steps++;
+        sleep (1);
     }
 
     // requestGameStart(&clientPlayer, clientFd);
     //draw lobby
 
 
-
+    die("got to end successfully.");
 
   
 }
