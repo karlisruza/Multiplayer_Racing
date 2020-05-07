@@ -18,7 +18,6 @@ bool checkMove (double y1, double x1, double y2, double x2){
     int inty2 = round(y2);
     int realx, realy;
 
-
         //creates the loop of the map
     for(int y = 2; y < MAP_HEIGHT-1;y++){
         for(int x = 1; x < MAP_WIDTH-1; x++){

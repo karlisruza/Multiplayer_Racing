@@ -116,9 +116,9 @@ int main(int argc, char* argv[]){
             handleData(msgr, &playerList, clientPlayer, clientFd);
 
             //if player joined, then refreshes lobby
-            if(msgr->type == PLAYER_JOINED){
+            if(msgr->type == PLAYER_JOINED || msgr->type == PLAYER_LEFT){
                 drawLobby(win, &playerList, clientPlayer);
-            } 
+            }
             else if(msgr->type == START_GAME){ //game has started
                 break;       
             }
@@ -165,7 +165,7 @@ int main(int argc, char* argv[]){
                 // mvwprintw(win, 37, 37, "x: %f, y:%f, a:%f ", current->x, current->y, current->angle);
                 // sleep(2);
                 // wrefresh(win);
-                drawPlayer(win, current);
+                drawPlayer(win, current, 1);
                 wrefresh(win);
             }
             if(msgr->type == STOP_GAME){//Breaks loop
