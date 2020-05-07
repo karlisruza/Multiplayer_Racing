@@ -165,7 +165,7 @@ void winSizeCheck (WINDOW* win){
 }
 
 //After the game is done, displays the winner and directs the player back to the lobby.
-void endScreen(WINDOW* win, struct car** player){
+void endScreen(WINDOW* win, player_t* player){
 
 	werase(win);
 
@@ -179,7 +179,7 @@ void endScreen(WINDOW* win, struct car** player){
 	//outputs info about the winner.
 	wattron(win, PLAYER_ONE_COLOR);
 	mvwprintw(win, 24, 4, 
-		"the blue player! ==0");
+		"%s", player->name);
 
 	wattroff(win, PLAYER_ONE_COLOR);
 	wattroff (win, A_BOLD);	

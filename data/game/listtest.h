@@ -24,7 +24,28 @@ void getTestingList(gamelist_t** list){
 	player->acceleration = 0.0000001;
 	player->speed = 1.0;
 	playerlistPush(&game->playerList, &player);
+
+	player = (player_t*)malloc(sizeof(player_t*));
+	strcpy(player->name, "pleb");
+	player->ID = 2;
+	player->gameID = 1;
+	player->x = 77.0;
+	player->y = 99.0;
+	player->acceleration = 0.0000001;
+	player->speed = 1.0;
+	playerlistPush(&game->playerList, &player);
+	
+	player = (player_t*)malloc(sizeof(player_t*));
+	strcpy(player->name, "pleb");
+	player->ID = 2;
+	player->gameID = 1;
+	player->x = 77.0;
+	player->y = 99.0;
+	player->acceleration = 0.0000001;
+	player->speed = 1.0;
+	playerlistPush(&game->playerList, &player);
 	return;
+
 //game with one player 
 
 }
