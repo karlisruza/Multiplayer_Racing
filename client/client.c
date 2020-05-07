@@ -63,8 +63,8 @@ int main(int argc, char* argv[]){
     }
     
     // //populate gamelist and then display it, and initialize navigator
+    while(true){
     requestGame(&gameList, clientFd);
-
     displayGameList(win, &gameList); //in graphics.h
 
 
@@ -173,9 +173,31 @@ int main(int argc, char* argv[]){
             drawPlayer(win, current);
             wrefresh(win);
         }
+        if(msgr->type == STOP_GAME){
+            cg_pt* payload = (cg_pt*)msgr->payload;
+            player_t* current = playerList->head;
+            while(current != NULL){
+                if(current->ID == payload->playerID){
+                    break;
+                }
+                current = current->next;
+            }
+            endScreen(win, current);
+            while(true){
+                char c = '\0';
+                read(STDIN_FILENO, &c, 1);
+                if(c == 13){
+                    break;
+                }
+            }
+            break;
+        }
     }
-
     pthread_join(thread, NULL);
+    deletePlayerList(&playerList);
+    deleteGameList(&gameList);
+    clientPlayer->gameID = 0;
+    }
 
 
     // requestGameStart(&clientPlayer, clientFd);

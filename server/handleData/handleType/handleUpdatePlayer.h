@@ -34,7 +34,7 @@ void handleUpdatePlayer(msg_t* message, gamelist_t** list, int clientFd){
     }
 
     //updates player position
-    updatePlayer(&currentPlayer, action);
+    updatePosition(&currentPlayer, action);
     //prepare message to send to all game members
     msg_t reply;
     reply.type = UPDATE_PLAYER;

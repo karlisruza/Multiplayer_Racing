@@ -94,4 +94,28 @@ void printGameList(gamelist_t** list){
     return;
 }
 
+void deleteGameList(gamelist_t** list){
+    gamelist_t* gameList = *list;
+    game_t* temp1;
+    game_t* temp2;
+    if(gameList->head == gameList->tail){
+        free(gameList->head);
+        return;
+    }
+    else{
+        temp1 = gameList->head;
+        temp2 = gameList->head->next;
+        while(temp1 != NULL){
+            if(temp1 == gameList->tail){
+                free(temp1);
+                return;
+            }
+            free(temp1);
+            temp1 = temp2;
+            temp2 = temp2->next;
+        }
+    }
+    return;
+}
+
 #endif

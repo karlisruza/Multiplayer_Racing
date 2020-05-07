@@ -159,5 +159,29 @@ char* getPlayerName(playerlist_t** list, int clientFd){
     return "Yikes";
 }
 
+void deletePlayerList(playerlist_t** list){
+    playerlist_t* playerList = *list;
+    player_t* temp1;
+    player_t* temp2;
+    if(playerList->head == playerList->tail){
+        free(playerList->head);
+        return;
+    }
+    else{
+        temp1 = playerList->head;
+        temp2 = playerList->head->next;
+        while(temp1 != NULL){
+            if(temp1 == playerList->tail){
+                free(temp1);
+                return;
+            }
+            free(temp1);
+            temp1 = temp2;
+            temp2 = temp2->next;
+        }
+    }
+    return;
+}
+
 
 #endif
