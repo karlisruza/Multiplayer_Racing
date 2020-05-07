@@ -165,6 +165,9 @@ void deletePlayerList(playerlist_t** list){
     player_t* temp2;
     if(playerList->head == playerList->tail){
         free(playerList->head);
+        playerList->head = NULL;
+        playerList->tail = NULL;
+        playerList->count = 0;
         return;
     }
     else{
@@ -173,6 +176,9 @@ void deletePlayerList(playerlist_t** list){
         while(temp1 != NULL){
             if(temp1 == playerList->tail){
                 free(temp1);
+                playerList->head = NULL;
+                playerList->tail = NULL;
+                playerList->count = 0;
                 return;
             }
             free(temp1);

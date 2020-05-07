@@ -100,6 +100,9 @@ void deleteGameList(gamelist_t** list){
     game_t* temp2;
     if(gameList->head == gameList->tail){
         free(gameList->head);
+        gameList->head = NULL;
+        gameList->tail = NULL;
+        gameList->count = 0;
         return;
     }
     else{
@@ -108,6 +111,9 @@ void deleteGameList(gamelist_t** list){
         while(temp1 != NULL){
             if(temp1 == gameList->tail){
                 free(temp1);
+                gameList->head = NULL;
+                gameList->tail = NULL;
+                gameList->count = 0;
                 return;
             }
             free(temp1);
