@@ -1,0 +1,176 @@
+==19237== Memcheck, a memory error detector
+==19237== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==19237== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==19237== Command: ./client 6666 127.0.0.1 8057
+==19237== Parent PID: 17912
+==19237== 
+==19237== Conditional jump or move depends on uninitialised value(s)
+==19237==    at 0x4C32D08: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x58A34D2: vfprintf (vfprintf.c:1643)
+==19237==    by 0x5978168: __vsnprintf_chk (vsnprintf_chk.c:63)
+==19237==    by 0x5071416: ??? (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==19237==    by 0x506C9EE: vwprintw (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==19237==    by 0x506CD24: mvwprintw (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==19237==    by 0x10C012: displayInput (graphics.h:31)
+==19237==    by 0x10D8B5: writePrompt (controls.h:49)
+==19237==    by 0x10E00E: main (client.c:56)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10D813: writePrompt (controls.h:35)
+==19237==    by 0x10E00E: main (client.c:56)
+==19237== 
+==19237== Conditional jump or move depends on uninitialised value(s)
+==19237==    at 0x10C079: displayGameList (graphics.h:42)
+==19237==    by 0x10E077: main (client.c:69)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10DFBA: main (client.c:49)
+==19237== 
+==19237== Conditional jump or move depends on uninitialised value(s)
+==19237==    at 0x10D9C4: gameListNav (controls.h:81)
+==19237==    by 0x10E0A2: main (client.c:77)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10DFBA: main (client.c:49)
+==19237== 
+==19237== Conditional jump or move depends on uninitialised value(s)
+==19237==    at 0x5069A43: wmove (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==19237==    by 0x10C293: gameListNavDraw (graphics.h:74)
+==19237==    by 0x10D9E3: gameListNav (controls.h:87)
+==19237==    by 0x10E0A2: main (client.c:77)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10DFBA: main (client.c:49)
+==19237== 
+==19237== Conditional jump or move depends on uninitialised value(s)
+==19237==    at 0x5069A4B: wmove (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==19237==    by 0x10C293: gameListNavDraw (graphics.h:74)
+==19237==    by 0x10D9E3: gameListNav (controls.h:87)
+==19237==    by 0x10E0A2: main (client.c:77)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10DFBA: main (client.c:49)
+==19237== 
+==19237== Use of uninitialised value of size 8
+==19237==    at 0x5063D53: wchgat (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==19237==    by 0x10C2B9: gameListNavDraw (graphics.h:74)
+==19237==    by 0x10D9E3: gameListNav (controls.h:87)
+==19237==    by 0x10E0A2: main (client.c:77)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10DFBA: main (client.c:49)
+==19237== 
+==19237== Use of uninitialised value of size 8
+==19237==    at 0x5063D77: wchgat (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==19237==    by 0x10C2B9: gameListNavDraw (graphics.h:74)
+==19237==    by 0x10D9E3: gameListNav (controls.h:87)
+==19237==    by 0x10E0A2: main (client.c:77)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10DFBA: main (client.c:49)
+==19237== 
+==19237== Use of uninitialised value of size 8
+==19237==    at 0x5063D90: wchgat (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==19237==    by 0x10C2B9: gameListNavDraw (graphics.h:74)
+==19237==    by 0x10D9E3: gameListNav (controls.h:87)
+==19237==    by 0x10E0A2: main (client.c:77)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10DFBA: main (client.c:49)
+==19237== 
+==19237== Use of uninitialised value of size 8
+==19237==    at 0x5063D99: wchgat (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==19237==    by 0x10C2B9: gameListNavDraw (graphics.h:74)
+==19237==    by 0x10D9E3: gameListNav (controls.h:87)
+==19237==    by 0x10E0A2: main (client.c:77)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10DFBA: main (client.c:49)
+==19237== 
+==19237== Conditional jump or move depends on uninitialised value(s)
+==19237==    at 0x1098FB: playerlistPush (player.h:58)
+==19237==    by 0x10ADC0: requestPlayer (requestPlayer.h:43)
+==19237==    by 0x10E12F: main (client.c:91)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10DFAC: main (client.c:48)
+==19237== 
+==19237== Conditional jump or move depends on uninitialised value(s)
+==19237==    at 0x10990B: playerlistPush (player.h:58)
+==19237==    by 0x10ADC0: requestPlayer (requestPlayer.h:43)
+==19237==    by 0x10E12F: main (client.c:91)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10DFAC: main (client.c:48)
+==19237== 
+==19237== Conditional jump or move depends on uninitialised value(s)
+==19237==    at 0x10C689: drawLobby (graphics.h:101)
+==19237==    by 0x10E159: main (client.c:95)
+==19237==  Uninitialised value was created by a heap allocation
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10AD4F: requestPlayer (requestPlayer.h:36)
+==19237==    by 0x10E12F: main (client.c:91)
+==19237== 
+==19237== 
+==19237== HEAP SUMMARY:
+==19237==     in use at exit: 367,579 bytes in 254 blocks
+==19237==   total heap usage: 271 allocs, 17 frees, 379,335 bytes allocated
+==19237== 
+==19237== 21 bytes in 1 blocks are definitely lost in loss record 5 of 52
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10D813: writePrompt (controls.h:35)
+==19237==    by 0x10E00E: main (client.c:56)
+==19237== 
+==19237== 132 bytes in 1 blocks are definitely lost in loss record 23 of 52
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10AB30: createGame (createGame.h:7)
+==19237==    by 0x10DAFE: gameListNav (controls.h:125)
+==19237==    by 0x10E0A2: main (client.c:77)
+==19237== 
+==19237== 132 bytes in 1 blocks are definitely lost in loss record 24 of 52
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10AEAE: joinGame (joinGame.h:19)
+==19237==    by 0x10E103: main (client.c:87)
+==19237== 
+==19237== 260 bytes in 1 blocks are definitely lost in loss record 28 of 52
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10AA20: sendName (sendName.h:12)
+==19237==    by 0x10E040: main (client.c:59)
+==19237== 
+==19237== 260 bytes in 1 blocks are definitely lost in loss record 29 of 52
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10AFF1: requestGame (requestGame.h:11)
+==19237==    by 0x10E064: main (client.c:68)
+==19237== 
+==19237== 260 bytes in 1 blocks are definitely lost in loss record 30 of 52
+==19237==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x10ACA0: requestPlayer (requestPlayer.h:18)
+==19237==    by 0x10E12F: main (client.c:91)
+==19237== 
+==19237== 272 bytes in 1 blocks are possibly lost in loss record 31 of 52
+==19237==    at 0x4C31B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x40134A6: allocate_dtv (dl-tls.c:286)
+==19237==    by 0x40134A6: _dl_allocate_tls (dl-tls.c:530)
+==19237==    by 0x4E44227: allocate_stack (allocatestack.c:627)
+==19237==    by 0x4E44227: pthread_create@@GLIBC_2.2.5 (pthread_create.c:644)
+==19237==    by 0x10E1B7: main (client.c:104)
+==19237== 
+==19237== 272 bytes in 1 blocks are possibly lost in loss record 32 of 52
+==19237==    at 0x4C31B25: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19237==    by 0x40134A6: allocate_dtv (dl-tls.c:286)
+==19237==    by 0x40134A6: _dl_allocate_tls (dl-tls.c:530)
+==19237==    by 0x4E44227: allocate_stack (allocatestack.c:627)
+==19237==    by 0x4E44227: pthread_create@@GLIBC_2.2.5 (pthread_create.c:644)
+==19237==    by 0x10E2BD: main (client.c:136)
+==19237== 
+==19237== LEAK SUMMARY:
+==19237==    definitely lost: 1,065 bytes in 6 blocks
+==19237==    indirectly lost: 0 bytes in 0 blocks
+==19237==      possibly lost: 544 bytes in 2 blocks
+==19237==    still reachable: 365,970 bytes in 246 blocks
+==19237==         suppressed: 0 bytes in 0 blocks
+==19237== Reachable blocks (those to which a pointer was found) are not shown.
+==19237== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==19237== 
+==19237== For counts of detected and suppressed errors, rerun with: -v
+==19237== ERROR SUMMARY: 464 errors from 20 contexts (suppressed: 0 from 0)

@@ -20,9 +20,8 @@ void handleStartGame(msg_t* message, gamelist_t** glist, int clientFd){
 
     player_t* currentPlayer = currentGame->playerList->head;
     while(currentPlayer != NULL){
-        if(currentPlayer->ID == clientFd){ //if just for testing
-            sendData(currentPlayer->ID, (void*)&reply, length, NULL);
-        }
+        printf("sending START_GAME to ID: %d\n", currentPlayer->ID);
+        sendData(currentPlayer->ID, (void*)&reply, length, NULL);
         currentPlayer = currentPlayer->next;
     }
 

@@ -34,7 +34,7 @@
 
 
 int main(int argc, char* argv[]){
-    // ./c 8015 10.0.2.15 8014
+    // ./c 8015 10.0.2.15 8014 [client port; server ip; server port]
     int clientFd;
     if (argc > 1){
         clientFd = clientConnect(argv[1], argv[2], argv[3]); //sets up connection
@@ -44,9 +44,9 @@ int main(int argc, char* argv[]){
         clientFd = clientConnect("8015", "127.0.0.1", "8014"); //sets up connection
     }
 
-    player_t* clientPlayer = (player_t*)malloc(sizeof(player_t));
+    player_t* clientPlayer = (player_t*)malloc(sizeof(player_t)); //this player
     playerlist_t* playerList = (playerlist_t*)malloc(sizeof(playerlist_t)); //contains all players in lobby
-    gamelist_t* gameList = (gamelist_t*)malloc(sizeof(gamelist_t));
+    gamelist_t* gameList = (gamelist_t*)malloc(sizeof(gamelist_t)); //contains games
 
     atexit(fixTerminal);			//const.h
     WINDOW* win = startGraphics();  //graphics.h- launches ncurses and screen
@@ -56,147 +56,145 @@ int main(int argc, char* argv[]){
     writePrompt(win, 3, 4, &clientPlayer); //in controls.h - displays the name you enter.
 
     if(clientPlayer->name != NULL){
-        clientPlayer->ID = sendName(clientPlayer->name, clientFd); //receives id as response from server
+        clientPlayer->ID = sendName(clientPlayer->name, clientFd); //sends name, receives id as response from server
     } 
     else{
         die("Couldn't properly send player name");
     }
     
-    // //populate gamelist and then display it, and initialize navigator
+    // main game loop
     while(true){
-    requestGame(&gameList, clientFd);
-    displayGameList(win, &gameList); //in graphics.h
+        //populate gamelist and then display it, and initialize navigator
+        requestGame(&gameList, clientFd);
+        displayGameList(win, &gameList); //in graphics.h
 
 
-    // //thread for user key input;
-    tparams_t* params = (tparams_t*)malloc(sizeof(tparams_t));
-                //via server or when create game > join game 
+        // //thread for user key input;
+        tparams_t* params = (tparams_t*)malloc(sizeof(tparams_t));
+                    //via server or when create game > join game 
 
-    	//if 0, then is host. If 1, then simply joins a game.
-    int gameListRet = gameListNav(win, &gameList, &clientPlayer, clientFd);
-    if(gameListRet == 0){
-    	params->isHost = true;
-    } else if (gameListRet == 1){
-    	params->isHost = false;
-    } else {
-        close(clientFd);
-        die("game list navigator made an error\n");
-    }
-    
-    if (joinGame(&playerList, &clientPlayer, clientFd) < 0){
-    	die("join game failed\n");
-    }
-    //start game
-    params->clientPlayer = clientPlayer;
-    params->playerList = playerList;
-    params->clientFd = clientFd;
-    
-
-    if (requestPlayer(&playerList, &clientPlayer, clientFd)<0){
-    	die("requestPlayerFailed");
-    }
-
-    drawLobby(win, &playerList, clientPlayer);   
-    char* buffer = (void*)malloc(sizeof(msg_t));
-    int length = (sizeof(msg_t));
-
-    pthread_t thread;
-    pthread_create(&thread, NULL, lobbyInput, (void*)params);
-
-    while(1){
-        //gaida incoming msgs (start game msg vai newPlayerMsg)
-        int retLen = recv(clientFd, (void*)buffer, length, 0);
-
-        if(retLen < 0){
-            printf("fail \n");
+        //if 0, then is host. If 1, then simply joins a game.
+        int gameListRet = gameListNav(win, &gameList, &clientPlayer, clientFd);
+        if(gameListRet == 0){
+            params->isHost = true;
+        } else if (gameListRet == 1){
+            params->isHost = false;
+        } else {
+            close(clientFd);
+            die("game list navigator made an error\n");
+        }
+        
+        if (joinGame(&playerList, &clientPlayer, clientFd) < 0){
+            die("join game failed\n");
         }
 
-        msg_t* msgr = (msg_t*)buffer;
-        handleData(msgr, &playerList, clientPlayer, clientFd);
+        if (requestPlayer(&playerList, &clientPlayer, clientFd)<0){
+            die("requestPlayerFailed");
+        }
 
-        if(msgr->type == PLAYER_JOINED){
-            drawLobby(win, &playerList, clientPlayer);
+        drawLobby(win, &playerList, clientPlayer);   
+        char* buffer = (void*)malloc(sizeof(msg_t));
+        int length = (sizeof(msg_t));
+
+        //lobby user input thread
+        params->clientPlayer = clientPlayer;
+        params->playerList = playerList;
+        params->clientFd = clientFd;
+        pthread_t thread;
+        pthread_create(&thread, NULL, lobbyInput, (void*)params);
+
+        //anticipates PLAYER_JOINED, PLAYER LEFT, START GAME
+        while(1){
+            //gaida incoming msgs (start game msg vai newPlayerMsg)
+            int retLen = recv(clientFd, (void*)buffer, length, 0);
+
+            if(retLen < 0){
+                printf("fail \n");
+            }
+
+            msg_t* msgr = (msg_t*)buffer;
+            handleData(msgr, &playerList, clientPlayer, clientFd);
+
+            //if player joined, then refreshes lobby
+            if(msgr->type == PLAYER_JOINED){
+                drawLobby(win, &playerList, clientPlayer);
+            } 
+            else if(msgr->type == START_GAME){ //game has started
+                break;       
+            }
         } 
-        else if(msgr->type == START_GAME){ 
-            break;       
+        pthread_cancel(thread);
+        free(params);
+
+        //Thread for sending user input
+        tparams_t* paramsTwo = (tparams_t*)malloc(sizeof(tparams_t));
+        paramsTwo->clientPlayer = clientPlayer;
+        paramsTwo->playerList = playerList;
+        paramsTwo->clientFd = clientFd;
+        pthread_t threadTwo;
+
+        if (pthread_create(&thread, NULL, carControl, (void*)paramsTwo) < 0){
+            die("failed the second thread\n");
         }
-    }
-
-    pthread_join(thread, NULL);
-    free(params);
-
-    wrefresh(win);
-
-    tparams_t* paramsTwo = (tparams_t*)malloc(sizeof(tparams_t));
-
-    paramsTwo->clientPlayer = clientPlayer;
-    paramsTwo->playerList = playerList;
-    paramsTwo->clientFd = clientFd;
-    pthread_t threadTwo;
-
-    if (pthread_create(&thread, NULL, carControl, (void*)paramsTwo) < 0){
-        die("failed the second thread\n");
-    }
-    
-    drawMap(win);
-    wrefresh(win);
-    while (thread){
-        // clientPlayer->x += 2.432;
-        // mvwprintw(win, 37, 37, "%f", clientPlayer->x);
-        // sleep(2);
-        // wrefresh(win);
-        int retLen = recv(clientFd, (void*)buffer, length, 0);
-
-        if(retLen < 0){
-            printf("fail \n");
-        }
-
-        msg_t* msgr = (msg_t*)buffer;
-        if(msgr->type == UPDATE_PLAYER){               
-            updpos_pt* playerData;
-            playerData = (updpos_pt*)msgr->payload;
-
-            //find player and update data
-            player_t* current = playerList->head;
-            while(current != NULL){
-                if(current->ID == playerData->ID){
-                    current->x = playerData->x;
-                    current->y = playerData->y;
-                    current->angle = playerData->angle;
-                    break;
-                }
-                current = current->next;
+        
+        //draws map
+        drawMap(win);
+        wrefresh(win);
+        while (thread){
+            int retLen = recv(clientFd, (void*)buffer, length, 0);
+            if(retLen < 0){
+                printf("fail \n");
             }
-            // mvwprintw(win, 37, 37, "x: %f, y:%f, a:%f ", current->x, current->y, current->angle);
-            // sleep(2);
-            // wrefresh(win);
-            drawPlayer(win, current);
-            wrefresh(win);
-        }
-        if(msgr->type == STOP_GAME){
-            cg_pt* payload = (cg_pt*)msgr->payload;
-            player_t* current = playerList->head;
-            while(current != NULL){
-                if(current->ID == payload->playerID){
-                    break;
+
+            msg_t* msgr = (msg_t*)buffer;
+            if(msgr->type == UPDATE_PLAYER){               
+                updpos_pt* playerData;
+                playerData = (updpos_pt*)msgr->payload;
+
+                //find player and update data
+                player_t* current = playerList->head;
+                while(current != NULL){
+                    if(current->ID == playerData->ID){
+                        current->x = playerData->x;
+                        current->y = playerData->y;
+                        current->angle = playerData->angle;
+                        break;
+                    }
+                    current = current->next;
                 }
-                current = current->next;
+                // mvwprintw(win, 37, 37, "x: %f, y:%f, a:%f ", current->x, current->y, current->angle);
+                // sleep(2);
+                // wrefresh(win);
+                drawPlayer(win, current);
+                wrefresh(win);
             }
-            endScreen(win, current);
-            while(true){
-                char c = '\0';
-                read(STDIN_FILENO, &c, 1);
-                if(c == 13){
-                    break;
+            if(msgr->type == STOP_GAME){//Breaks loop
+                cg_pt* payload = (cg_pt*)msgr->payload;
+                player_t* current = playerList->head;
+                //find the winner
+                while(current != NULL){
+                    if(current->ID == payload->playerID){
+                        break;
+                    }
+                    current = current->next;
                 }
+                //display endscreen with winner
+                endScreen(win, current);
+                while(true){ //press enter to return to gamelist
+                    char c = '\0';
+                    read(STDIN_FILENO, &c, 1);
+                    if(c == 13){
+                        break;
+                    }
+                }
+                break;
             }
-            break;
         }
-    }
-    pthread_join(thread, NULL);
-    deletePlayerList(&playerList);
-    deleteGameList(&gameList);
-    clientPlayer->gameID = 0;
+        pthread_join(thread, NULL);
+        //free lists and reset gameID
+        deletePlayerList(&playerList);
+        deleteGameList(&gameList);
+        clientPlayer->gameID = 0;
     }
 
 

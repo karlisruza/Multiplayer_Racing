@@ -34,6 +34,7 @@ int requestGame(gamelist_t** list, int clientFd){
         gamelistPush(&gameList, &game);
         counter++;
     }while(counter < gamecount);
+    free(buffer);
 
     return 0;
 }

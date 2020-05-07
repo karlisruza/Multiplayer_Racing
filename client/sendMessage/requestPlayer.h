@@ -43,7 +43,7 @@ int requestPlayer(playerlist_t** list, player_t** clientPlayer, int clientFd){
         playerlistPush(&playerList, &player);
         counter++;
     }while(counter < playerCount);
-
+    free(buffer);
     return 0;
 }
 

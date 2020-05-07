@@ -17,7 +17,6 @@ int handlePlayerJoined(msg_t* message, playerlist_t** list, int clientFd){
     //create new player and add to playerList
     player_t* player = (player_t*)malloc(sizeof(player_t));
     player->ID = newPlayer->ID;
-    printf("newplayerid: %d\n", player->ID);
     strcpy(player->name, newPlayer->name);
     playerlistPush(&playerList, &player);
 

@@ -7,6 +7,7 @@
 int handleStartGame(playerlist_t** list, player_t* clientPlayer, int clientFd){
     // playerlist_t* playerList = *list;
     // requestUpdatePlayer(&playerList, clientPlayer, clientFd, 0, 0);
+    printf("GAMESTART!!!\n");
     return 0;
 }
 
