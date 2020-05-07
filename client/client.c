@@ -70,8 +70,6 @@ int main(int argc, char* argv[]){
 
     // //thread for user key input;
     tparams_t* params = (tparams_t*)malloc(sizeof(tparams_t));
-    params->clientPlayer = clientPlayer;
-    params->clientFd = clientFd;
                 //via server or when create game > join game 
 
     	//if 0, then is host. If 1, then simply joins a game.
@@ -89,52 +87,70 @@ int main(int argc, char* argv[]){
     	die("join game failed\n");
     }
     //start game
-
-
-    pthread_t thread;
- 	pthread_create(&thread, NULL, lobbyInput, (void*)params);
+    params->clientPlayer = clientPlayer;
+    params->playerList = playerList;
+    params->clientFd = clientFd;
     
 
     if (requestPlayer(&playerList, &clientPlayer, clientFd)<0){
     	die("requestPlayerFailed");
     }
 
-
     drawLobby(win, &playerList, clientPlayer);   
     char* buffer = (void*)malloc(sizeof(msg_t));
     int length = (sizeof(msg_t));
 
-    int steps = 0;
-    while(1){
-        //gaida incoming msgs (start game msg vai newPlayerMsg)
-        mvwprintw(win, 30, 30, "%d - start", steps);
-        wrefresh(win);
-        int retLen = recv(clientFd, (void*)buffer, length, 0);
+    pthread_t thread;
+    pthread_create(&thread, NULL, lobbyInput, (void*)params);
 
-        if(retLen < 0){
-            printf("fail \n");
-        }
-        mvwprintw(win, 31, 31, "recv - %d", steps);
-        wrefresh(win);
+    // while(1){
+    //     //gaida incoming msgs (start game msg vai newPlayerMsg)
+    //     int retLen = recv(clientFd, (void*)buffer, length, 0);
 
-        msg_t* msgr = (msg_t*)buffer;
-        handleData(msgr, &playerList, clientPlayer, clientFd);
-        mvwprintw(win, 32, 32, "handleData-dledata - %d", steps);
-        wrefresh(win);
+    //     if(retLen < 0){
+    //         printf("fail \n");
+    //     }
 
-        if(msgr->type = PLAYER_JOINED){
-            drawLobby(win, &playerList, clientPlayer);
-            mvwprintw(win, 33, 33, "during draw lobby - %d", steps);
-            wrefresh(win);
+    //     msg_t* msgr = (msg_t*)buffer;
+    //     handleData(msgr, &playerList, clientPlayer, clientFd);
 
-        }
-		mvwprintw(win, 34, 34, "after draw lobby - %d", steps);
+    //     if(msgr->type = PLAYER_JOINED){
+    //         drawLobby(win, &playerList, clientPlayer);
 
-		wrefresh(win);
+    //     } else if (msgr->type = START_GAME){
+    //         //game start signal
+    //         //
+    //     }
+    // }
 
-		steps++;
-        sleep (1);
+    pthread_join(thread, NULL);
+    free(params);
+
+    wrefresh(win);
+
+    tparams_t* paramsTwo = (tparams_t*)malloc(sizeof(tparams_t));
+
+    paramsTwo->clientPlayer = clientPlayer;
+    paramsTwo->playerList = playerList;
+    paramsTwo->clientFd = clientFd;
+    pthread_t threadTwo;
+
+    if (pthread_create(&thread, NULL, carControl, (void*)paramsTwo) < 0){
+        die("failed the second thread\n");
     }
+
+
+    drawMap(win);
+    
+    while (thread){
+        clientPlayer->x += 2.432;
+        mvwprintw(win, 37, 37, "%f", clientPlayer->x);
+        sleep(2);
+        wrefresh(win);
+    }
+
+    pthread_join(thread, NULL);
+
 
     // requestGameStart(&clientPlayer, clientFd);
     //draw lobby

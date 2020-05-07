@@ -205,31 +205,46 @@ void *lobbyInput(void* params){
 
 
 	//new car function that is a thread
-char carControl (){
+void* carControl (void* params){
+		printf("thread launch");
+	    int clientFd = ((tparams_t*)params)->clientFd;
+	    player_t* clientPlayer = ((tparams_t*)params)->clientPlayer;
+		playerlist_t* list = ((tparams_t*)params)->playerList;
+	
 
-		char c = '\0';
-		read(STDIN_FILENO, &c, 1);
+		while (1){	
+			char c = '\0';
+			read(STDIN_FILENO, &c, 1);
 	
-	
-		switch (c)
-		{
-		    case 119: //w
-		    case 87:  //W
-			case 115: //s
-		    case 83: //S
-		    case 97: //a
-		    case 65:  //A
-		    case 100: //d
-		    case 68:  //D
-				return c;
-	    		break;
-	
-		    case 27: //esc
-				//but also send exit signal
-				return 0;	
+			switch (c){
+				    case 119: //w
+				    case 87:  //W
+				    	requestUpdatePlayer(list, clientPlayer, clientFd, 1, 0);
+				    	break;
 
-		    default:
-		    return 0;
+					case 115: //s
+				    case 83: //S
+						requestUpdatePlayer(list, clientPlayer, clientFd, -1, 0);
+				    	break;
+
+				    case 97: //a
+				    case 65:  //A
+						requestUpdatePlayer(list, clientPlayer, clientFd, 0, 1);
+				    	break;
+
+				    case 100: //d
+				    case 68:  //D
+						requestUpdatePlayer(list, clientPlayer, clientFd, 0, -1);
+				    	break;
+			
+				    case 27: //esc
+						//but also send exit signal
+						pthread_exit(NULL);		
+
+				    default:
+				    	break;
+				    	//return 0;
+			}
 		}
 }
 

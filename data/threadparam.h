@@ -14,6 +14,7 @@ typedef struct threadParam{
 
 //thread struct for client
 typedef struct tparams{
+	playerlist_t* playerList;
     player_t* clientPlayer;
     int clientFd;
     bool isHost;
