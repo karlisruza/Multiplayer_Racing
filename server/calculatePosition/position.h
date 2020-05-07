@@ -6,7 +6,7 @@
 #define ACCELERATION     0.08
 #define MAX_SPEED        0.95
 #define MAX_REV_SPEED    -0.6
-#define TURN_SPEED       0.097
+#define TURN_SPEED       0.05
 #define FRICTION         0.03
 #define MAP_HEIGHT       40
 #define MAP_WIDTH        150
@@ -86,15 +86,18 @@ void updatePosition(player_t** player, action_t action){
     float newYTail = ((*player)->y) 
         - sin(tempAngle * M_PI)
         + tempVelocity * sin(tempAngle * M_PI);
-
+        
+        (*player)->x += cos(tempAngle * M_PI)*action.y;
+        (*player)->y += sin(tempAngle * M_PI)*action.y;
+        (*player)->angle -= (TURN_SPEED * M_PI)*action.x;
 
         //if the new coordinates of the head and tail don't collide,
             //parameters get updated
     if(checkMove(newYHead, newXHead, newYTail, newXTail)){
-        (*player)->x += tempVelocity*cos(tempAngle * M_PI);
-        (*player)->y += tempVelocity*sin(tempAngle * M_PI);
-        (*player)->angle = tempAngle;
-        (*player)->speed = tempVelocity;
+        (*player)->x += cos(tempAngle * M_PI)*action.y;
+        (*player)->y += sin(tempAngle * M_PI)*action.y;
+        (*player)->angle -= (TURN_SPEED * M_PI)*action.x;
+        //(*player)->speed = tempVelocity;
     } else { //otherwise, collision detected and speed is zero. 
         (*player)-> speed = 0;
     }

@@ -152,9 +152,10 @@ int main(int argc, char* argv[]){
                 playerData = (updpos_pt*)msgr->payload;
 
                 //find player and update data
+                int iter = 1;
+
                 player_t* current = playerList->head;
                 while(current != NULL){
-                    int iter = 1;
                     removePlayerDraw(win, current, iter);
 
                     if(current->ID == playerData->ID){
@@ -168,9 +169,14 @@ int main(int argc, char* argv[]){
                     iter++;
                     current = current->next;
                 }
+
+                removePlayerDraw(win, current, iter);
+
+                drawPlayer(win, current, iter);
+
                 // mvwprintw(win, 37, 37, "x: %f, y:%f, a:%f ", current->x, current->y, current->angle);
                 // sleep(2);
-                // wrefresh(win);
+                wrefresh(win);
 
             }
             if(msgr->type == STOP_GAME){//Breaks loop

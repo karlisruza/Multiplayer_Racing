@@ -270,15 +270,13 @@ void drawPlayer(WINDOW * win, player_t* player, int iter){
 		//wattron intiates the ability to use ncurses formatting properties
 			//in this case, the car is outlined and coloured according 
 			//to the player.
-	wattron(win, A_BOLD);
-	wattron(win, COLOR_PAIR(iter+1));
+
 
 		mvwprintw(win, ty, tx, "=");
 		mvwprintw(win, my, mx, "=");
 		mvwprintw(win, hy, hx, "0");
 
-	wattroff(win, COLOR_PAIR(iter+1));
-	wattroff(win, A_BOLD);
+
 
 	wrefresh(win);
 	return;
