@@ -179,7 +179,7 @@ void *lobbyInput(void* params){
 		switch (c)
 		{
 		    case 13:  //ent
-		    	printf("enter was pressed");
+		    	// printf("enter was pressed");
 		    	if (((tparams_t*)params)->isHost){
 		    		requestGameStart(clientPlayer, clientFd);
 		    		pthread_exit(NULL);
@@ -219,22 +219,22 @@ void* carControl (void* params){
 			switch (c){
 				    case 119: //w
 				    case 87:  //W
-				    	requestUpdatePlayer(list, clientPlayer, clientFd, 1, 0);
+				    	requestUpdatePlayer(&list, clientPlayer, clientFd, 0, 1);
 				    	break;
 
 					case 115: //s
 				    case 83: //S
-						requestUpdatePlayer(list, clientPlayer, clientFd, -1, 0);
+						requestUpdatePlayer(&list, clientPlayer, clientFd, 0, -1);
 				    	break;
 
 				    case 97: //a
 				    case 65:  //A
-						requestUpdatePlayer(list, clientPlayer, clientFd, 0, 1);
+						requestUpdatePlayer(&list, clientPlayer, clientFd, 1, 0);
 				    	break;
 
 				    case 100: //d
 				    case 68:  //D
-						requestUpdatePlayer(list, clientPlayer, clientFd, 0, -1);
+						requestUpdatePlayer(&list, clientPlayer, clientFd, -1, 0);
 				    	break;
 			
 				    case 27: //esc

@@ -1,22 +1,10 @@
 
+#include "../../calculatePosition/position.h"
+
 #ifndef HANDLESUPDATEPLAYER_H_INCLUDED
 #define HANDLESUPDATEPLAYER_H_INCLUDED
 
-void updatePlayer(player_t** player, action_t action){
-    if(action.x == 1){ //Turn right
-        return;
-    }
-    else if(action.x == -1){//Turn left
-        return;
-    }
-    if(action.y == 1){//move forward
-        return;
-    }
-    else if(action.y == -1){//move backward{
-        return;
-    }
-    return;
-}
+
 
 void handleUpdatePlayer(msg_t* message, gamelist_t** list, int clientFd){
     gamelist_t* gameList = *list;

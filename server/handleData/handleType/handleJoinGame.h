@@ -40,14 +40,15 @@ void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, in
 
     //remove from playerList and push in to the games playerlist
     player_t* current = playerList->head;
+    int counter = 0;
     while(current != NULL){
         if(current->ID == clientFd){
             removePlayer(&playerList, clientFd);
             playerlistPush(&(currentGame)->playerList, &current);
             current->gameID = currentGame->gameid;
-            current->x = 20;
-            current->y = 40;
-            current->angle = 77;
+            current->x = 75;
+            current->y = 32 + counter * 2;
+            current->angle = 6.283;
             current->speed = 88;
             current->acceleration = 0;
             break;
@@ -57,6 +58,7 @@ void handleJoinGame(msg_t* message, gamelist_t** glist, playerlist_t** plist, in
             return;
         }
         current = current->next;
+        counter++;
     }
     printGame(currentGame);
 

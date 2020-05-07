@@ -249,7 +249,6 @@ WINDOW* startGraphics (){
 
 	//Places symbols after each completion of the moveCar function and rotateCar functions
 void drawCar(WINDOW* win, struct car** player){
-
 		//creates the int value for the car head
 	int hx = round(((*player)->mid->x) + 1*cos((*player)->angle * M_PI));
 	int hy = round(((*player)->mid->y) + 1*sin((*player)->angle * M_PI));
@@ -261,6 +260,35 @@ void drawCar(WINDOW* win, struct car** player){
 		//creates the int value for the car tail
 	int tx = round(((*player)->mid->x) - 1*cos((*player)->angle * M_PI));
 	int ty = round(((*player)->mid->y) - 1*sin((*player)->angle * M_PI));
+
+
+		
+		//wattron intiates the ability to use ncurses formatting properties
+			//in this case, the car is outlined and coloured according 
+			//to the player.
+	wattron(win, A_BOLD);
+	wattron(win, PLAYER_ONE_COLOR);
+
+		mvwprintw(win, ty, tx, "=");
+		mvwprintw(win, my, mx, "=");
+		mvwprintw(win, hy, hx, "0");
+
+	wattroff(win, PLAYER_ONE_COLOR);
+	wattroff(win, A_BOLD);
+}
+
+void drawPlayer(WINDOW* win, player_t* player){
+	//creates the int value for the car head
+	int hx = round((player->x) + 1*cos(player->angle * M_PI));
+	int hy = round((player->y) + 1*sin(player->angle * M_PI));
+	
+	//creates the int value for the car middle
+	int mx = round(player->x);
+	int my = round(player->y);
+
+	//creates the int value for the car tail
+	int tx = round((player->x) - 1*cos(player->angle * M_PI));
+	int ty = round((player->y) - 1*sin(player->angle * M_PI));
 
 
 		

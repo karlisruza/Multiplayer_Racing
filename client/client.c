@@ -103,25 +103,24 @@ int main(int argc, char* argv[]){
     pthread_t thread;
     pthread_create(&thread, NULL, lobbyInput, (void*)params);
 
-    // while(1){
-    //     //gaida incoming msgs (start game msg vai newPlayerMsg)
-    //     int retLen = recv(clientFd, (void*)buffer, length, 0);
+    while(1){
+        //gaida incoming msgs (start game msg vai newPlayerMsg)
+        int retLen = recv(clientFd, (void*)buffer, length, 0);
 
-    //     if(retLen < 0){
-    //         printf("fail \n");
-    //     }
+        if(retLen < 0){
+            printf("fail \n");
+        }
 
-    //     msg_t* msgr = (msg_t*)buffer;
-    //     handleData(msgr, &playerList, clientPlayer, clientFd);
+        msg_t* msgr = (msg_t*)buffer;
+        handleData(msgr, &playerList, clientPlayer, clientFd);
 
-    //     if(msgr->type = PLAYER_JOINED){
-    //         drawLobby(win, &playerList, clientPlayer);
-
-    //     } else if (msgr->type = START_GAME){
-    //         //game start signal
-    //         //
-    //     }
-    // }
+        if(msgr->type == PLAYER_JOINED){
+            drawLobby(win, &playerList, clientPlayer);
+        } 
+        else if(msgr->type == START_GAME){ 
+            break;       
+        }
+    }
 
     pthread_join(thread, NULL);
     free(params);
@@ -138,15 +137,42 @@ int main(int argc, char* argv[]){
     if (pthread_create(&thread, NULL, carControl, (void*)paramsTwo) < 0){
         die("failed the second thread\n");
     }
-
-
-    drawMap(win);
     
+    drawMap(win);
+    wrefresh(win);
     while (thread){
-        clientPlayer->x += 2.432;
-        mvwprintw(win, 37, 37, "%f", clientPlayer->x);
-        sleep(2);
-        wrefresh(win);
+        // clientPlayer->x += 2.432;
+        // mvwprintw(win, 37, 37, "%f", clientPlayer->x);
+        // sleep(2);
+        // wrefresh(win);
+        int retLen = recv(clientFd, (void*)buffer, length, 0);
+
+        if(retLen < 0){
+            printf("fail \n");
+        }
+
+        msg_t* msgr = (msg_t*)buffer;
+        if(msgr->type == UPDATE_PLAYER){               
+            updpos_pt* playerData;
+            playerData = (updpos_pt*)msgr->payload;
+
+            //find player and update data
+            player_t* current = playerList->head;
+            while(current != NULL){
+                if(current->ID == playerData->ID){
+                    current->x = playerData->x;
+                    current->y = playerData->y;
+                    current->angle = playerData->angle;
+                    break;
+                }
+                current = current->next;
+            }
+            // mvwprintw(win, 37, 37, "x: %f, y:%f, a:%f ", current->x, current->y, current->angle);
+            // sleep(2);
+            // wrefresh(win);
+            drawPlayer(win, current);
+            wrefresh(win);
+        }
     }
 
     pthread_join(thread, NULL);

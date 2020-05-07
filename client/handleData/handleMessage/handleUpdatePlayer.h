@@ -5,7 +5,6 @@ int handleUpdatePlayer(msg_t* message, playerlist_t** list){
     playerlist_t* playerList = *list;
     updpos_pt* playerData;
     playerData = (updpos_pt*)message->payload;
-    printf("playerdata x: %f\n", playerData->x);
 
     //find player and update data
     player_t* current = playerList->head;
